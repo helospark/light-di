@@ -1,0 +1,53 @@
+= LightDI
+
+*Fast, lightweight, Spring like, annotation driven dependency injection framework.*
+
+Designed specifically for small applications, that has to have small memory footprint, small jar size and fast startup time, for example plugins, (embedded) standalone application, integration tests, jobs etc.
+
+== Features
+
+Similar to Spring annotation-support.
+ - Classpath scanning for beans
+ - Stereotype annotations to create a bean `@Component`, `@Service`
+ - `@Autowired` can be applied to constructor, fields, setters to automatically set dependency
+ - `@Value` can be applied to constructors, fields, setters to get value from property file
+ - `@PropertySource` annotation can be set to components to load property files
+ - `@PostConstruct/@PreDestroy` annotations can be applied to methods to run post construct and pre destroy respectively
+ - By default all beans are lazily initialized
+ - Fast startup time, small memory footprint (see performance section (soon))
+
+== Usage
+
+Annotate beans with above annotations
+
+[source,java]
+    LightDiContext context = lightDi.initContextByPackage(ConstructorDependency.class.getPackage().getName());
+    SomeClass someClass = context.getBean(SomeClass.class);
+    someClass.doSomething();
+[source]
+
+_SomeClass (and all of it's dependencies) has to be annotated with @Component._
+
+If you started a project with LightDI, but realize, that you will need more features that LightDI won't provide, you should be able to move to Spring relatively simply. It could be done by replacing annotation package names, and change the class that creates the context.
+
+If you started a project in Spring, and only used DI features, moving to LightDI should also be fairly straightforward, following the above steps in reverse. Therefore you could get a more lightweight application.
+
+== Performance
+
+_Statistics coming soon_
+
+== Limitation
+
+LightDI was designed to be much more lightweight than Spring, it also has many of Spring's feature lacking.
+
+_List of these soon_ 
+
+== Why another DI framework
+
+This framework shamelessly copied the the usage and idea from Spring framework, even down to annotation names. So why I have not just used Spring instead?
+
+While Spring is great, but even with absolute minimal number of dependencies has a large size (in jars), it also takes long to start it up (ex. lazy context creation and startup cannot be achieved on first usage, since it is very expensive to start the context), also has fairly large memory footprint that is not good for embedded applications.
+
+For several of my smaller project I found, that just the (Spring) DI framework used up more space in my jars, than all other dependencies (including my code) together.
+
+There are already large number of other DI frameworks out there, but I have not been able to find another DI framework, that has classpath scanning, annotations support combined with fast startup time, low memory footprint, therefore the idea of LightDI was born.

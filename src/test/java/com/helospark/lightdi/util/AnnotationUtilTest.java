@@ -1,0 +1,34 @@
+package com.helospark.lightdi.util;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.Test;
+
+import com.helospark.lightdi.annotation.PostConstruct;
+
+public class AnnotationUtilTest {
+
+    @Test
+    public void testGetMethodsAnnotatedWith() throws NoSuchMethodException, SecurityException {
+        // GIVEN
+
+        // WHEN
+        List<Method> result = AnnotationUtil.getMethodsWithAnnotation(TestClassWithAnnotation.class,
+                PostConstruct.class);
+
+        // THEN
+        assertThat(result, is(Collections.singletonList(TestClassWithAnnotation.class.getMethod("annotatedMethod"))));
+    }
+
+    static class TestClassWithAnnotation {
+        @PostConstruct
+        public void annotatedMethod() {
+
+        }
+    }
+}
