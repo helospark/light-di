@@ -12,4 +12,10 @@ public class PropertySourceHolder {
     public String resolveProperty(String name) {
         return properties.get(name);
     }
+
+    @Override
+    public String toString() {
+        return "PropertySourceHolder [properties=" + properties + "]";
+    }
+
 }

@@ -100,6 +100,13 @@ public class DependencyDescriptor implements InjectionDescriptor {
         return preDestroyMethods;
     }
 
+    @Override
+    public String toString() {
+        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", isPrimary=" + isPrimary
+                + ", postConstructMethods=" + postConstructMethods
+                + ", preDestroyMethods=" + preDestroyMethods + "]";
+    }
+
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();

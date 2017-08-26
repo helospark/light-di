@@ -2,6 +2,9 @@ package com.helospark.lightdi;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
 import com.helospark.lightdi.dependencywire.WiringProcessingService;
@@ -12,6 +15,7 @@ import com.helospark.lightdi.properties.ValueResolverFactory;
 import com.helospark.lightdi.scanner.LightDiClasspathScanner;
 
 public class LightDi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
     private BeanFactory beanFactory;
     private WiringProcessingService preprocessWiringService;
     private BeanDefinitionCollector beanDefinitionCollector;
@@ -40,18 +44,18 @@ public class LightDi {
     private LightDiContext initInternal(String packageName) {
         List<String> classes = lightDiClasspathScanner.scanClasspathForBeanClassNames(packageName);
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Following classes are annotated for LightDI: " + classes);
+        }
+
         try {
-            // phase 1
             List<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector
                     .collectDependencyDescriptors(classes);
-
-            // phase 2
             preprocessWiringService.wireTogetherDependencies(dependencyDescriptors);
-
-            // Properties phase
             ValueResolver valueResolver = valueResolverFactory.createValueResolver(dependencyDescriptors);
 
-            // phase 3
+            LOGGER.info("Context initialized ");
+
             return new LightDiContext(dependencyDescriptors, valueResolver, beanFactory);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helospark.lightdi.annotation.PropertySource;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
 public class ValueResolverFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValueResolverFactory.class);
     private PropertiesFileLoader propertiesFileLoader;
 
     public ValueResolverFactory() {
@@ -20,6 +24,10 @@ public class ValueResolverFactory {
                 .filter(descriptor -> doesHavePropertySource(descriptor))
                 .flatMap(descriptor -> createPropertySourceResolver(descriptor))
                 .collect(Collectors.toList());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Properties are loaded: " + propertySourceHolders);
+        }
 
         PropertyValueResolver propertyValueResolver = new PropertyValueResolver(propertySourceHolders);
         PropertyStringResolver propertyStringResolver = new PropertyStringResolver(propertyValueResolver);

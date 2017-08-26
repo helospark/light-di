@@ -32,7 +32,7 @@ public class ContextLoadIT {
         // GIVEN
 
         // WHEN
-        ConstructorDependency component = context.getOrCreateBean(ConstructorDependency.class);
+        ConstructorDependency component = context.getBean(ConstructorDependency.class);
 
         // THEN
         assertNotNull(component);
@@ -44,7 +44,7 @@ public class ContextLoadIT {
         // GIVEN
 
         // WHEN
-        ServiceAnnotatedComponent component = context.getOrCreateBean(ServiceAnnotatedComponent.class);
+        ServiceAnnotatedComponent component = context.getBean(ServiceAnnotatedComponent.class);
 
         // THEN
         assertNotNull(component);
@@ -56,7 +56,7 @@ public class ContextLoadIT {
 
         // WHEN
         SetterDependency component = context
-                .getOrCreateBean(SetterDependency.class);
+                .getBean(SetterDependency.class);
 
         // THEN
         assertNotNull(component);
@@ -68,7 +68,7 @@ public class ContextLoadIT {
         // GIVEN
 
         // WHEN
-        FieldDependency component = context.getOrCreateBean(FieldDependency.class);
+        FieldDependency component = context.getBean(FieldDependency.class);
 
         // THEN
         assertNotNull(component);
@@ -81,7 +81,7 @@ public class ContextLoadIT {
 
         // WHEN
         ComponentWithConstructorValue component = context
-                .getOrCreateBean(ComponentWithConstructorValue.class);
+                .getBean(ComponentWithConstructorValue.class);
 
         // THEN
         assertThat(component.getValue(), is("asd"));
@@ -93,7 +93,7 @@ public class ContextLoadIT {
 
         // WHEN
         ComponentWithSetterValue component = context
-                .getOrCreateBean(ComponentWithSetterValue.class);
+                .getBean(ComponentWithSetterValue.class);
 
         // THEN
         assertThat(component.getValue(), is("asd=asd"));
@@ -105,7 +105,7 @@ public class ContextLoadIT {
 
         // WHEN
         ComponentWithFieldValue component = context
-                .getOrCreateBean(ComponentWithFieldValue.class);
+                .getBean(ComponentWithFieldValue.class);
 
         // THEN
         assertThat(component.getValue(), is("value=asd"));
@@ -117,7 +117,7 @@ public class ContextLoadIT {
 
         // WHEN
         ComponentWithPostConstruct component = context
-                .getOrCreateBean(ComponentWithPostConstruct.class);
+                .getBean(ComponentWithPostConstruct.class);
 
         // THEN
         assertThat(component.getFieldFilledInPostConstruct(), is("ok"));

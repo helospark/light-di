@@ -11,6 +11,6 @@ public class DependencyGetter {
                 .withClazz(dependencyDescriptor.getClazz())
                 .withQualifier(dependencyDescriptor.getQualifier())
                 .build();
-        return lightDiContext.getOrCreateBean(query);
+        return lightDiContext.getBean(query);
     }
 }

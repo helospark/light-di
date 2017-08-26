@@ -1,17 +1,24 @@
 package com.helospark.lightdi;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.properties.ValueResolver;
 
-public class LightDiContext {
+public class LightDiContext implements AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LightDiContext.class);
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
     private BeanFactory beanFactory;
     private ValueResolver valueResolver;
@@ -25,24 +32,24 @@ public class LightDiContext {
         this.valueResolver = valueResolver;
     }
 
-    public <T> T getOrCreateBean(Class<T> clazz) {
+    public <T> T getBean(Class<T> clazz) {
         DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
                 .withClazz(clazz)
                 .build();
         return (T) getOrCreateDependencyInternal(query);
     }
 
+    public Object getBean(DependencyDescriptorQuery query) {
+        return getOrCreateDependencyInternal(query);
+    }
+
     public ValueResolver getValueResolver() {
         return valueResolver;
     }
 
-    public Object getOrCreateBean(DependencyDescriptorQuery query) {
-        return getOrCreateDependencyInternal(query);
-    }
-
     public void eagerInitAllBeans() {
         dependencyDescriptors.stream()
-                .forEach(dependencyDescriptor -> getOrCreateBean(convertToQuery(dependencyDescriptor)));
+                .forEach(dependencyDescriptor -> getBean(convertToQuery(dependencyDescriptor)));
     }
 
     private Object getOrCreateDependencyInternal(DependencyDescriptorQuery query) {
@@ -103,7 +110,7 @@ public class LightDiContext {
         List<Object> result = dependencyDescriptors.stream()
                 .filter(descriptor -> clazz.isAssignableFrom(descriptor.getClazz()))
                 .map(descriptor -> convertToQuery(descriptor))
-                .map(descriptor -> this.getOrCreateBean(descriptor))
+                .map(descriptor -> this.getBean(descriptor))
                 .collect(Collectors.toList());
         return (List<T>) result;
 
@@ -114,5 +121,27 @@ public class LightDiContext {
                 .withClazz(descriptor.getClazz())
                 .withQualifier(descriptor.getQualifier())
                 .build();
+    }
+
+    @Override
+    public void close() throws Exception {
+        initializedSingletonBeans.entrySet()
+                .stream()
+                .forEach(entry -> closeDependency(entry));
+    }
+
+    private void closeDependency(Entry<DependencyDescriptor, Object> entry) {
+        entry.getKey()
+                .getPreDestroyMethods()
+                .stream()
+                .forEach(preDestoryMethod -> invokeMethod(preDestoryMethod, entry.getValue()));
+    }
+
+    private void invokeMethod(Method preDestoryMethod, Object object) {
+        try {
+            preDestoryMethod.invoke(object);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            LOGGER.error("Exception thrown while calling preDestroy method", e);
+        }
     }
 }
