@@ -7,14 +7,15 @@ Designed specifically for small applications, that has to have small memory foot
 == Features
 
 Similar to Spring annotation-support.
- * Classpath scanning for beans
- * Stereotype annotations to create a bean `@Component`, `@Service`
- * `@Autowired` can be applied to constructor, fields, setters to automatically set dependency
- * `@Value` can be applied to constructors, fields, setters to get value from property file
- * `@PropertySource` annotation can be set to components to load property files
- * `@PostConstruct/@PreDestroy` annotations can be applied to methods to run post construct and pre destroy respectively
- * By default all beans are lazily initialized
- * Fast startup time, small memory footprint (see performance section (soon))
+
+* Classpath scanning for beans
+* Stereotype annotations to create a bean `@Component`, `@Service`
+* `@Autowired` can be applied to constructor, fields, setters to automatically set dependency
+* `@Value` can be applied to constructors, fields, setters to get value from property file
+* `@PropertySource` annotation can be set to components to load property files
+* `@PostConstruct/@PreDestroy` annotations can be applied to methods to run post construct and pre destroy respectively
+* By default all beans are lazily initialized
+* Fast startup time, small memory footprint (see performance section (soon))
 
 == Usage
 
