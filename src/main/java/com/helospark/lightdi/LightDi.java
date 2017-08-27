@@ -5,11 +5,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
 import com.helospark.lightdi.dependencywire.WiringProcessingService;
 import com.helospark.lightdi.dependencywire.WiringProcessingServiceFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
+import com.helospark.lightdi.exception.ContextInitializationFailedException;
 import com.helospark.lightdi.properties.ValueResolver;
 import com.helospark.lightdi.properties.ValueResolverFactory;
 import com.helospark.lightdi.scanner.LightDiClasspathScanner;
@@ -17,7 +19,7 @@ import com.helospark.lightdi.scanner.LightDiClasspathScanner;
 public class LightDi {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
     private BeanFactory beanFactory;
-    private WiringProcessingService preprocessWiringService;
+    private WiringProcessingService wiringProcessingService;
     private BeanDefinitionCollector beanDefinitionCollector;
     private ValueResolverFactory valueResolverFactory;
     private LightDiClasspathScanner lightDiClasspathScanner;
@@ -32,7 +34,7 @@ public class LightDi {
         beanFactory = beanFactoryFactory.createBeanFactory();
 
         WiringProcessingServiceFactory preprocessWireServiceFactory = new WiringProcessingServiceFactory();
-        preprocessWiringService = preprocessWireServiceFactory.createFieldWireSupport();
+        wiringProcessingService = preprocessWireServiceFactory.createFieldWireSupport();
 
         valueResolverFactory = new ValueResolverFactory();
     }
@@ -42,23 +44,23 @@ public class LightDi {
     }
 
     private LightDiContext initInternal(String packageName) {
-        List<String> classes = lightDiClasspathScanner.scanClasspathForBeanClassNames(packageName);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Following classes are annotated for LightDI: " + classes);
-        }
-
         try {
+            List<String> classes = lightDiClasspathScanner.scanClasspathForBeanClassNames(packageName);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Following classes are annotated for LightDI: " + classes);
+            }
+
             List<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector
                     .collectDependencyDescriptors(classes);
-            preprocessWiringService.wireTogetherDependencies(dependencyDescriptors);
+            wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
             ValueResolver valueResolver = valueResolverFactory.createValueResolver(dependencyDescriptors);
 
-            LOGGER.info("Context initialized ");
+            LOGGER.info("Context initialized");
 
             return new LightDiContext(dependencyDescriptors, valueResolver, beanFactory);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ContextInitializationFailedException("Context initialization failed", e);
         }
     }
 

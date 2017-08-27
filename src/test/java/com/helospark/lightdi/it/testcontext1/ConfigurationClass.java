@@ -10,4 +10,14 @@ public class ConfigurationClass {
     public NonAnnotatedClass createNonAnnotatedClass() {
         return new NonAnnotatedClass();
     }
+
+    @Bean
+    public OtherNonAnnotatedClass createNonAnnotatedClassWithDependency(TestDependency dependency) {
+        return new OtherNonAnnotatedClass(dependency);
+    }
+
+    @Bean("otherQualifiedBean")
+    public QualifiedBean otherQualifiedBean() {
+        return new QualifiedBean();
+    }
 }

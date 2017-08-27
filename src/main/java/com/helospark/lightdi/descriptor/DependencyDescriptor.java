@@ -58,4 +58,14 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
                 + ", preDestroyMethods=" + preDestroyMethods + "]";
     }
 
+    public boolean doesMatch(DependencyDescriptorQuery toFind) {
+        boolean classMatch = toFind.getClazz()
+                .map(clazz -> clazz.isAssignableFrom(this.getClazz()))
+                .orElse(true);
+        boolean qualifierMatch = toFind.getQualifier()
+                .map(toFindQualifier -> this.getQualifier().equals(toFindQualifier))
+                .orElse(true);
+        return classMatch && qualifierMatch;
+    }
+
 }

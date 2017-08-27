@@ -49,6 +49,12 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         this.methodDescriptor = methodDescriptor;
     }
 
+    @Override
+    public String toString() {
+        return "BeanDependencyDescriptor [configurationDescriptor=" + configurationDescriptor + ", method=" + method
+                + ", methodDescriptor=" + methodDescriptor + ", toString()=" + super.toString() + "]";
+    }
+
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();

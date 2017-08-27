@@ -1,6 +1,8 @@
 package com.helospark.lightdi.it;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -12,11 +14,14 @@ import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.it.testcontext1.ComponentWithConstructorValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithFieldValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithPostConstruct;
+import com.helospark.lightdi.it.testcontext1.ComponentWithQualifiedDependency;
 import com.helospark.lightdi.it.testcontext1.ComponentWithSetterValue;
 import com.helospark.lightdi.it.testcontext1.ConfigurationClass;
 import com.helospark.lightdi.it.testcontext1.ConstructorDependency;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
+import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
+import com.helospark.lightdi.it.testcontext1.QualifiedBean;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
 import com.helospark.lightdi.it.testcontext1.SetterDependency;
 
@@ -136,5 +141,44 @@ public class ContextLoadIT {
         // THEN
         assertNotNull(configurationClass);
         assertNotNull(nonAnnotatedClass);
+    }
+
+    @Test
+    public void testConfigurationClassShouldWorkWithDependency() {
+        // GIVEN
+
+        // WHEN
+        OtherNonAnnotatedClass otherNonAnnotatedClass = context.getBean(OtherNonAnnotatedClass.class);
+
+        // THEN
+        assertNotNull(otherNonAnnotatedClass);
+        assertNotNull(otherNonAnnotatedClass.getDependency());
+    }
+
+    @Test
+    public void testQualifiedBeanShouldWork() {
+        // GIVEN
+
+        // WHEN
+        QualifiedBean qualifiedBean = (QualifiedBean) context.getBean("myQualifiedBean");
+        QualifiedBean otherQualifiedBean = (QualifiedBean) context.getBean("otherQualifiedBean");
+
+        // THEN
+        assertNotNull(qualifiedBean);
+        assertNotNull(otherQualifiedBean);
+        assertNotEquals(qualifiedBean, otherQualifiedBean);
+    }
+
+    @Test
+    public void testQualifiedDependencyShouldWork() {
+        // GIVEN
+
+        // WHEN
+        ComponentWithQualifiedDependency qualifiedBean = context.getBean(ComponentWithQualifiedDependency.class);
+        QualifiedBean otherQualifiedBean = (QualifiedBean) context.getBean("myQualifiedBean");
+
+        // THEN
+        assertNotNull(qualifiedBean);
+        assertEquals(qualifiedBean.getQualifiedBean(), otherQualifiedBean);
     }
 }

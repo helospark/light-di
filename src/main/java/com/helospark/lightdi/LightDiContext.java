@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.properties.ValueResolver;
@@ -45,6 +46,13 @@ public class LightDiContext implements AutoCloseable {
 
     public Object getBean(DependencyDescriptor query) {
         return getOrCreateDependencyInternal(convertToQuery(query));
+    }
+
+    public Object getBean(String qualifier) {
+        DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
+                .withQualifier(qualifier)
+                .build();
+        return getOrCreateDependencyInternal(query);
     }
 
     public ValueResolver getValueResolver() {
@@ -89,7 +97,7 @@ public class LightDiContext implements AutoCloseable {
             DependencyDescriptorQuery toFind) {
         return dependencies
                 .stream()
-                .filter(dependencyEntry -> isDependencyMatch(dependencyEntry, toFind))
+                .filter(dependencyEntry -> dependencyEntry.doesMatch(toFind))
                 .collect(Collectors.toList());
     }
 
@@ -98,15 +106,6 @@ public class LightDiContext implements AutoCloseable {
         return foundDependencies.stream()
                 .filter(dependency -> dependency.isPrimary())
                 .findFirst();
-    }
-
-    private boolean isDependencyMatch(DependencyDescriptor dependencyDescriptor,
-            DependencyDescriptorQuery toFind) {
-        boolean classMatch = dependencyDescriptor.getClazz().equals(toFind.getClazz());
-        boolean qualifierMatch = toFind.getQualifier()
-                .map(toFindQualifier -> dependencyDescriptor.getQualifier().equals(toFindQualifier))
-                .orElse(true);
-        return classMatch && qualifierMatch;
     }
 
     @SuppressWarnings("unchecked")
@@ -148,4 +147,5 @@ public class LightDiContext implements AutoCloseable {
             LOGGER.error("Exception thrown while calling preDestroy method", e);
         }
     }
+
 }

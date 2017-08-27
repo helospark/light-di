@@ -1,20 +1,22 @@
 package com.helospark.lightdi.descriptor;
 
+import static java.util.Optional.ofNullable;
+
 import java.util.Optional;
 
 import javax.annotation.Generated;
 
 public class DependencyDescriptorQuery {
-    private Class<?> clazz;
+    private Optional<Class<?>> clazz;
     private Optional<String> qualifier;
 
     @Generated("SparkTools")
     private DependencyDescriptorQuery(Builder builder) {
-        this.clazz = builder.clazz;
-        this.qualifier = Optional.ofNullable(builder.qualifier);
+        this.clazz = ofNullable(builder.clazz);
+        this.qualifier = ofNullable(builder.qualifier);
     }
 
-    public Class<?> getClazz() {
+    public Optional<Class<?>> getClazz() {
         return clazz;
     }
 
@@ -22,18 +24,16 @@ public class DependencyDescriptorQuery {
         return qualifier;
     }
 
-    /**
-     * Creates builder to build {@link DependencyDescriptorQuery}.
-     * @return created builder
-     */
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Builder to build {@link DependencyDescriptorQuery}.
-     */
+    @Override
+    public String toString() {
+        return "DependencyDescriptorQuery [clazz=" + clazz + ", qualifier=" + qualifier + "]";
+    }
+
     @Generated("SparkTools")
     public static final class Builder {
         private Class<?> clazz;

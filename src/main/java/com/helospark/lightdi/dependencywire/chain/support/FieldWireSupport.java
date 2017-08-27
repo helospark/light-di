@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.annotation.Qualifier;
 import com.helospark.lightdi.annotation.Value;
 import com.helospark.lightdi.dependencywire.FindInDependencySupport;
 import com.helospark.lightdi.dependencywire.PropertyDescriptorFactory;
@@ -41,20 +42,32 @@ public class FieldWireSupport {
                 .collect(Collectors.toList());
 
         for (Field field : fields) {
-            Class<?> fieldType = field.getType();
-            DependencyDescriptorQuery query = DependencyDescriptorQuery
-                    .builder()
-                    .withClazz(fieldType)
-                    .build();
-            DependencyDescriptor dependencyDescriptor = findInDependencySupport.findOrThrow(dependencyDescriptors,
-                    query);
+            DependencyDescriptorQuery query = createDependencyDescriptorQuery(field);
+            DependencyDescriptor dependencyDescriptor = findInDependencySupport.findOrThrow(dependencyDescriptors, query);
             result.add(FieldDescriptor.builder()
                     .withField(field)
-                    .withFieldName(field.getName())
                     .withInjectionDescriptor(dependencyDescriptor)
                     .build());
         }
         return result;
+    }
+
+    private DependencyDescriptorQuery createDependencyDescriptorQuery(Field field) {
+        Class<?> fieldType = field.getType();
+        DependencyDescriptorQuery query = DependencyDescriptorQuery
+                .builder()
+                .withClazz(fieldType)
+                .withQualifier(extractQualifierOrNull(field))
+                .build();
+        return query;
+    }
+
+    private String extractQualifierOrNull(Field field) {
+        Qualifier[] qualifierAnnotation = field.getAnnotationsByType(Qualifier.class);
+        if (qualifierAnnotation.length > 0) {
+            return qualifierAnnotation[0].value();
+        }
+        return null;
     }
 
     private List<FieldDescriptor> collectValueFields(Class<?> clazz,
@@ -67,7 +80,6 @@ public class FieldWireSupport {
         for (Field field : fields) {
             result.add(FieldDescriptor.builder()
                     .withField(field)
-                    .withFieldName(field.getName())
                     .withInjectionDescriptor(propertyDescriptorFactory.buildPropertyDescriptor(field))
                     .build());
         }

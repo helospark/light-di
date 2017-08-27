@@ -1,6 +1,8 @@
 package com.helospark.lightdi.definitioncollector;
 
 import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
+import static com.helospark.lightdi.util.BeanNameGenerator.createBeanNameForStereotypeAnnotatedClass;
+import static com.helospark.lightdi.util.BeanNameGenerator.createQualifierForMethodAnnotatedWithBean;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
     private StereotypeDependencyDescriptor createConfigurationBeanDescriptor(Class<?> clazz) {
         return StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
+                .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
                 .build();
     }
 
@@ -46,6 +49,7 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
         return BeanDependencyDescriptor.builder()
                 .withClazz(returnType)
                 .withMethod(method)
+                .withQualifier(createQualifierForMethodAnnotatedWithBean(method))
                 .withConfigurationDescriptor(configurationDescriptor)
                 .build();
     }

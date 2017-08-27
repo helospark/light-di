@@ -11,16 +11,11 @@ public class FindInDependencySupport {
     public DependencyDescriptor findOrThrow(List<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptorQuery query) {
         List<DependencyDescriptor> found = dependencyDescriptors.stream()
-                .filter(descriptor -> isMatch(descriptor, query))
+                .filter(descriptor -> descriptor.doesMatch(query))
                 .collect(Collectors.toList());
         if (found.size() != 1) {
-            throw new IllegalArgumentException("No single match " + found);
+            throw new IllegalArgumentException("No single match for " + query + " found: " + found);
         }
         return found.get(0);
-    }
-
-    private boolean isMatch(DependencyDescriptor descriptor, DependencyDescriptorQuery query) {
-        return descriptor.getClazz().equals(query.getClazz())
-                && query.getQualifier().map(a -> a.equals(descriptor.getQualifier())).orElse(true);
     }
 }

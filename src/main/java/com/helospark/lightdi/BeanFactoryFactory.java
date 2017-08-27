@@ -1,7 +1,12 @@
 package com.helospark.lightdi;
 
+import static java.util.Arrays.asList;
+
 import java.util.Arrays;
 
+import com.helospark.lightdi.beanfactory.BeanFactory;
+import com.helospark.lightdi.beanfactory.chain.ConfigurationBeanFacotoryChainItem;
+import com.helospark.lightdi.beanfactory.chain.StereotypeAnnotatedBeanFactoryChainItem;
 import com.helospark.lightdi.reflection.ConstructorInvoker;
 import com.helospark.lightdi.reflection.FieldSetInvoker;
 import com.helospark.lightdi.reflection.MethodInvoker;
@@ -27,12 +32,11 @@ public class BeanFactoryFactory {
 
         PostConstructInvoker postConstructInvoker = new PostConstructInvoker();
 
-        return BeanFactory.builder()
-                .withConstructorInvoker(constructorInvoker)
-                .withFieldSetInvoker(fieldSetInvoker)
-                .withMethodInvoker(methodInvoker)
-                .withPostConstructInvoker(postConstructInvoker)
-                .withSetterInvoker(setterInvoker)
-                .build();
+        StereotypeAnnotatedBeanFactoryChainItem stereotypeAnnotatedBeanFactoryChainItem = new StereotypeAnnotatedBeanFactoryChainItem(
+                constructorInvoker, setterInvoker, fieldSetInvoker, postConstructInvoker);
+        ConfigurationBeanFacotoryChainItem configurationBeanFacotoryChainItem = new ConfigurationBeanFacotoryChainItem(
+                methodInvoker);
+
+        return new BeanFactory(asList(stereotypeAnnotatedBeanFactoryChainItem, configurationBeanFacotoryChainItem));
     }
 }

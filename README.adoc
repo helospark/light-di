@@ -10,6 +10,7 @@ Similar to Spring annotation-support.
 
 * Classpath scanning for beans
 * Stereotype annotations to create a bean `@Component`, `@Service`
+* `@Configuration` can be applied to classes, annotated class can contain multiple `@Bean` annotated methods, these methods will be automatically called, and their return value will be injected to the context
 * `@Autowired` can be applied to constructor, fields, setters to automatically set dependency
 * `@Value` can be applied to constructors, fields, setters to get value from property file
 * `@PropertySource` annotation can be set to components to load property files
@@ -40,7 +41,8 @@ _Statistics coming soon_
 
 LightDI was designed to be much more lightweight than Spring, it also has many of Spring's feature lacking.
 
-_List of these soon_ 
+* LightDi does not use AOP, therefore if you manually call `@Component` class' methods, it will create new instances (even for singletons), therefore, you should not manually invoke these methods. If you need these beans, you can always inject it (and then it will be singleton)
+* _More will come soon_ 
 
 == Why another DI framework
 
@@ -58,3 +60,5 @@ You can build using Maven:
 
 [source,bash]
      mvn clean install
+
+Feel free to open issues / pull requests.

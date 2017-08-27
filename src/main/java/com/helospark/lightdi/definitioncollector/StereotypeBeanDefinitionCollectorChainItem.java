@@ -1,6 +1,7 @@
 package com.helospark.lightdi.definitioncollector;
 
 import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
+import static com.helospark.lightdi.util.BeanNameGenerator.createBeanNameForStereotypeAnnotatedClass;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,7 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
         DependencyDescriptor dependencyDescriptor = StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
+                .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
                 .build();
         return Collections.singletonList(dependencyDescriptor);
     }
