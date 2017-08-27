@@ -1,4 +1,4 @@
-package com.helospark.lightdi.descriptor.constructor;
+package com.helospark.lightdi.descriptor.stereotype.constructor;
 
 import javax.annotation.Generated;
 

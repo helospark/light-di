@@ -7,7 +7,10 @@ public class BeanDefinitionProcessorChainFactory {
     private List<BeanDefinitionCollectorChainItem> beanDefinitionPreprocessorChain;
 
     public BeanDefinitionProcessorChainFactory() {
-        this.beanDefinitionPreprocessorChain = Arrays.asList(new StereotypeBeanDefinitionCollectorChainItem());
+        StereotypeBeanDefinitionCollectorChainItem stereotypeBeanDefinitionCollectorChainItem = new StereotypeBeanDefinitionCollectorChainItem();
+        ConfigurationClassBeanDefinitionCollectorChainItem configurationClassBeanDefinitionCollectorChainItem = new ConfigurationClassBeanDefinitionCollectorChainItem();
+        this.beanDefinitionPreprocessorChain = Arrays.asList(stereotypeBeanDefinitionCollectorChainItem,
+                configurationClassBeanDefinitionCollectorChainItem);
     }
 
     public BeanDefinitionCollector createBeanDefinitionProcessorChain() {

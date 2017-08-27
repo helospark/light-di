@@ -1,20 +1,52 @@
 package com.helospark.lightdi.dependencywire;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.helospark.lightdi.dependencywire.chain.BeanDependencyWireChainItem;
+import com.helospark.lightdi.dependencywire.chain.CommonDependencyWireChain;
+import com.helospark.lightdi.dependencywire.chain.ComponentDependencyWireChainItem;
+import com.helospark.lightdi.dependencywire.chain.DependencyWireChain;
+import com.helospark.lightdi.dependencywire.chain.support.ConstructorWireSupport;
+import com.helospark.lightdi.dependencywire.chain.support.FieldWireSupport;
+import com.helospark.lightdi.dependencywire.chain.support.MethodDependencyCollector;
+import com.helospark.lightdi.dependencywire.chain.support.ParameterDependencyDescriptorBuilder;
+import com.helospark.lightdi.dependencywire.chain.support.SetterWireSupport;
+
 public class WiringProcessingServiceFactory {
     private ConstructorWireSupport constructorWireSupport;
     private SetterWireSupport setterWireSupport;
     private FieldWireSupport fieldWireSupport;
     private FindInDependencySupport findInDependencySupport;
 
+    List<DependencyWireChain> wireChain;
+
     public WiringProcessingServiceFactory() {
         findInDependencySupport = new FindInDependencySupport();
         PropertyDescriptorFactory propertyDescriptorFactory = new PropertyDescriptorFactory();
-        constructorWireSupport = new ConstructorWireSupport(findInDependencySupport, propertyDescriptorFactory);
-        setterWireSupport = new SetterWireSupport(findInDependencySupport, propertyDescriptorFactory);
+
+        ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder = new ParameterDependencyDescriptorBuilder(
+                findInDependencySupport, propertyDescriptorFactory);
+
+        constructorWireSupport = new ConstructorWireSupport(parameterDependencyDescriptorBuilder);
+
+        MethodDependencyCollector methodDependencyCollector = new MethodDependencyCollector(
+                parameterDependencyDescriptorBuilder);
+
+        setterWireSupport = new SetterWireSupport(propertyDescriptorFactory, methodDependencyCollector);
         fieldWireSupport = new FieldWireSupport(findInDependencySupport, propertyDescriptorFactory);
+
+        BeanDependencyWireChainItem beanDependencyWireChainItem = new BeanDependencyWireChainItem(
+                methodDependencyCollector);
+        ComponentDependencyWireChainItem componentDependencyWireChainItem = new ComponentDependencyWireChainItem(
+                constructorWireSupport, setterWireSupport, fieldWireSupport);
+        CommonDependencyWireChain commonDependencyWireChain = new CommonDependencyWireChain();
+
+        wireChain = Arrays.asList(beanDependencyWireChainItem, componentDependencyWireChainItem,
+                commonDependencyWireChain);
     }
 
     public WiringProcessingService createFieldWireSupport() {
-        return new WiringProcessingService(constructorWireSupport, setterWireSupport, fieldWireSupport);
+        return new WiringProcessingService(wireChain);
     }
 }

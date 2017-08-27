@@ -1,4 +1,6 @@
-package com.helospark.lightdi.descriptor;
+package com.helospark.lightdi.descriptor.property;
+
+import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
 public class PropertyDescritor implements InjectionDescriptor {
     private Class<?> clazz;

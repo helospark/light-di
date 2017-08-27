@@ -6,7 +6,7 @@ import java.lang.reflect.Parameter;
 
 import com.helospark.lightdi.annotation.Value;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
-import com.helospark.lightdi.descriptor.PropertyDescritor;
+import com.helospark.lightdi.descriptor.property.PropertyDescritor;
 
 public class PropertyDescriptorFactory {
     public PropertyDescritor buildPropertyDescriptor(Parameter parameter) {

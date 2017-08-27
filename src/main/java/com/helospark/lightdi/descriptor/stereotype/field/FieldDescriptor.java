@@ -1,4 +1,4 @@
-package com.helospark.lightdi.descriptor.field;
+package com.helospark.lightdi.descriptor.stereotype.field;
 
 import java.lang.reflect.Field;
 

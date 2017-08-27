@@ -4,9 +4,9 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import com.helospark.lightdi.LightDiContext;
-import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
-import com.helospark.lightdi.descriptor.constructor.ConstructorDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.constructor.ConstructorDescriptor;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
 
 public class ConstructorInvoker {
@@ -16,9 +16,9 @@ public class ConstructorInvoker {
         this.dependencyObjectResolverHandler = dependencyObjectResolverHandler;
     }
 
-    public Object invokeConstructor(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate)
+    public Object invokeConstructor(LightDiContext lightDiContext, StereotypeDependencyDescriptor dependencyToCreate)
             throws Exception {
-        List<ConstructorDescriptor> constructorDescriptors = dependencyToCreate.getConstructorDescriptors();
+        List<ConstructorDescriptor> constructorDescriptors = dependencyToCreate.getConstructorDescriptor();
         Object[] params = new Object[constructorDescriptors.size()];
 
         for (int i = 0; i < constructorDescriptors.size(); ++i) {

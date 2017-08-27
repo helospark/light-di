@@ -7,9 +7,9 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import javax.annotation.PostConstruct;
 
-import com.helospark.lightdi.annotation.PostConstruct;
+import org.junit.Test;
 
 public class AnnotationUtilTest {
 

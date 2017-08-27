@@ -1,17 +1,18 @@
-package com.helospark.lightdi.descriptor.setter;
+package com.helospark.lightdi.descriptor.stereotype.setter;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
-public class SetterDescriptor {
+public class MethodDescriptor {
     private Method method;
-    private InjectionDescriptor injectionDescriptor;
+    private List<InjectionDescriptor> injectionDescriptor;
 
     @Generated("SparkTools")
-    private SetterDescriptor(Builder builder) {
+    private MethodDescriptor(Builder builder) {
         this.method = builder.method;
         this.injectionDescriptor = builder.injectionDescriptor;
     }
@@ -20,7 +21,7 @@ public class SetterDescriptor {
         return method;
     }
 
-    public InjectionDescriptor getInjectionDescriptor() {
+    public List<InjectionDescriptor> getInjectionDescriptor() {
         return injectionDescriptor;
     }
 
@@ -32,7 +33,7 @@ public class SetterDescriptor {
     @Generated("SparkTools")
     public static final class Builder {
         private Method method;
-        private InjectionDescriptor injectionDescriptor;
+        private List<InjectionDescriptor> injectionDescriptor;
 
         private Builder() {
         }
@@ -42,13 +43,13 @@ public class SetterDescriptor {
             return this;
         }
 
-        public Builder withInjectionDescriptor(InjectionDescriptor injectionDescriptor) {
+        public Builder withInjectionDescriptor(List<InjectionDescriptor> injectionDescriptor) {
             this.injectionDescriptor = injectionDescriptor;
             return this;
         }
 
-        public SetterDescriptor build() {
-            return new SetterDescriptor(this);
+        public MethodDescriptor build() {
+            return new MethodDescriptor(this);
         }
     }
 

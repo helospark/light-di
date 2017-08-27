@@ -1,71 +1,69 @@
-package com.helospark.lightdi.dependencywire;
+package com.helospark.lightdi.dependencywire.chain.support;
 
 import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
 import com.helospark.lightdi.annotation.Value;
+import com.helospark.lightdi.dependencywire.PropertyDescriptorFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
-import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
-import com.helospark.lightdi.descriptor.setter.SetterDescriptor;
+import com.helospark.lightdi.descriptor.InjectionDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
 
 public class SetterWireSupport {
-    private FindInDependencySupport findInDependencySupport;
     private PropertyDescriptorFactory propertyDescriptorFactory;
+    private MethodDependencyCollector methodDependencyCollector;
 
-    public SetterWireSupport(FindInDependencySupport findInDependencySupport,
-            PropertyDescriptorFactory propertyDescriptorFactory) {
-        this.findInDependencySupport = findInDependencySupport;
+    public SetterWireSupport(PropertyDescriptorFactory propertyDescriptorFactory,
+            MethodDependencyCollector methodDependencyCollector) {
         this.propertyDescriptorFactory = propertyDescriptorFactory;
+        this.methodDependencyCollector = methodDependencyCollector;
     }
 
-    public List<SetterDescriptor> getSetterDependencies(Class<?> clazz,
+    public List<MethodDescriptor> getSetterDependencies(Class<?> clazz,
             List<DependencyDescriptor> dependencyDescriptors) {
-        List<SetterDescriptor> result = new ArrayList<>();
+        List<MethodDescriptor> result = new ArrayList<>();
         result.addAll(collectInjectMethods(clazz, dependencyDescriptors));
         result.addAll(collectValueMethods(clazz, dependencyDescriptors));
         return result;
     }
 
-    private List<SetterDescriptor> collectInjectMethods(Class<?> clazz,
+    private List<MethodDescriptor> collectInjectMethods(Class<?> clazz,
             List<DependencyDescriptor> dependencyDescriptors) {
-        List<SetterDescriptor> result = new ArrayList<>();
+        List<MethodDescriptor> result = new ArrayList<>();
         List<Method> setters = Arrays.stream(clazz.getMethods())
                 .filter(method -> isAutowiredSetter(method))
                 .collect(Collectors.toList());
 
         for (Method method : setters) {
-            Class<?> paramType = method.getParameterTypes()[0];
-            DependencyDescriptorQuery query = DependencyDescriptorQuery
-                    .builder()
-                    .withClazz(paramType)
-                    .build();
-            DependencyDescriptor dependencyDescriptor = findInDependencySupport.findOrThrow(dependencyDescriptors,
-                    query);
-            result.add(SetterDescriptor.builder()
-                    .withInjectionDescriptor(dependencyDescriptor)
+            List<InjectionDescriptor> injections = methodDependencyCollector.getSetterDependencies(method,
+                    dependencyDescriptors);
+            result.add(MethodDescriptor.builder()
                     .withMethod(method)
+                    .withInjectionDescriptor(injections)
                     .build());
         }
         return result;
     }
 
-    private List<SetterDescriptor> collectValueMethods(Class<?> clazz,
+    private List<MethodDescriptor> collectValueMethods(Class<?> clazz,
             List<DependencyDescriptor> dependencyDescriptors) {
-        List<SetterDescriptor> result = new ArrayList<>();
+        List<MethodDescriptor> result = new ArrayList<>();
         List<Method> setters = Arrays.stream(clazz.getMethods())
                 .filter(method -> isValueSetter(method))
                 .collect(Collectors.toList());
 
         for (Method method : setters) {
-            result.add(SetterDescriptor.builder()
+            result.add(MethodDescriptor.builder()
                     .withMethod(method)
-                    .withInjectionDescriptor(propertyDescriptorFactory.buildPropertyDescriptor(method))
+                    .withInjectionDescriptor(
+                            Collections.singletonList(propertyDescriptorFactory.buildPropertyDescriptor(method)))
                     .build());
         }
         return result;

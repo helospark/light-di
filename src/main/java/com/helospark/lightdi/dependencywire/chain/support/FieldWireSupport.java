@@ -1,4 +1,4 @@
-package com.helospark.lightdi.dependencywire;
+package com.helospark.lightdi.dependencywire.chain.support;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
 import com.helospark.lightdi.annotation.Value;
+import com.helospark.lightdi.dependencywire.FindInDependencySupport;
+import com.helospark.lightdi.dependencywire.PropertyDescriptorFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
-import com.helospark.lightdi.descriptor.field.FieldDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.field.FieldDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
 
 public class FieldWireSupport {

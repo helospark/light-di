@@ -8,12 +8,13 @@ import java.util.List;
 import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.Service;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 
 public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
 
     @Override
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
-        DependencyDescriptor dependencyDescriptor = DependencyDescriptor.builder()
+        DependencyDescriptor dependencyDescriptor = StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
                 .build();
         return Collections.singletonList(dependencyDescriptor);

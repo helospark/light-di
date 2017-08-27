@@ -13,8 +13,10 @@ import com.helospark.lightdi.it.testcontext1.ComponentWithConstructorValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithFieldValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithPostConstruct;
 import com.helospark.lightdi.it.testcontext1.ComponentWithSetterValue;
+import com.helospark.lightdi.it.testcontext1.ConfigurationClass;
 import com.helospark.lightdi.it.testcontext1.ConstructorDependency;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
+import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
 import com.helospark.lightdi.it.testcontext1.SetterDependency;
 
@@ -121,5 +123,18 @@ public class ContextLoadIT {
 
         // THEN
         assertThat(component.getFieldFilledInPostConstruct(), is("ok"));
+    }
+
+    @Test
+    public void testConfigurationClassShouldWork() {
+        // GIVEN
+
+        // WHEN
+        ConfigurationClass configurationClass = context.getBean(ConfigurationClass.class);
+        NonAnnotatedClass nonAnnotatedClass = context.getBean(NonAnnotatedClass.class);
+
+        // THEN
+        assertNotNull(configurationClass);
+        assertNotNull(nonAnnotatedClass);
     }
 }

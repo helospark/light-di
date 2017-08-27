@@ -1,32 +1,20 @@
 package com.helospark.lightdi.reflection;
 
 import com.helospark.lightdi.LightDiContext;
-import com.helospark.lightdi.descriptor.DependencyDescriptor;
-import com.helospark.lightdi.descriptor.InjectionDescriptor;
-import com.helospark.lightdi.descriptor.setter.SetterDescriptor;
-import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
+import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 
 public class SetterInvoker {
-    private DependencyObjectResolverHandler dependencyObjectResolverHandler;
+    private MethodInvoker methodInvoker;
 
-    public SetterInvoker(DependencyObjectResolverHandler dependencyObjectResolverHandler) {
-        this.dependencyObjectResolverHandler = dependencyObjectResolverHandler;
+    public SetterInvoker(MethodInvoker methodInvoker) {
+        this.methodInvoker = methodInvoker;
     }
 
-    public void invokeSetters(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate, Object result) {
+    public void invokeSetters(LightDiContext lightDiContext, StereotypeDependencyDescriptor dependencyToCreate,
+            Object result) {
         dependencyToCreate.getSetterDescriptor()
                 .stream()
-                .forEach(setter -> invokeSetter(lightDiContext, setter, result));
-    }
+                .forEach(setter -> methodInvoker.invokeMethod(lightDiContext, setter, result));
 
-    private void invokeSetter(LightDiContext lightDiContext, SetterDescriptor setter, Object result) {
-        try {
-            InjectionDescriptor injectionDescriptor = setter.getInjectionDescriptor();
-            Object objectToSet = dependencyObjectResolverHandler.resolve(lightDiContext, injectionDescriptor);
-            setter.getMethod().invoke(result, objectToSet);
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to call setter " + setter, e);
-        }
     }
-
 }

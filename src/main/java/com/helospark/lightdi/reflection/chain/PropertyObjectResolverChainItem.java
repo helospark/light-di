@@ -2,7 +2,7 @@ package com.helospark.lightdi.reflection.chain;
 
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
-import com.helospark.lightdi.descriptor.PropertyDescritor;
+import com.helospark.lightdi.descriptor.property.PropertyDescritor;
 import com.helospark.lightdi.properties.ValueResolver;
 
 public class PropertyObjectResolverChainItem implements DependencyObjectResolverChainItem {

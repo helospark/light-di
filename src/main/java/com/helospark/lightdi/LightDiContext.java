@@ -43,6 +43,10 @@ public class LightDiContext implements AutoCloseable {
         return getOrCreateDependencyInternal(query);
     }
 
+    public Object getBean(DependencyDescriptor query) {
+        return getOrCreateDependencyInternal(convertToQuery(query));
+    }
+
     public ValueResolver getValueResolver() {
         return valueResolver;
     }

@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.annotation.PropertySource;
-import com.helospark.lightdi.descriptor.DependencyDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.properties.converter.StringPropertyConverter;
 
 public class ValueResolverFactoryTest {
@@ -34,7 +34,7 @@ public class ValueResolverFactoryTest {
     @Test
     public void testFactoryShouldLoadFileAndReturnUsableValueResolver() {
         // GIVEN
-        DependencyDescriptor descriptor = DependencyDescriptor.builder()
+        StereotypeDependencyDescriptor descriptor = StereotypeDependencyDescriptor.builder()
                 .withClazz(PropertySourceAnnotatedClass.class)
                 .build();
 

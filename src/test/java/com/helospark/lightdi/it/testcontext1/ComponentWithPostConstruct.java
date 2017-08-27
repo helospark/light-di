@@ -1,7 +1,8 @@
 package com.helospark.lightdi.it.testcontext1;
 
+import javax.annotation.PostConstruct;
+
 import com.helospark.lightdi.annotation.Component;
-import com.helospark.lightdi.annotation.PostConstruct;
 
 @Component
 public class ComponentWithPostConstruct {
