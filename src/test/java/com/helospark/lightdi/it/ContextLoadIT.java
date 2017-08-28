@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
@@ -21,6 +23,7 @@ import com.helospark.lightdi.it.testcontext1.ConstructorDependency;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
+import com.helospark.lightdi.it.testcontext1.PrototypeBean;
 import com.helospark.lightdi.it.testcontext1.QualifiedBean;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
 import com.helospark.lightdi.it.testcontext1.SetterDependency;
@@ -180,5 +183,18 @@ public class ContextLoadIT {
         // THEN
         assertNotNull(qualifiedBean);
         assertEquals(qualifiedBean.getQualifiedBean(), otherQualifiedBean);
+    }
+
+    @Test
+    public void testPrototypeBeanShouldCreateNewInstancesForEachGetBean() {
+        // GIVEN
+
+        // WHEN
+        PrototypeBean firstInstance = context.getBean(PrototypeBean.class);
+        PrototypeBean secondInstance = context.getBean(PrototypeBean.class);
+
+        // THEN
+        assertNotSame(firstInstance, secondInstance);
+        assertSame(firstInstance.getTestDependency(), secondInstance.getTestDependency());
     }
 }

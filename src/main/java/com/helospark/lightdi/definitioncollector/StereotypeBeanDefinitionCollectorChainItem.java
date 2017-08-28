@@ -10,6 +10,7 @@ import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.Service;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.util.QualifierExtractor;
 
 public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
 
@@ -18,6 +19,7 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
         DependencyDescriptor dependencyDescriptor = StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
                 .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
+                .withScope(QualifierExtractor.extractScope(clazz))
                 .build();
         return Collections.singletonList(dependencyDescriptor);
     }

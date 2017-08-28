@@ -15,6 +15,7 @@ import com.helospark.lightdi.annotation.Configuration;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.bean.BeanDependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.util.QualifierExtractor;
 
 public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
 
@@ -31,6 +32,7 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
         return StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
                 .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
+                .withScope(QualifierExtractor.extractScope(clazz))
                 .build();
     }
 
@@ -48,6 +50,7 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
 
         return BeanDependencyDescriptor.builder()
                 .withClazz(returnType)
+                .withScope(QualifierExtractor.extractScope(method))
                 .withMethod(method)
                 .withQualifier(createQualifierForMethodAnnotatedWithBean(method))
                 .withConfigurationDescriptor(configurationDescriptor)

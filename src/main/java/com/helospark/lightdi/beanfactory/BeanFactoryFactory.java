@@ -1,10 +1,9 @@
-package com.helospark.lightdi;
+package com.helospark.lightdi.beanfactory;
 
 import static java.util.Arrays.asList;
 
 import java.util.Arrays;
 
-import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.beanfactory.chain.ConfigurationBeanFacotoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.StereotypeAnnotatedBeanFactoryChainItem;
 import com.helospark.lightdi.reflection.ConstructorInvoker;

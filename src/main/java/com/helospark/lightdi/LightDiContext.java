@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
+import com.helospark.lightdi.constants.LightDiConstants;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.properties.ValueResolver;
@@ -21,6 +22,7 @@ import com.helospark.lightdi.properties.ValueResolver;
 public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDiContext.class);
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
+    private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
     private BeanFactory beanFactory;
     private ValueResolver valueResolver;
     private List<DependencyDescriptor> dependencyDescriptors;
@@ -28,6 +30,7 @@ public class LightDiContext implements AutoCloseable {
     public LightDiContext(List<DependencyDescriptor> dependencyDescriptors, ValueResolver valueResolver,
             BeanFactory beanFactory) {
         initializedSingletonBeans = new HashMap<>();
+        initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = dependencyDescriptors;
         this.beanFactory = beanFactory;
         this.valueResolver = valueResolver;
@@ -69,15 +72,23 @@ public class LightDiContext implements AutoCloseable {
         if (initializedSingletonDescriptor.isPresent()) {
             return initializedSingletonBeans.get(initializedSingletonDescriptor.get());
         } else {
-            List<DependencyDescriptor> dependencyToCreate = findDependencyDescriptor(dependencyDescriptors, query);
-            if (dependencyToCreate.size() == 1) {
-                DependencyDescriptor descriptorToUse = dependencyToCreate.get(0);
-                Object createdBean = beanFactory.createBean(this, descriptorToUse);
+            return createNewInstance(query);
+        }
+    }
+
+    private Object createNewInstance(DependencyDescriptorQuery query) {
+        List<DependencyDescriptor> dependencyToCreate = findDependencyDescriptor(dependencyDescriptors, query);
+        if (dependencyToCreate.size() == 1) {
+            DependencyDescriptor descriptorToUse = dependencyToCreate.get(0);
+            Object createdBean = beanFactory.createBean(this, descriptorToUse);
+            if (descriptorToUse.getScope().equals(LightDiConstants.SCOPE_SINGLETON)) {
                 initializedSingletonBeans.put(descriptorToUse, createdBean);
-                return createdBean;
             } else {
-                throw new IllegalArgumentException("No single match " + dependencyToCreate);
+                initializedPrototypeBeans.put(descriptorToUse, createdBean);
             }
+            return createdBean;
+        } else {
+            throw new IllegalArgumentException("No single match for " + query + " found " + dependencyToCreate);
         }
     }
 
@@ -129,6 +140,9 @@ public class LightDiContext implements AutoCloseable {
     @Override
     public void close() throws Exception {
         initializedSingletonBeans.entrySet()
+                .stream()
+                .forEach(entry -> closeDependency(entry));
+        initializedPrototypeBeans.entrySet()
                 .stream()
                 .forEach(entry -> closeDependency(entry));
     }

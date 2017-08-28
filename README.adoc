@@ -15,6 +15,7 @@ Similar to Spring annotation-support.
 * `@Value` can be applied to constructors, fields, setters to get value from property file
 * `@PropertySource` annotation can be set to components to load property files
 * `@PostConstruct/@PreDestroy` annotations can be applied to methods to run post construct and pre destroy respectively
+* `@Scope("prototype") / @Scope("singleton")` can be applied to beans, prototype scope bean will be recreated for each getBean, singleton beans will be shared in the application context
 * By default all beans are lazily initialized
 * Fast startup time, small memory footprint (see performance section (soon))
 

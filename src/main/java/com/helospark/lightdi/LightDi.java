@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
+import com.helospark.lightdi.beanfactory.BeanFactoryFactory;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
 import com.helospark.lightdi.dependencywire.WiringProcessingService;

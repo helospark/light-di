@@ -14,6 +14,9 @@ import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
  * Descriptor for classes annotated with stereotype annotations.
  * @author helospark
  */
+/**
+ * @author helospark
+ */
 public class StereotypeDependencyDescriptor extends DependencyDescriptor {
     private List<ConstructorDescriptor> constructorDescriptor;
     private List<MethodDescriptor> setterDescriptor;
@@ -23,17 +26,13 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
     private StereotypeDependencyDescriptor(Builder builder) {
         this.clazz = builder.clazz;
         this.qualifier = builder.qualifier;
+        this.scope = builder.scope;
         this.isPrimary = builder.isPrimary;
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
         this.constructorDescriptor = builder.constructorDescriptor;
         this.setterDescriptor = builder.setterDescriptor;
         this.fieldDescriptor = builder.fieldDescriptor;
-    }
-
-    @Generated("SparkTools")
-    public static Builder builder() {
-        return new Builder();
     }
 
     public List<ConstructorDescriptor> getConstructorDescriptor() {
@@ -60,10 +59,53 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
         this.fieldDescriptor = fieldDescriptor;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((constructorDescriptor == null) ? 0 : constructorDescriptor.hashCode());
+        result = prime * result + ((fieldDescriptor == null) ? 0 : fieldDescriptor.hashCode());
+        result = prime * result + ((setterDescriptor == null) ? 0 : setterDescriptor.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        StereotypeDependencyDescriptor other = (StereotypeDependencyDescriptor) obj;
+        if (constructorDescriptor == null) {
+            if (other.constructorDescriptor != null)
+                return false;
+        } else if (!constructorDescriptor.equals(other.constructorDescriptor))
+            return false;
+        if (fieldDescriptor == null) {
+            if (other.fieldDescriptor != null)
+                return false;
+        } else if (!fieldDescriptor.equals(other.fieldDescriptor))
+            return false;
+        if (setterDescriptor == null) {
+            if (other.setterDescriptor != null)
+                return false;
+        } else if (!setterDescriptor.equals(other.setterDescriptor))
+            return false;
+        return true;
+    }
+
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Generated("SparkTools")
     public static final class Builder {
         private Class<?> clazz;
         private String qualifier;
+        private String scope;
         private boolean isPrimary;
         private List<Method> postConstructMethods;
         private List<Method> preDestroyMethods;
@@ -81,6 +123,11 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withQualifier(String qualifier) {
             this.qualifier = qualifier;
+            return this;
+        }
+
+        public Builder withScope(String scope) {
+            this.scope = scope;
             return this;
         }
 
