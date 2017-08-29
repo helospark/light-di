@@ -18,6 +18,7 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         this.clazz = builder.clazz;
         this.qualifier = builder.qualifier;
         this.scope = builder.scope;
+        this.isLazy = builder.isLazy;
         this.isPrimary = builder.isPrimary;
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
@@ -103,6 +104,7 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         private Class<?> clazz;
         private String qualifier;
         private String scope;
+        private boolean isLazy;
         private boolean isPrimary;
         private List<Method> postConstructMethods;
         private List<Method> preDestroyMethods;
@@ -125,6 +127,11 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withScope(String scope) {
             this.scope = scope;
+            return this;
+        }
+
+        public Builder withIsLazy(boolean isLazy) {
+            this.isLazy = isLazy;
             return this;
         }
 

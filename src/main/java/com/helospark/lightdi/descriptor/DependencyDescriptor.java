@@ -7,6 +7,7 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
     protected Class<?> clazz;
     protected String qualifier;
     protected String scope;
+    protected boolean isLazy;
     protected boolean isPrimary;
 
     protected List<Method> postConstructMethods;
@@ -60,10 +61,18 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
         this.scope = scope;
     }
 
+    public boolean isLazy() {
+        return isLazy;
+    }
+
+    public void setLazy(boolean isLazy) {
+        this.isLazy = isLazy;
+    }
+
     @Override
     public String toString() {
-        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isPrimary=" + isPrimary
-                + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + "]";
+        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary="
+                + isPrimary + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + "]";
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {

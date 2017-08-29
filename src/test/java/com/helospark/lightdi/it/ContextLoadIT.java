@@ -2,12 +2,15 @@ package com.helospark.lightdi.it;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,12 +18,15 @@ import com.helospark.lightdi.LightDi;
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.it.testcontext1.ComponentWithConstructorValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithFieldValue;
+import com.helospark.lightdi.it.testcontext1.ComponentWithNoEagernessAnnotation;
 import com.helospark.lightdi.it.testcontext1.ComponentWithPostConstruct;
 import com.helospark.lightdi.it.testcontext1.ComponentWithQualifiedDependency;
 import com.helospark.lightdi.it.testcontext1.ComponentWithSetterValue;
 import com.helospark.lightdi.it.testcontext1.ConfigurationClass;
 import com.helospark.lightdi.it.testcontext1.ConstructorDependency;
+import com.helospark.lightdi.it.testcontext1.EagerComponent;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
+import com.helospark.lightdi.it.testcontext1.LazyComponent;
 import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.PrototypeBean;
@@ -35,6 +41,11 @@ public class ContextLoadIT {
     public void setUp() {
         LightDi lightDi = new LightDi();
         context = lightDi.initContextByPackage(ConstructorDependency.class.getPackage().getName());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        context.close();
     }
 
     @Test
@@ -196,5 +207,47 @@ public class ContextLoadIT {
         // THEN
         assertNotSame(firstInstance, secondInstance);
         assertSame(firstInstance.getTestDependency(), secondInstance.getTestDependency());
+    }
+
+    @Test
+    public void testEagerComponentShouldInitializeWhenContextLoads() {
+        // GIVEN
+
+        // WHEN context loads
+
+        // THEN
+        assertTrue(EagerComponent.IS_INITIALIZED);
+    }
+
+    @Test
+    public void testLazyComponentShouldNotBeInitializeWhenContextLoads() {
+        // GIVEN
+
+        // WHEN context loads
+
+        // THEN
+        assertFalse(LazyComponent.IS_INITIALIZED);
+    }
+
+    @Test
+    public void testLazyComponentShouldBeInitializedAfterExplicitlyRequestingIt() {
+        // GIVEN
+
+        // WHEN
+        LazyComponent instance = context.getBean(LazyComponent.class);
+
+        // THEN
+        assertNotNull(instance);
+        assertTrue(LazyComponent.IS_INITIALIZED);
+    }
+
+    @Test
+    public void testComponentWithoutEagernessAnnotationShouldBeLazyByDefault() {
+        // GIVEN
+
+        // WHEN context loads
+
+        // THEN
+        assertFalse(ComponentWithNoEagernessAnnotation.IS_INITIALIZED);
     }
 }

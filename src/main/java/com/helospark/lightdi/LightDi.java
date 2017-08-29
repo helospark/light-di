@@ -59,10 +59,20 @@ public class LightDi {
 
             LOGGER.info("Context initialized");
 
-            return new LightDiContext(dependencyDescriptors, valueResolver, beanFactory);
+            LightDiContext context = new LightDiContext(dependencyDescriptors, valueResolver, beanFactory);
+
+            initializeEagerDependencies(context, dependencyDescriptors);
+
+            return context;
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);
         }
+    }
+
+    private void initializeEagerDependencies(LightDiContext context, List<DependencyDescriptor> dependencyDescriptors) {
+        dependencyDescriptors.stream()
+                .filter(dependency -> !dependency.isLazy())
+                .forEach(dependency -> context.getBean(dependency));
     }
 
 }
