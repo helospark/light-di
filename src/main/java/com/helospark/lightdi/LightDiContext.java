@@ -78,18 +78,24 @@ public class LightDiContext implements AutoCloseable {
 
     private Object createNewInstance(DependencyDescriptorQuery query) {
         List<DependencyDescriptor> dependencyToCreate = findDependencyDescriptor(dependencyDescriptors, query);
+        Optional<DependencyDescriptor> primary = findPrimary(dependencyToCreate);
         if (dependencyToCreate.size() == 1) {
-            DependencyDescriptor descriptorToUse = dependencyToCreate.get(0);
-            Object createdBean = beanFactory.createBean(this, descriptorToUse);
-            if (descriptorToUse.getScope().equals(LightDiConstants.SCOPE_SINGLETON)) {
-                initializedSingletonBeans.put(descriptorToUse, createdBean);
-            } else {
-                initializedPrototypeBeans.put(descriptorToUse, createdBean);
-            }
-            return createdBean;
+            return createDependency(dependencyToCreate.get(0));
+        } else if (primary.isPresent()) {
+            return createDependency(primary.get());
         } else {
             throw new IllegalArgumentException("No single match for " + query + " found " + dependencyToCreate);
         }
+    }
+
+    private Object createDependency(DependencyDescriptor descriptorToUse) {
+        Object createdBean = beanFactory.createBean(this, descriptorToUse);
+        if (descriptorToUse.getScope().equals(LightDiConstants.SCOPE_SINGLETON)) {
+            initializedSingletonBeans.put(descriptorToUse, createdBean);
+        } else {
+            initializedPrototypeBeans.put(descriptorToUse, createdBean);
+        }
+        return createdBean;
     }
 
     private Optional<DependencyDescriptor> findInitializedSingletonDescriptor(DependencyDescriptorQuery toFind) {

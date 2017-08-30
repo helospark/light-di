@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.helospark.lightdi.annotation.Component;
+import com.helospark.lightdi.annotation.IsPrimaryExtractor;
 import com.helospark.lightdi.annotation.Service;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
@@ -22,6 +23,7 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
                 .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
                 .withScope(QualifierExtractor.extractScope(clazz))
                 .withIsLazy(IsLazyExtractor.isLazy(clazz))
+                .withIsPrimary(IsPrimaryExtractor.isPrimary(clazz))
                 .build();
         return Collections.singletonList(dependencyDescriptor);
     }

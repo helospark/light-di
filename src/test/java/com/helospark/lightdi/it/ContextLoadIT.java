@@ -29,6 +29,7 @@ import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.LazyComponent;
 import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
+import com.helospark.lightdi.it.testcontext1.PrimaryTestBean;
 import com.helospark.lightdi.it.testcontext1.PrototypeBean;
 import com.helospark.lightdi.it.testcontext1.QualifiedBean;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
@@ -249,5 +250,16 @@ public class ContextLoadIT {
 
         // THEN
         assertFalse(ComponentWithNoEagernessAnnotation.IS_INITIALIZED);
+    }
+
+    @Test
+    public void testPrimaryBeanShouldGetPrimary() {
+        // GIVEN
+
+        // WHEN
+        PrimaryTestBean instance = context.getBean(PrimaryTestBean.class);
+
+        // THEN
+        assertEquals(instance.getValue(), "primary");
     }
 }
