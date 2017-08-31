@@ -17,4 +17,5 @@ public class PrimaryConfiguration {
     public PrimaryTestBean primary() {
         return new PrimaryTestBean("primary");
     }
+
 }

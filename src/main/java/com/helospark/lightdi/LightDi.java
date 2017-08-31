@@ -16,6 +16,7 @@ import com.helospark.lightdi.exception.ContextInitializationFailedException;
 import com.helospark.lightdi.properties.ValueResolver;
 import com.helospark.lightdi.properties.ValueResolverFactory;
 import com.helospark.lightdi.scanner.LightDiClasspathScanner;
+import com.helospark.lightdi.util.AutowirePostProcessor;
 
 public class LightDi {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
@@ -25,19 +26,24 @@ public class LightDi {
     private ValueResolverFactory valueResolverFactory;
     private LightDiClasspathScanner lightDiClasspathScanner;
 
+    private WiringProcessingServiceFactory preprocessWireServiceFactory;
+    private BeanFactoryFactory beanFactoryFactory;
+    private BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory;
+
     public LightDi() {
         lightDiClasspathScanner = new LightDiClasspathScanner();
 
-        BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
+        beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
         beanDefinitionCollector = beanDefinitionProcessorChainFactory.createBeanDefinitionProcessorChain();
 
-        BeanFactoryFactory beanFactoryFactory = new BeanFactoryFactory();
+        beanFactoryFactory = new BeanFactoryFactory();
         beanFactory = beanFactoryFactory.createBeanFactory();
 
-        WiringProcessingServiceFactory preprocessWireServiceFactory = new WiringProcessingServiceFactory();
+        preprocessWireServiceFactory = new WiringProcessingServiceFactory();
         wiringProcessingService = preprocessWireServiceFactory.createFieldWireSupport();
 
         valueResolverFactory = new ValueResolverFactory();
+
     }
 
     public LightDiContext initContextByPackage(String packageName) {
@@ -60,6 +66,13 @@ public class LightDi {
             LOGGER.info("Context initialized");
 
             LightDiContext context = new LightDiContext(dependencyDescriptors, valueResolver, beanFactory);
+
+            // TODO: think of better way to do this
+            AutowirePostProcessor autowireSupportUtil = new AutowirePostProcessor(
+                    beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
+                    preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
+                    context);
+            context.setAutowireSupportUtil(autowireSupportUtil);
 
             initializeEagerDependencies(context, dependencyDescriptors);
 

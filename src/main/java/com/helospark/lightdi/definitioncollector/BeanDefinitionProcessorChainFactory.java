@@ -5,10 +5,12 @@ import java.util.List;
 
 public class BeanDefinitionProcessorChainFactory {
     private List<BeanDefinitionCollectorChainItem> beanDefinitionPreprocessorChain;
+    private StereotypeBeanDefinitionCollectorChainItem stereotypeBeanDefinitionCollectorChainItem;
+    private ConfigurationClassBeanDefinitionCollectorChainItem configurationClassBeanDefinitionCollectorChainItem;
 
     public BeanDefinitionProcessorChainFactory() {
-        StereotypeBeanDefinitionCollectorChainItem stereotypeBeanDefinitionCollectorChainItem = new StereotypeBeanDefinitionCollectorChainItem();
-        ConfigurationClassBeanDefinitionCollectorChainItem configurationClassBeanDefinitionCollectorChainItem = new ConfigurationClassBeanDefinitionCollectorChainItem();
+        stereotypeBeanDefinitionCollectorChainItem = new StereotypeBeanDefinitionCollectorChainItem();
+        configurationClassBeanDefinitionCollectorChainItem = new ConfigurationClassBeanDefinitionCollectorChainItem();
         this.beanDefinitionPreprocessorChain = Arrays.asList(stereotypeBeanDefinitionCollectorChainItem,
                 configurationClassBeanDefinitionCollectorChainItem);
     }
@@ -16,4 +18,13 @@ public class BeanDefinitionProcessorChainFactory {
     public BeanDefinitionCollector createBeanDefinitionProcessorChain() {
         return new BeanDefinitionCollector(beanDefinitionPreprocessorChain);
     }
+
+    public StereotypeBeanDefinitionCollectorChainItem getStereotypeBeanDefinitionCollectorChainItem() {
+        return stereotypeBeanDefinitionCollectorChainItem;
+    }
+
+    public ConfigurationClassBeanDefinitionCollectorChainItem getConfigurationClassBeanDefinitionCollectorChainItem() {
+        return configurationClassBeanDefinitionCollectorChainItem;
+    }
+
 }

@@ -1,24 +1,21 @@
 package com.helospark.lightdi.beanfactory.chain;
 
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.beanfactory.chain.support.AutowirePostProcessSupport;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.reflection.ConstructorInvoker;
-import com.helospark.lightdi.reflection.FieldSetInvoker;
 import com.helospark.lightdi.reflection.PostConstructInvoker;
-import com.helospark.lightdi.reflection.SetterInvoker;
 
 public class StereotypeAnnotatedBeanFactoryChainItem implements BeanFactoryChainItem {
     private ConstructorInvoker constructorInvoker;
-    private SetterInvoker setterInvoker;
-    private FieldSetInvoker fieldSetInvoker;
+    private AutowirePostProcessSupport autowirePostProcessSupport;
     private PostConstructInvoker postConstructInvoker;
 
-    public StereotypeAnnotatedBeanFactoryChainItem(ConstructorInvoker constructorInvoker, SetterInvoker setterInvoker,
-            FieldSetInvoker fieldSetInvoker, PostConstructInvoker postConstructInvoker) {
+    public StereotypeAnnotatedBeanFactoryChainItem(ConstructorInvoker constructorInvoker, AutowirePostProcessSupport autowirePostProcessSupport,
+            PostConstructInvoker postConstructInvoker) {
         this.constructorInvoker = constructorInvoker;
-        this.setterInvoker = setterInvoker;
-        this.fieldSetInvoker = fieldSetInvoker;
+        this.autowirePostProcessSupport = autowirePostProcessSupport;
         this.postConstructInvoker = postConstructInvoker;
     }
 
@@ -26,8 +23,7 @@ public class StereotypeAnnotatedBeanFactoryChainItem implements BeanFactoryChain
     public Object createBean(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate) throws Exception {
         StereotypeDependencyDescriptor stereotypeDependency = (StereotypeDependencyDescriptor) dependencyToCreate;
         Object result = constructorInvoker.invokeConstructor(lightDiContext, stereotypeDependency);
-        setterInvoker.invokeSetters(lightDiContext, stereotypeDependency, result);
-        fieldSetInvoker.setFieldValues(lightDiContext, stereotypeDependency, result);
+        autowirePostProcessSupport.injectAutowired(lightDiContext, stereotypeDependency, result);
         postConstructInvoker.invokePostConstructMethods(stereotypeDependency, result);
         return result;
     }

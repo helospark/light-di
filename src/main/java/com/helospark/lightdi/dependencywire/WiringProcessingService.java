@@ -26,7 +26,7 @@ public class WiringProcessingService {
 
     }
 
-    private void initializeAllWiring(DependencyDescriptor dependency,
+    public void initializeAllWiring(DependencyDescriptor dependency,
             List<DependencyDescriptor> dependencyDescriptors) {
         wireChain.stream()
                 .forEach(chainItem -> chainItem.collectDependencies(dependencyDescriptors, dependency));

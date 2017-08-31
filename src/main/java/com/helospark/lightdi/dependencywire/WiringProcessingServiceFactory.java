@@ -19,7 +19,11 @@ public class WiringProcessingServiceFactory {
     private FieldWireSupport fieldWireSupport;
     private FindInDependencySupport findInDependencySupport;
 
-    List<DependencyWireChain> wireChain;
+    private ComponentDependencyWireChainItem componentDependencyWireChainItem;
+    private CommonDependencyWireChain commonDependencyWireChain;
+    private BeanDependencyWireChainItem beanDependencyWireChainItem;
+
+    private List<DependencyWireChain> wireChain;
 
     public WiringProcessingServiceFactory() {
         findInDependencySupport = new FindInDependencySupport();
@@ -36,11 +40,11 @@ public class WiringProcessingServiceFactory {
         setterWireSupport = new SetterWireSupport(propertyDescriptorFactory, methodDependencyCollector);
         fieldWireSupport = new FieldWireSupport(findInDependencySupport, propertyDescriptorFactory);
 
-        BeanDependencyWireChainItem beanDependencyWireChainItem = new BeanDependencyWireChainItem(
+        beanDependencyWireChainItem = new BeanDependencyWireChainItem(
                 methodDependencyCollector);
-        ComponentDependencyWireChainItem componentDependencyWireChainItem = new ComponentDependencyWireChainItem(
+        componentDependencyWireChainItem = new ComponentDependencyWireChainItem(
                 constructorWireSupport, setterWireSupport, fieldWireSupport);
-        CommonDependencyWireChain commonDependencyWireChain = new CommonDependencyWireChain();
+        commonDependencyWireChain = new CommonDependencyWireChain();
 
         wireChain = Arrays.asList(beanDependencyWireChainItem, componentDependencyWireChainItem,
                 commonDependencyWireChain);
@@ -49,4 +53,13 @@ public class WiringProcessingServiceFactory {
     public WiringProcessingService createFieldWireSupport() {
         return new WiringProcessingService(wireChain);
     }
+
+    public List<DependencyWireChain> getWireChain() {
+        return wireChain;
+    }
+
+    public ComponentDependencyWireChainItem getComponentDependencyWireChainItem() {
+        return componentDependencyWireChainItem;
+    }
+
 }

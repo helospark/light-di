@@ -1,17 +1,18 @@
 package com.helospark.lightdi.descriptor;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class DependencyDescriptor implements InjectionDescriptor {
     protected Class<?> clazz;
     protected String qualifier;
     protected String scope;
-    protected boolean isLazy;
-    protected boolean isPrimary;
+    protected boolean isLazy = true;
+    protected boolean isPrimary = false;
 
-    protected List<Method> postConstructMethods;
-    protected List<Method> preDestroyMethods;
+    protected List<Method> postConstructMethods = Collections.emptyList();
+    protected List<Method> preDestroyMethods = Collections.emptyList();
 
     public Class<?> getClazz() {
         return clazz;

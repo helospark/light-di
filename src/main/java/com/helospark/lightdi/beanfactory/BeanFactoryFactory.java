@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import com.helospark.lightdi.beanfactory.chain.ConfigurationBeanFacotoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.StereotypeAnnotatedBeanFactoryChainItem;
+import com.helospark.lightdi.beanfactory.chain.support.AutowirePostProcessSupport;
 import com.helospark.lightdi.reflection.ConstructorInvoker;
 import com.helospark.lightdi.reflection.FieldSetInvoker;
 import com.helospark.lightdi.reflection.MethodInvoker;
@@ -16,8 +17,11 @@ import com.helospark.lightdi.reflection.chain.DependentObjectResolverChainItem;
 import com.helospark.lightdi.reflection.chain.PropertyObjectResolverChainItem;
 
 public class BeanFactoryFactory {
+    private AutowirePostProcessSupport autowirePostProcessSupport;
+    private ConfigurationBeanFacotoryChainItem configurationBeanFacotoryChainItem;
+    private StereotypeAnnotatedBeanFactoryChainItem stereotypeAnnotatedBeanFactoryChainItem;
 
-    public BeanFactory createBeanFactory() {
+    public BeanFactoryFactory() {
         DependentObjectResolverChainItem dependentObjectResolverChainItem = new DependentObjectResolverChainItem();
         PropertyObjectResolverChainItem propertyObjectResolverChainItem = new PropertyObjectResolverChainItem();
 
@@ -30,12 +34,19 @@ public class BeanFactoryFactory {
         FieldSetInvoker fieldSetInvoker = new FieldSetInvoker(dependencyObjectResolverHandler);
 
         PostConstructInvoker postConstructInvoker = new PostConstructInvoker();
-
-        StereotypeAnnotatedBeanFactoryChainItem stereotypeAnnotatedBeanFactoryChainItem = new StereotypeAnnotatedBeanFactoryChainItem(
-                constructorInvoker, setterInvoker, fieldSetInvoker, postConstructInvoker);
-        ConfigurationBeanFacotoryChainItem configurationBeanFacotoryChainItem = new ConfigurationBeanFacotoryChainItem(
+        autowirePostProcessSupport = new AutowirePostProcessSupport(setterInvoker, fieldSetInvoker);
+        stereotypeAnnotatedBeanFactoryChainItem = new StereotypeAnnotatedBeanFactoryChainItem(
+                constructorInvoker, autowirePostProcessSupport, postConstructInvoker);
+        configurationBeanFacotoryChainItem = new ConfigurationBeanFacotoryChainItem(
                 methodInvoker);
+    }
 
+    public BeanFactory createBeanFactory() {
         return new BeanFactory(asList(stereotypeAnnotatedBeanFactoryChainItem, configurationBeanFacotoryChainItem));
     }
+
+    public AutowirePostProcessSupport getAutowirePostProcessSupport() {
+        return autowirePostProcessSupport;
+    }
+
 }

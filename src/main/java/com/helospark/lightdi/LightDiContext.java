@@ -18,6 +18,7 @@ import com.helospark.lightdi.constants.LightDiConstants;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.properties.ValueResolver;
+import com.helospark.lightdi.util.AutowirePostProcessor;
 
 public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDiContext.class);
@@ -25,6 +26,7 @@ public class LightDiContext implements AutoCloseable {
     private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
     private BeanFactory beanFactory;
     private ValueResolver valueResolver;
+    private AutowirePostProcessor autowireSupportUtil;
     private List<DependencyDescriptor> dependencyDescriptors;
 
     public LightDiContext(List<DependencyDescriptor> dependencyDescriptors, ValueResolver valueResolver,
@@ -166,6 +168,18 @@ public class LightDiContext implements AutoCloseable {
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             LOGGER.error("Exception thrown while calling preDestroy method", e);
         }
+    }
+
+    public List<DependencyDescriptor> getDependencyDescriptors() {
+        return dependencyDescriptors;
+    }
+
+    public AutowirePostProcessor getAutowireSupportUtil() {
+        return autowireSupportUtil;
+    }
+
+    public void setAutowireSupportUtil(AutowirePostProcessor autowireSupportUtil) {
+        this.autowireSupportUtil = autowireSupportUtil;
     }
 
 }
