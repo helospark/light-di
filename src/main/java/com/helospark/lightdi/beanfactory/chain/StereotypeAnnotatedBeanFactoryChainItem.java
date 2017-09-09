@@ -5,18 +5,14 @@ import com.helospark.lightdi.beanfactory.chain.support.AutowirePostProcessSuppor
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.reflection.ConstructorInvoker;
-import com.helospark.lightdi.reflection.PostConstructInvoker;
 
 public class StereotypeAnnotatedBeanFactoryChainItem implements BeanFactoryChainItem {
     private ConstructorInvoker constructorInvoker;
     private AutowirePostProcessSupport autowirePostProcessSupport;
-    private PostConstructInvoker postConstructInvoker;
 
-    public StereotypeAnnotatedBeanFactoryChainItem(ConstructorInvoker constructorInvoker, AutowirePostProcessSupport autowirePostProcessSupport,
-            PostConstructInvoker postConstructInvoker) {
+    public StereotypeAnnotatedBeanFactoryChainItem(ConstructorInvoker constructorInvoker, AutowirePostProcessSupport autowirePostProcessSupport) {
         this.constructorInvoker = constructorInvoker;
         this.autowirePostProcessSupport = autowirePostProcessSupport;
-        this.postConstructInvoker = postConstructInvoker;
     }
 
     @Override
@@ -24,7 +20,6 @@ public class StereotypeAnnotatedBeanFactoryChainItem implements BeanFactoryChain
         StereotypeDependencyDescriptor stereotypeDependency = (StereotypeDependencyDescriptor) dependencyToCreate;
         Object result = constructorInvoker.invokeConstructor(lightDiContext, stereotypeDependency);
         autowirePostProcessSupport.injectAutowired(lightDiContext, stereotypeDependency, result);
-        postConstructInvoker.invokePostConstructMethods(stereotypeDependency, result);
         return result;
     }
 

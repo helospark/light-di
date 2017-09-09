@@ -64,8 +64,6 @@ public class LightDi {
             wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
             ValueResolver valueResolver = valueResolverFactory.createValueResolver(dependencyDescriptors);
 
-            LOGGER.info("Context initialized");
-
             LightDiContext context = new LightDiContext(dependencyDescriptors, valueResolver, beanFactory);
 
             // TODO: think of better way to do this
@@ -76,6 +74,8 @@ public class LightDi {
             context.setAutowireSupportUtil(autowireSupportUtil);
 
             initializeEagerDependencies(context, dependencyDescriptors);
+
+            LOGGER.info("Context initialized");
 
             return context;
         } catch (Exception e) {

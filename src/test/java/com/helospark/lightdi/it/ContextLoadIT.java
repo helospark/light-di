@@ -25,6 +25,7 @@ import com.helospark.lightdi.it.testcontext1.ComponentWithQualifiedDependency;
 import com.helospark.lightdi.it.testcontext1.ComponentWithSetterValue;
 import com.helospark.lightdi.it.testcontext1.ConfigurationClass;
 import com.helospark.lightdi.it.testcontext1.ConstructorDependency;
+import com.helospark.lightdi.it.testcontext1.ContextAwareTest;
 import com.helospark.lightdi.it.testcontext1.EagerComponent;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.LazyComponent;
@@ -285,5 +286,16 @@ public class ContextLoadIT {
 
         // THEN
         assertNotNull(instance);
+    }
+
+    @Test
+    public void testContextAwareShouldHaveContext() {
+        // GIVEN
+
+        // WHEN
+        ContextAwareTest instance = context.getBean(ContextAwareTest.class);
+
+        // THEN
+        assertThat(instance.getContext(), is(context));
     }
 }

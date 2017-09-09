@@ -27,8 +27,8 @@ public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
         return result;
     }
 
-    private String extractPackageFromClass(Class<?> klass2) {
-        LightDiTest annotation = klass2.getAnnotation(LightDiTest.class);
+    private String extractPackageFromClass(Class<?> clazz) {
+        LightDiTest annotation = clazz.getAnnotation(LightDiTest.class);
         if (annotation == null) {
             throw new IllegalStateException(
                     LightDiJUnitTestRunner.class.getSimpleName() + " is running a test which does not contain @LightDiTest annotation");

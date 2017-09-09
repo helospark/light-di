@@ -20,6 +20,7 @@ public class BeanFactoryFactory {
     private AutowirePostProcessSupport autowirePostProcessSupport;
     private ConfigurationBeanFacotoryChainItem configurationBeanFacotoryChainItem;
     private StereotypeAnnotatedBeanFactoryChainItem stereotypeAnnotatedBeanFactoryChainItem;
+    private PostConstructInvoker postConstructInvoker;
 
     public BeanFactoryFactory() {
         DependentObjectResolverChainItem dependentObjectResolverChainItem = new DependentObjectResolverChainItem();
@@ -33,16 +34,17 @@ public class BeanFactoryFactory {
         SetterInvoker setterInvoker = new SetterInvoker(methodInvoker);
         FieldSetInvoker fieldSetInvoker = new FieldSetInvoker(dependencyObjectResolverHandler);
 
-        PostConstructInvoker postConstructInvoker = new PostConstructInvoker();
+        postConstructInvoker = new PostConstructInvoker();
         autowirePostProcessSupport = new AutowirePostProcessSupport(setterInvoker, fieldSetInvoker);
         stereotypeAnnotatedBeanFactoryChainItem = new StereotypeAnnotatedBeanFactoryChainItem(
-                constructorInvoker, autowirePostProcessSupport, postConstructInvoker);
+                constructorInvoker, autowirePostProcessSupport);
         configurationBeanFacotoryChainItem = new ConfigurationBeanFacotoryChainItem(
                 methodInvoker);
     }
 
     public BeanFactory createBeanFactory() {
-        return new BeanFactory(asList(stereotypeAnnotatedBeanFactoryChainItem, configurationBeanFacotoryChainItem));
+        return new BeanFactory(asList(stereotypeAnnotatedBeanFactoryChainItem, configurationBeanFacotoryChainItem),
+                postConstructInvoker);
     }
 
     public AutowirePostProcessSupport getAutowirePostProcessSupport() {

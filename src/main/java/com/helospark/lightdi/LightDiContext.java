@@ -17,6 +17,7 @@ import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.constants.LightDiConstants;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
+import com.helospark.lightdi.postprocessor.BeanPostProcessor;
 import com.helospark.lightdi.properties.ValueResolver;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 
@@ -24,6 +25,7 @@ public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDiContext.class);
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
     private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
+    private List<BeanPostProcessor> beanPostProcessors;
     private BeanFactory beanFactory;
     private ValueResolver valueResolver;
     private AutowirePostProcessor autowireSupportUtil;
@@ -31,11 +33,12 @@ public class LightDiContext implements AutoCloseable {
 
     public LightDiContext(List<DependencyDescriptor> dependencyDescriptors, ValueResolver valueResolver,
             BeanFactory beanFactory) {
-        initializedSingletonBeans = new HashMap<>();
-        initializedPrototypeBeans = new HashMap<>();
+        this.initializedSingletonBeans = new HashMap<>();
+        this.initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = dependencyDescriptors;
         this.beanFactory = beanFactory;
         this.valueResolver = valueResolver;
+        this.beanPostProcessors = this.getListOfBeans(BeanPostProcessor.class);
     }
 
     public <T> T getBean(Class<T> clazz) {
@@ -92,12 +95,26 @@ public class LightDiContext implements AutoCloseable {
 
     private Object createDependency(DependencyDescriptor descriptorToUse) {
         Object createdBean = beanFactory.createBean(this, descriptorToUse);
+        createdBean = postProcessInstance(createdBean, descriptorToUse);
         if (descriptorToUse.getScope().equals(LightDiConstants.SCOPE_SINGLETON)) {
             initializedSingletonBeans.put(descriptorToUse, createdBean);
         } else {
             initializedPrototypeBeans.put(descriptorToUse, createdBean);
         }
         return createdBean;
+    }
+
+    private Object postProcessInstance(Object createdBean, DependencyDescriptor descriptorToUse) {
+        Object result = createdBean;
+
+        // BeanPostProcessors try to run on BeanPostProcessor and it's dependencies
+        if (beanPostProcessors != null) {
+            for (BeanPostProcessor postProcessor : beanPostProcessors) {
+                result = postProcessor.postProcessAfterInitialization(result, descriptorToUse);
+            }
+        }
+        return result;
+
     }
 
     private Optional<DependencyDescriptor> findInitializedSingletonDescriptor(DependencyDescriptorQuery toFind) {
