@@ -9,6 +9,8 @@ import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.beanfactory.BeanFactoryFactory;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
+import com.helospark.lightdi.dependencywire.ComponentScanCollector;
+import com.helospark.lightdi.dependencywire.RecursiveDependencyDescriptorCollector;
 import com.helospark.lightdi.dependencywire.WiringProcessingService;
 import com.helospark.lightdi.dependencywire.WiringProcessingServiceFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
@@ -25,6 +27,7 @@ public class LightDi {
     private BeanDefinitionCollector beanDefinitionCollector;
     private ValueResolverFactory valueResolverFactory;
     private LightDiClasspathScanner lightDiClasspathScanner;
+    private RecursiveDependencyDescriptorCollector recursiveDependencyDescriptorCollector;
 
     private WiringProcessingServiceFactory preprocessWireServiceFactory;
     private BeanFactoryFactory beanFactoryFactory;
@@ -44,6 +47,10 @@ public class LightDi {
 
         valueResolverFactory = new ValueResolverFactory();
 
+        ComponentScanCollector componentScanCollector = new ComponentScanCollector();
+
+        recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(lightDiClasspathScanner, beanDefinitionCollector,
+                componentScanCollector);
     }
 
     public LightDiContext initContextByPackage(String packageName) {
@@ -52,14 +59,8 @@ public class LightDi {
 
     private LightDiContext initInternal(String packageName) {
         try {
-            List<String> classes = lightDiClasspathScanner.scanClasspathForBeanClassNames(packageName);
+            List<DependencyDescriptor> dependencyDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Following classes are annotated for LightDI: " + classes);
-            }
-
-            List<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector
-                    .collectDependencyDescriptors(classes);
             wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
             ValueResolver valueResolver = valueResolverFactory.createValueResolver(dependencyDescriptors);
 

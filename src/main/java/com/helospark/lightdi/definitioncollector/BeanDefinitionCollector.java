@@ -19,10 +19,8 @@ public class BeanDefinitionCollector {
         for (String className : classes) {
             Class<?> clazz = createClassForName(className);
             beanDefinitionCollectorChain.stream()
-                    .filter(chain -> chain.isSupported(clazz))
-                    .findFirst()
                     .map(chain -> chain.collectDefinitions(clazz))
-                    .ifPresent(descriptors -> dependencyDescriptors.addAll(descriptors));
+                    .forEach(descriptors -> dependencyDescriptors.addAll(descriptors));
         }
         return dependencyDescriptors;
     }

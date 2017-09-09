@@ -8,6 +8,4 @@ public interface BeanDefinitionCollectorChainItem {
 
     List<DependencyDescriptor> collectDefinitions(Class<?> clazz);
 
-    boolean isSupported(Class<?> clazz);
-
 }

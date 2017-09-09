@@ -25,7 +25,8 @@ public class AutowirePostProcessor {
     }
 
     public void autowireFieldsTo(Object instance) {
-        List<DependencyDescriptor> definition = stereotypeBeanDefinitionCollectorChainItem.collectDefinitions(instance.getClass());
+        List<DependencyDescriptor> definition = stereotypeBeanDefinitionCollectorChainItem
+                .collectDefinitionsOnNonStereotypeClass(instance.getClass());
         StereotypeDependencyDescriptor actualDependencyDescriptor = (StereotypeDependencyDescriptor) definition.get(0);
         wiringProcessingService.initializeAllWiring(actualDependencyDescriptor, context.getDependencyDescriptors());
         autowirePostProcessSupport.injectAutowired(context, actualDependencyDescriptor, instance);

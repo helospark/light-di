@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.helospark.lightdi.LightDi;
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.it.othertestpackage.TestComponentInDifferentPackage;
 import com.helospark.lightdi.it.testcontext1.ComponentWithConstructorValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithFieldValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithNoEagernessAnnotation;
@@ -34,6 +35,7 @@ import com.helospark.lightdi.it.testcontext1.PrototypeBean;
 import com.helospark.lightdi.it.testcontext1.QualifiedBean;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
 import com.helospark.lightdi.it.testcontext1.SetterDependency;
+import com.helospark.lightdi.it.thirdpackage.ThirdPackageConfiguration;
 
 public class ContextLoadIT {
     private LightDiContext context;
@@ -261,5 +263,27 @@ public class ContextLoadIT {
 
         // THEN
         assertEquals(instance.getValue(), "primary");
+    }
+
+    @Test
+    public void testComponentScanShouldWork() {
+        // GIVEN
+
+        // WHEN
+        TestComponentInDifferentPackage instance = context.getBean(TestComponentInDifferentPackage.class);
+
+        // THEN
+        assertNotNull(instance);
+    }
+
+    @Test
+    public void testImportShouldWork() {
+        // GIVEN
+
+        // WHEN
+        ThirdPackageConfiguration instance = context.getBean(ThirdPackageConfiguration.class);
+
+        // THEN
+        assertNotNull(instance);
     }
 }

@@ -18,6 +18,14 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
 
     @Override
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
+        if (isSupported(clazz)) {
+            return collectDefinitionsOnNonStereotypeClass(clazz);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<DependencyDescriptor> collectDefinitionsOnNonStereotypeClass(Class<?> clazz) {
         DependencyDescriptor dependencyDescriptor = StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
                 .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
@@ -28,7 +36,6 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
         return Collections.singletonList(dependencyDescriptor);
     }
 
-    @Override
     public boolean isSupported(Class<?> clazz) {
         return hasAnnotation(clazz, Component.class) ||
                 hasAnnotation(clazz, Service.class);

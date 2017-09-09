@@ -19,6 +19,7 @@ Similar to Spring annotation-support.
 * `@Lazy`, `@Eager` can be used to make beans initializing lazily or eagerly. (Lazy bean means slightly different thing than in Spring, see below limitation)
 * By default all beans are lazily initialized
 * `@Primary` can be used to declare a bean as primary in case of bean collision (useful for mocking out dependencies)
+* `@ComponentScan` and `@Import` support to load more beans in other packages
 * JUnit test support (You can Autowire to test)
 * Fast startup time, small memory footprint (see performance section (soon))
 

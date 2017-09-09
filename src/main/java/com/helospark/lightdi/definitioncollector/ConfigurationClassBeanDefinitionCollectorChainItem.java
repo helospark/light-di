@@ -7,6 +7,7 @@ import static com.helospark.lightdi.util.BeanNameGenerator.createQualifierForMet
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,11 +24,15 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
 
     @Override
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
-        List<DependencyDescriptor> result = new ArrayList<>();
-        StereotypeDependencyDescriptor configurationDescriptor = createConfigurationBeanDescriptor(clazz);
-        result.add(configurationDescriptor);
-        result.addAll(collectBeanMethodDescriptors(clazz, configurationDescriptor));
-        return result;
+        if (hasAnnotation(clazz, Configuration.class)) {
+            List<DependencyDescriptor> result = new ArrayList<>();
+            StereotypeDependencyDescriptor configurationDescriptor = createConfigurationBeanDescriptor(clazz);
+            result.add(configurationDescriptor);
+            result.addAll(collectBeanMethodDescriptors(clazz, configurationDescriptor));
+            return result;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private StereotypeDependencyDescriptor createConfigurationBeanDescriptor(Class<?> clazz) {
@@ -61,11 +66,6 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
                 .withIsPrimary(IsPrimaryExtractor.isPrimary(method))
                 .withConfigurationDescriptor(configurationDescriptor)
                 .build();
-    }
-
-    @Override
-    public boolean isSupported(Class<?> clazz) {
-        return hasAnnotation(clazz, Configuration.class);
     }
 
 }
