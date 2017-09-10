@@ -6,8 +6,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
 public class PropertyStringResolverTest {
+    private final List<PropertySourceHolder> propertySourceHolder = new ArrayList<>();
     @Mock
     private PropertyValueResolver propertyValueResolver;
 
@@ -36,10 +39,10 @@ public class PropertyStringResolverTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         underTest = new PropertyStringResolver(propertyValueResolver);
-        when(propertyValueResolver.resolveOptional("TEST_VALUE")).thenReturn(of("testValueResolved"));
-        when(propertyValueResolver.resolveOptional("NESTED_VALUE")).thenReturn(of("nested=${TEST_VALUE}"));
-        when(propertyValueResolver.resolveOptional("DOUBLE_NESTED")).thenReturn(of("${NESTED_VALUE}=${TEST_VALUE}"));
-        when(propertyValueResolver.resolveOptional("EMPTY")).thenReturn(empty());
+        when(propertyValueResolver.resolveOptional("TEST_VALUE", propertySourceHolder)).thenReturn(of("testValueResolved"));
+        when(propertyValueResolver.resolveOptional("NESTED_VALUE", propertySourceHolder)).thenReturn(of("nested=${TEST_VALUE}"));
+        when(propertyValueResolver.resolveOptional("DOUBLE_NESTED", propertySourceHolder)).thenReturn(of("${NESTED_VALUE}=${TEST_VALUE}"));
+        when(propertyValueResolver.resolveOptional("EMPTY", propertySourceHolder)).thenReturn(empty());
     }
 
     @Test
@@ -47,7 +50,7 @@ public class PropertyStringResolverTest {
         // GIVEN
 
         // WHEN
-        String result = underTest.resolve(expectedInput);
+        String result = underTest.resolve(expectedInput, propertySourceHolder);
 
         // THEN
         assertThat(result, is(expectedOutput));

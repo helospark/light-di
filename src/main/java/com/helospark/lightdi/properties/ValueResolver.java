@@ -2,6 +2,7 @@ package com.helospark.lightdi.properties;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,8 +17,8 @@ public class ValueResolver {
         this.propertyStringResolver = propertyStringResolver;
     }
 
-    public <T> T resolve(String value, Class<T> type, LightDiContext context) {
-        String resolvedValue = propertyStringResolver.resolve(value);
+    public <T> T resolve(String value, Class<T> type, LightDiContext context, Collection<PropertySourceHolder> properties) {
+        String resolvedValue = propertyStringResolver.resolve(value, properties);
         if (type.isArray()) {
             Class<?> elementType = type.getComponentType();
             PropertyConverter<?> converter = findConverterForType(elementType, context);

@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 import com.helospark.lightdi.annotation.PropertySource;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
-public class ValueResolverFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ValueResolverFactory.class);
+public class EnvironmentInitializerFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentInitializerFactory.class);
     private PropertiesFileLoader propertiesFileLoader;
 
-    public ValueResolverFactory() {
+    public EnvironmentInitializerFactory() {
         this.propertiesFileLoader = new PropertiesFileLoader();
     }
 
-    public ValueResolver createValueResolver(List<DependencyDescriptor> dependencyDescriptors) {
+    public Environment initializeEnvironment(Environment environment, List<DependencyDescriptor> dependencyDescriptors) {
         List<PropertySourceHolder> propertySourceHolders = dependencyDescriptors.stream()
                 .filter(descriptor -> doesHavePropertySource(descriptor))
                 .flatMap(descriptor -> createPropertySourceResolver(descriptor))
@@ -29,9 +29,8 @@ public class ValueResolverFactory {
             LOGGER.debug("Properties are loaded: " + propertySourceHolders);
         }
 
-        PropertyValueResolver propertyValueResolver = new PropertyValueResolver(propertySourceHolders);
-        PropertyStringResolver propertyStringResolver = new PropertyStringResolver(propertyValueResolver);
-        return new ValueResolver(propertyStringResolver);
+        environment.addPropertySources(propertySourceHolders);
+        return environment;
     }
 
     private boolean doesHavePropertySource(DependencyDescriptor descriptor) {
@@ -39,11 +38,14 @@ public class ValueResolverFactory {
     }
 
     private Stream<PropertySourceHolder> createPropertySourceResolver(DependencyDescriptor descriptor) {
-        PropertySource[] annotation = descriptor.getClazz().getAnnotationsByType(PropertySource.class);
-        return Arrays.stream(annotation)
-                .map(propertySourceAnnotation -> propertySourceAnnotation.value())
-                .flatMap(value -> Arrays.stream(value))
+        PropertySource[] annotations = descriptor.getClazz().getAnnotationsByType(PropertySource.class);
+        return Arrays.stream(annotations)
+                .flatMap(annotation -> loadPropertySource(annotation));
+    }
+
+    private Stream<PropertySourceHolder> loadPropertySource(PropertySource annotation) {
+        return Arrays.stream(annotation.value())
                 .map(value -> propertiesFileLoader.load(value))
-                .map(value -> new PropertySourceHolder(value));
+                .map(loadedProperty -> new PropertySourceHolder(annotation.order(), loadedProperty));
     }
 }

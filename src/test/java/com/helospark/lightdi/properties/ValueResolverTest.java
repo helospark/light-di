@@ -3,8 +3,12 @@ package com.helospark.lightdi.properties;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,19 +24,22 @@ public class ValueResolverTest {
     @Mock
     private LightDiContext context;
 
-    private ValueResolver underTest;
+    private ValueResolver valueResolver;
+
+    private Environment underTest;
 
     @Before
     public void setUp() {
         initMocks(this);
-        underTest = new ValueResolver(propertyStringResolver);
-        when(propertyStringResolver.resolve("${INT}")).thenReturn("42");
-        when(propertyStringResolver.resolve("${STRING}")).thenReturn("asd");
-        when(propertyStringResolver.resolve("${INT_ARRAY}")).thenReturn("1,2,3");
-        when(propertyStringResolver.resolve("${STRING_ARRAY}")).thenReturn("a,b,c");
+        valueResolver = new ValueResolver(propertyStringResolver);
+        when(propertyStringResolver.resolve(eq("${INT}"), any(List.class))).thenReturn("42");
+        when(propertyStringResolver.resolve(eq("${STRING}"), any(List.class))).thenReturn("asd");
+        when(propertyStringResolver.resolve(eq("${INT_ARRAY}"), any(List.class))).thenReturn("1,2,3");
+        when(propertyStringResolver.resolve(eq("${STRING_ARRAY}"), any(List.class))).thenReturn("a,b,c");
         when(context.getListOfBeans(PropertyConverter.class)).thenReturn(
                 asList(new StringPropertyConverter(),
                         new IntegerPropertyConverter()));
+        underTest = new Environment(context, valueResolver);
     }
 
     @Test
@@ -40,7 +47,7 @@ public class ValueResolverTest {
         // GIVEN
 
         // WHEN
-        String result = underTest.resolve("${STRING}", String.class, context);
+        String result = underTest.resolve("${STRING}", String.class);
 
         // THEN
         assertThat(result, is("asd"));
@@ -51,7 +58,7 @@ public class ValueResolverTest {
         // GIVEN
 
         // WHEN
-        Integer result = underTest.resolve("${INT}", Integer.class, context);
+        Integer result = underTest.resolve("${INT}", Integer.class);
 
         // THEN
         assertThat(result, is(42));
@@ -62,7 +69,7 @@ public class ValueResolverTest {
         // GIVEN
 
         // WHEN
-        Integer[] result = underTest.resolve("${INT_ARRAY}", Integer[].class, context);
+        Integer[] result = underTest.resolve("${INT_ARRAY}", Integer[].class);
 
         // THEN
         assertThat(result, is(new Integer[] { 1, 2, 3 }));
@@ -73,7 +80,7 @@ public class ValueResolverTest {
         // GIVEN
 
         // WHEN
-        String[] result = underTest.resolve("${STRING_ARRAY}", String[].class, context);
+        String[] result = underTest.resolve("${STRING_ARRAY}", String[].class);
 
         // THEN
         assertThat(result, is(new String[] { "a", "b", "c" }));

@@ -30,8 +30,10 @@ import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.descriptor.ManualDependencyDescriptor;
 import com.helospark.lightdi.exception.ContextInitializationFailedException;
 import com.helospark.lightdi.postprocessor.BeanPostProcessor;
+import com.helospark.lightdi.properties.Environment;
+import com.helospark.lightdi.properties.EnvironmentFactory;
+import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
 import com.helospark.lightdi.properties.ValueResolver;
-import com.helospark.lightdi.properties.ValueResolverFactory;
 import com.helospark.lightdi.scanner.LightDiClasspathScanner;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 import com.helospark.lightdi.util.DependencyChooser;
@@ -43,7 +45,7 @@ public class LightDiContext implements AutoCloseable {
     private BeanFactory beanFactory;
     private WiringProcessingService wiringProcessingService;
     private BeanDefinitionCollector beanDefinitionCollector;
-    private ValueResolverFactory valueResolverFactory;
+    private EnvironmentInitializerFactory environmentInitializer;
     private RecursiveDependencyDescriptorCollector recursiveDependencyDescriptorCollector;
     private LightDiClasspathScanner lightDiClasspathScanner;
 
@@ -58,11 +60,14 @@ public class LightDiContext implements AutoCloseable {
     private AutowirePostProcessor autowireSupportUtil;
     private List<DependencyDescriptor> dependencyDescriptors;
 
+    private Environment environment = null;
+
     public LightDiContext() {
         this.initializedSingletonBeans = new HashMap<>();
         this.initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = new ArrayList<>();
         this.beanPostProcessors = new ArrayList<>();
+        this.environment = new EnvironmentFactory().createEnvironment(this);
 
         /** Moved from LightDi class **/
         lightDiClasspathScanner = new LightDiClasspathScanner();
@@ -76,12 +81,16 @@ public class LightDiContext implements AutoCloseable {
         preprocessWireServiceFactory = new WiringProcessingServiceFactory();
         wiringProcessingService = preprocessWireServiceFactory.createFieldWireSupport();
 
-        valueResolverFactory = new ValueResolverFactory();
+        environmentInitializer = new EnvironmentInitializerFactory();
 
         ComponentScanCollector componentScanCollector = new ComponentScanCollector();
 
         recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(lightDiClasspathScanner, beanDefinitionCollector,
                 componentScanCollector);
+
+        /** Register stuff */
+        registerSingleton(environment);
+        registerSingleton(this);
     }
 
     public <T> T getBean(Class<T> clazz) {
@@ -247,8 +256,7 @@ public class LightDiContext implements AutoCloseable {
 
             wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
 
-            // TODO: this should append
-            valueResolver = valueResolverFactory.createValueResolver(dependencyDescriptors);
+            environment = environmentInitializer.initializeEnvironment(environment, dependencyDescriptors);
 
             autowireSupportUtil = new AutowirePostProcessor(
                     beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
@@ -274,6 +282,10 @@ public class LightDiContext implements AutoCloseable {
         dependencyDescriptors.stream()
                 .filter(dependency -> !dependency.isLazy())
                 .forEach(dependency -> getBean(dependency));
+    }
+
+    public Environment getEnvironment() {
+        return environment;
     }
 
 }

@@ -27,6 +27,7 @@ import com.helospark.lightdi.it.testcontext1.ConfigurationClass;
 import com.helospark.lightdi.it.testcontext1.ConstructorDependency;
 import com.helospark.lightdi.it.testcontext1.ContextAwareTest;
 import com.helospark.lightdi.it.testcontext1.EagerComponent;
+import com.helospark.lightdi.it.testcontext1.EnvironmentInjectTest;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.LazyComponent;
 import com.helospark.lightdi.it.testcontext1.ManuallyRegisteredBean;
@@ -311,5 +312,16 @@ public class ContextLoadIT {
 
         // THEN
         assertThat(instance, is(bean));
+    }
+
+    @Test
+    public void testEnvironmentInject() {
+        // GIVEN
+
+        // WHEN
+        EnvironmentInjectTest bean = context.getBean(EnvironmentInjectTest.class);
+
+        // THEN
+        assertThat(bean.getValue(), is("asd"));
     }
 }
