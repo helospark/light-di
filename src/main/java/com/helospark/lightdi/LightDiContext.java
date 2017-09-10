@@ -1,8 +1,11 @@
 package com.helospark.lightdi;
 
+import static com.helospark.lightdi.util.BeanNameGenerator.createBeanNameForStereotypeAnnotatedClass;
+import static com.helospark.lightdi.util.DependencyChooser.findPrimary;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,31 +17,69 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
+import com.helospark.lightdi.beanfactory.BeanFactoryFactory;
 import com.helospark.lightdi.constants.LightDiConstants;
+import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
+import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
+import com.helospark.lightdi.dependencywire.ComponentScanCollector;
+import com.helospark.lightdi.dependencywire.RecursiveDependencyDescriptorCollector;
+import com.helospark.lightdi.dependencywire.WiringProcessingService;
+import com.helospark.lightdi.dependencywire.WiringProcessingServiceFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
+import com.helospark.lightdi.descriptor.ManualDependencyDescriptor;
+import com.helospark.lightdi.exception.ContextInitializationFailedException;
 import com.helospark.lightdi.postprocessor.BeanPostProcessor;
 import com.helospark.lightdi.properties.ValueResolver;
+import com.helospark.lightdi.properties.ValueResolverFactory;
+import com.helospark.lightdi.scanner.LightDiClasspathScanner;
 import com.helospark.lightdi.util.AutowirePostProcessor;
+import com.helospark.lightdi.util.DependencyChooser;
 
 public class LightDiContext implements AutoCloseable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LightDiContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
+    private BeanFactory beanFactory;
+    private WiringProcessingService wiringProcessingService;
+    private BeanDefinitionCollector beanDefinitionCollector;
+    private ValueResolverFactory valueResolverFactory;
+    private RecursiveDependencyDescriptorCollector recursiveDependencyDescriptorCollector;
+    private LightDiClasspathScanner lightDiClasspathScanner;
+
+    private WiringProcessingServiceFactory preprocessWireServiceFactory;
+    private BeanFactoryFactory beanFactoryFactory;
+    private BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory;
+
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
     private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
     private List<BeanPostProcessor> beanPostProcessors;
-    private BeanFactory beanFactory;
     private ValueResolver valueResolver;
     private AutowirePostProcessor autowireSupportUtil;
     private List<DependencyDescriptor> dependencyDescriptors;
 
-    public LightDiContext(List<DependencyDescriptor> dependencyDescriptors, ValueResolver valueResolver,
-            BeanFactory beanFactory) {
+    public LightDiContext() {
         this.initializedSingletonBeans = new HashMap<>();
         this.initializedPrototypeBeans = new HashMap<>();
-        this.dependencyDescriptors = dependencyDescriptors;
-        this.beanFactory = beanFactory;
-        this.valueResolver = valueResolver;
-        this.beanPostProcessors = this.getListOfBeans(BeanPostProcessor.class);
+        this.dependencyDescriptors = new ArrayList<>();
+        this.beanPostProcessors = new ArrayList<>();
+
+        /** Moved from LightDi class **/
+        lightDiClasspathScanner = new LightDiClasspathScanner();
+
+        beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
+        beanDefinitionCollector = beanDefinitionProcessorChainFactory.createBeanDefinitionProcessorChain();
+
+        beanFactoryFactory = new BeanFactoryFactory();
+        beanFactory = beanFactoryFactory.createBeanFactory();
+
+        preprocessWireServiceFactory = new WiringProcessingServiceFactory();
+        wiringProcessingService = preprocessWireServiceFactory.createFieldWireSupport();
+
+        valueResolverFactory = new ValueResolverFactory();
+
+        ComponentScanCollector componentScanCollector = new ComponentScanCollector();
+
+        recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(lightDiClasspathScanner, beanDefinitionCollector,
+                componentScanCollector);
     }
 
     public <T> T getBean(Class<T> clazz) {
@@ -72,6 +113,27 @@ public class LightDiContext implements AutoCloseable {
                 .forEach(dependencyDescriptor -> getBean(convertToQuery(dependencyDescriptor)));
     }
 
+    public void registerSingleton(Object bean) {
+        this.registerSingleton(bean, createBeanNameForStereotypeAnnotatedClass(bean.getClass()));
+    }
+
+    public void registerSingleton(Object bean, String beanName) {
+        ManualDependencyDescriptor dependencyDescriptor = ManualDependencyDescriptor.builder()
+                .withClazz(bean.getClass())
+                .withIsLazy(false)
+                .withQualifier(beanName)
+                .withScope(LightDiConstants.SCOPE_SINGLETON)
+                .withIsPrimary(false)
+                .build();
+        registerSingleton(dependencyDescriptor, bean);
+    }
+
+    public void registerSingleton(ManualDependencyDescriptor dependencyDescriptor, Object bean) {
+        dependencyDescriptor.setScope(LightDiConstants.SCOPE_SINGLETON);
+        this.dependencyDescriptors.add(dependencyDescriptor);
+        this.initializedSingletonBeans.put(dependencyDescriptor, bean);
+    }
+
     private Object getOrCreateDependencyInternal(DependencyDescriptorQuery query) {
         Optional<DependencyDescriptor> initializedSingletonDescriptor = findInitializedSingletonDescriptor(query);
         if (initializedSingletonDescriptor.isPresent()) {
@@ -82,15 +144,8 @@ public class LightDiContext implements AutoCloseable {
     }
 
     private Object createNewInstance(DependencyDescriptorQuery query) {
-        List<DependencyDescriptor> dependencyToCreate = findDependencyDescriptor(dependencyDescriptors, query);
-        Optional<DependencyDescriptor> primary = findPrimary(dependencyToCreate);
-        if (dependencyToCreate.size() == 1) {
-            return createDependency(dependencyToCreate.get(0));
-        } else if (primary.isPresent()) {
-            return createDependency(primary.get());
-        } else {
-            throw new IllegalArgumentException("No single match for " + query + " found " + dependencyToCreate);
-        }
+        DependencyDescriptor foundDependency = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
+        return createDependency(foundDependency);
     }
 
     private Object createDependency(DependencyDescriptor descriptorToUse) {
@@ -114,11 +169,10 @@ public class LightDiContext implements AutoCloseable {
             }
         }
         return result;
-
     }
 
     private Optional<DependencyDescriptor> findInitializedSingletonDescriptor(DependencyDescriptorQuery toFind) {
-        List<DependencyDescriptor> foundDependencies = findDependencyDescriptor(initializedSingletonBeans.keySet(),
+        List<DependencyDescriptor> foundDependencies = DependencyChooser.findDependencyDescriptor(initializedSingletonBeans.keySet(),
                 toFind);
         if (foundDependencies.isEmpty()) {
             return Optional.empty();
@@ -127,21 +181,6 @@ public class LightDiContext implements AutoCloseable {
         } else {
             return findPrimary(foundDependencies);
         }
-    }
-
-    private List<DependencyDescriptor> findDependencyDescriptor(Collection<DependencyDescriptor> dependencies,
-            DependencyDescriptorQuery toFind) {
-        return dependencies
-                .stream()
-                .filter(dependencyEntry -> dependencyEntry.doesMatch(toFind))
-                .collect(Collectors.toList());
-    }
-
-    private Optional<DependencyDescriptor> findPrimary(
-            List<DependencyDescriptor> foundDependencies) {
-        return foundDependencies.stream()
-                .filter(dependency -> dependency.isPrimary())
-                .findFirst();
     }
 
     @SuppressWarnings("unchecked")
@@ -197,6 +236,38 @@ public class LightDiContext implements AutoCloseable {
 
     public void setAutowireSupportUtil(AutowirePostProcessor autowireSupportUtil) {
         this.autowireSupportUtil = autowireSupportUtil;
+    }
+
+    public void loadDependencies(String packageName) {
+        try {
+            List<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
+            dependencyDescriptors.addAll(loadedDescriptors);
+
+            wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
+
+            // TODO: this should append
+            valueResolver = valueResolverFactory.createValueResolver(dependencyDescriptors);
+
+            autowireSupportUtil = new AutowirePostProcessor(
+                    beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
+                    preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
+                    this);
+
+            initializeEagerDependencies(dependencyDescriptors);
+
+            LOGGER.info("Context initialized");
+
+            this.beanPostProcessors.addAll(this.getListOfBeans(BeanPostProcessor.class));
+
+        } catch (Exception e) {
+            throw new ContextInitializationFailedException("Context initialization failed", e);
+        }
+    }
+
+    private void initializeEagerDependencies(List<DependencyDescriptor> dependencyDescriptors) {
+        dependencyDescriptors.stream()
+                .filter(dependency -> !dependency.isLazy())
+                .forEach(dependency -> getBean(dependency));
     }
 
 }

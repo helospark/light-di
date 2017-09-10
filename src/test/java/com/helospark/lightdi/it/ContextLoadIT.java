@@ -29,6 +29,7 @@ import com.helospark.lightdi.it.testcontext1.ContextAwareTest;
 import com.helospark.lightdi.it.testcontext1.EagerComponent;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.LazyComponent;
+import com.helospark.lightdi.it.testcontext1.ManuallyRegisteredBean;
 import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.PrimaryTestBean;
@@ -297,5 +298,18 @@ public class ContextLoadIT {
 
         // THEN
         assertThat(instance.getContext(), is(context));
+    }
+
+    @Test
+    public void testRegisterSingletonShouldRegisterBean() {
+        // GIVEN
+        ManuallyRegisteredBean bean = new ManuallyRegisteredBean();
+        context.registerSingleton(bean);
+
+        // WHEN
+        ManuallyRegisteredBean instance = context.getBean(ManuallyRegisteredBean.class);
+
+        // THEN
+        assertThat(instance, is(bean));
     }
 }

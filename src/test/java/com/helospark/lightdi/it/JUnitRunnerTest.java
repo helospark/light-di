@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 
 import com.helospark.lightdi.annotation.Autowired;
 import com.helospark.lightdi.it.testcontext1.TestDependency;
-import com.helospark.lightdi.test.LightDiTest;
+import com.helospark.lightdi.test.annotation.LightDiTest;
 import com.helospark.lightdi.test.junit4.LightDiJUnitTestRunner;
 
 @RunWith(LightDiJUnitTestRunner.class)

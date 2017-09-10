@@ -14,9 +14,6 @@ import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
  * Descriptor for classes annotated with stereotype annotations.
  * @author helospark
  */
-/**
- * @author helospark
- */
 public class StereotypeDependencyDescriptor extends DependencyDescriptor {
     private List<ConstructorDescriptor> constructorDescriptor;
     private List<MethodDescriptor> setterDescriptor;
