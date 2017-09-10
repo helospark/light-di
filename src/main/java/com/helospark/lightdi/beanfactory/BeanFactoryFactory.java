@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.Arrays;
 
 import com.helospark.lightdi.beanfactory.chain.ConfigurationBeanFacotoryChainItem;
+import com.helospark.lightdi.beanfactory.chain.ManualBeanFactoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.StereotypeAnnotatedBeanFactoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.support.AutowirePostProcessSupport;
 import com.helospark.lightdi.reflection.ConstructorInvoker;
@@ -20,6 +21,7 @@ public class BeanFactoryFactory {
     private AutowirePostProcessSupport autowirePostProcessSupport;
     private ConfigurationBeanFacotoryChainItem configurationBeanFacotoryChainItem;
     private StereotypeAnnotatedBeanFactoryChainItem stereotypeAnnotatedBeanFactoryChainItem;
+    private ManualBeanFactoryChainItem manualBeanFactoryChainItem;
     private PostConstructInvoker postConstructInvoker;
 
     public BeanFactoryFactory() {
@@ -38,12 +40,13 @@ public class BeanFactoryFactory {
         autowirePostProcessSupport = new AutowirePostProcessSupport(setterInvoker, fieldSetInvoker);
         stereotypeAnnotatedBeanFactoryChainItem = new StereotypeAnnotatedBeanFactoryChainItem(
                 constructorInvoker, autowirePostProcessSupport);
+        manualBeanFactoryChainItem = new ManualBeanFactoryChainItem();
         configurationBeanFacotoryChainItem = new ConfigurationBeanFacotoryChainItem(
                 methodInvoker);
     }
 
     public BeanFactory createBeanFactory() {
-        return new BeanFactory(asList(stereotypeAnnotatedBeanFactoryChainItem, configurationBeanFacotoryChainItem),
+        return new BeanFactory(asList(stereotypeAnnotatedBeanFactoryChainItem, configurationBeanFacotoryChainItem, manualBeanFactoryChainItem),
                 postConstructInvoker);
     }
 

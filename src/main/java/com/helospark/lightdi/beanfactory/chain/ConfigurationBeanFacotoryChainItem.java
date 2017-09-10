@@ -1,7 +1,11 @@
 package com.helospark.lightdi.beanfactory.chain;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
+import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.bean.BeanDependencyDescriptor;
 import com.helospark.lightdi.reflection.MethodInvoker;
 
@@ -24,5 +28,18 @@ public class ConfigurationBeanFacotoryChainItem implements BeanFactoryChainItem 
     @Override
     public boolean isSupported(DependencyDescriptor dependencyDescriptor) {
         return dependencyDescriptor instanceof BeanDependencyDescriptor;
+    }
+
+    @Override
+    public List<DependencyDescriptor> extractDependencies(DependencyDescriptor dependencyToCreate) {
+        BeanDependencyDescriptor beanDependencyDescriptor = (BeanDependencyDescriptor) dependencyToCreate;
+        return streamToInject(beanDependencyDescriptor.getMethodDescriptor().getInjectionDescriptor());
+    }
+
+    private List<DependencyDescriptor> streamToInject(List<InjectionDescriptor> list) {
+        return list.stream()
+                .filter(injectDescriptor -> injectDescriptor instanceof DependencyDescriptor)
+                .map(injectDescriptor -> (DependencyDescriptor) injectDescriptor)
+                .collect(Collectors.toList());
     }
 }

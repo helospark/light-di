@@ -1,5 +1,8 @@
 package com.helospark.lightdi.beanfactory;
 
+import static com.helospark.lightdi.util.LogMessageBeanNameFormatter.convertToBeanNameListString;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import com.helospark.lightdi.LightDiContext;
@@ -7,6 +10,7 @@ import com.helospark.lightdi.aware.ContextAware;
 import com.helospark.lightdi.beanfactory.chain.BeanFactoryChainItem;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.BeanCreationException;
+import com.helospark.lightdi.exception.IllegalConfigurationException;
 import com.helospark.lightdi.reflection.PostConstructInvoker;
 
 public class BeanFactory {
@@ -20,12 +24,7 @@ public class BeanFactory {
 
     public Object createBean(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate) {
         try {
-            Object createdBean = chain.stream()
-                    .filter(chainItem -> chainItem.isSupported(dependencyToCreate))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Cannot create bean because no bean factory exists for type "
-                                    + dependencyToCreate.getClass().getName()))
+            Object createdBean = findHandler(dependencyToCreate)
                     .createBean(lightDiContext, dependencyToCreate);
 
             postProcessCreatedBean(lightDiContext, dependencyToCreate, createdBean);
@@ -34,6 +33,42 @@ public class BeanFactory {
         } catch (Exception e) {
             throw new BeanCreationException("Failed to create bean " + dependencyToCreate, e);
         }
+    }
+
+    private BeanFactoryChainItem findHandler(DependencyDescriptor dependencyToCreate) {
+        return chain.stream()
+                .filter(chainItem -> chainItem.isSupported(dependencyToCreate))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Cannot create bean because no bean factory exists for type "
+                                + dependencyToCreate.getClass().getName()));
+    }
+
+    public void assertValidConfiguration(List<DependencyDescriptor> earlierInRoute) {
+        for (DependencyDescriptor descriptor : earlierInRoute) {
+            assertValidConfiguration(descriptor, new ArrayList<>());
+        }
+    }
+
+    public void assertValidConfiguration(DependencyDescriptor dependencyToCreate, List<DependencyDescriptor> earlierInRoute) {
+        List<DependencyDescriptor> dependencies = findDependenciesFor(dependencyToCreate);
+
+        for (DependencyDescriptor dependency : dependencies) {
+            if (earlierInRoute.contains(dependency)) {
+                throw new IllegalConfigurationException("Circle in bean definitions: " + convertToBeanNameListString(earlierInRoute));
+            }
+        }
+
+        for (DependencyDescriptor dependency : dependencies) {
+            earlierInRoute.add(dependency);
+            assertValidConfiguration(dependency, earlierInRoute);
+            earlierInRoute.remove(dependencies);
+        }
+    }
+
+    private List<DependencyDescriptor> findDependenciesFor(DependencyDescriptor dependencyToCreate) {
+        return findHandler(dependencyToCreate)
+                .extractDependencies(dependencyToCreate);
     }
 
     private void postProcessCreatedBean(LightDiContext context, DependencyDescriptor dependencyToCreate, Object createdBean) {

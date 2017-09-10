@@ -38,6 +38,8 @@ import com.helospark.lightdi.util.DependencyChooser;
 
 public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
+    private static boolean CHECK_FOR_INTEGRITY = true;
+
     private BeanFactory beanFactory;
     private WiringProcessingService wiringProcessingService;
     private BeanDefinitionCollector beanDefinitionCollector;
@@ -252,6 +254,10 @@ public class LightDiContext implements AutoCloseable {
                     beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
                     preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
                     this);
+
+            if (CHECK_FOR_INTEGRITY) {
+                beanFactory.assertValidConfiguration(dependencyDescriptors);
+            }
 
             initializeEagerDependencies(dependencyDescriptors);
 
