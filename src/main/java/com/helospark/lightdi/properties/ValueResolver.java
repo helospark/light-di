@@ -19,6 +19,9 @@ public class ValueResolver {
 
     public <T> T resolve(String value, Class<T> type, LightDiContext context, Collection<PropertySourceHolder> properties) {
         String resolvedValue = propertyStringResolver.resolve(value, properties);
+        if (type.equals(String.class)) {
+            return (T) resolvedValue;
+        }
         if (type.isArray()) {
             Class<?> elementType = type.getComponentType();
             PropertyConverter<?> converter = findConverterForType(elementType, context);

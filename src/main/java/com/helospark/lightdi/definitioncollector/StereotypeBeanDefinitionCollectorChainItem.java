@@ -9,12 +9,18 @@ import java.util.List;
 import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.IsPrimaryExtractor;
 import com.helospark.lightdi.annotation.Service;
+import com.helospark.lightdi.conditional.ConditionalAnnotationsExtractor;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.util.IsLazyExtractor;
 import com.helospark.lightdi.util.QualifierExtractor;
 
 public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
+    private ConditionalAnnotationsExtractor conditionalAnnotationsExtractor;
+
+    public StereotypeBeanDefinitionCollectorChainItem(ConditionalAnnotationsExtractor conditionalAnnotationsExtractor) {
+        this.conditionalAnnotationsExtractor = conditionalAnnotationsExtractor;
+    }
 
     @Override
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
@@ -32,6 +38,7 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
                 .withScope(QualifierExtractor.extractScope(clazz))
                 .withIsLazy(IsLazyExtractor.isLazy(clazz))
                 .withIsPrimary(IsPrimaryExtractor.isPrimary(clazz))
+                .withConditions(conditionalAnnotationsExtractor.extractConditions(clazz))
                 .build();
         return Collections.singletonList(dependencyDescriptor);
     }

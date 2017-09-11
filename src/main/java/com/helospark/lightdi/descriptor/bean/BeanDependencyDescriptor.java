@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
+import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
 
@@ -22,6 +23,7 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         this.isPrimary = builder.isPrimary;
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
+        this.conditions = builder.conditions;
         this.configurationDescriptor = builder.configurationDescriptor;
         this.method = builder.method;
         this.methodDescriptor = builder.methodDescriptor;
@@ -108,6 +110,7 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         private boolean isPrimary;
         private List<Method> postConstructMethods;
         private List<Method> preDestroyMethods;
+        private List<DependencyCondition> conditions;
         private DependencyDescriptor configurationDescriptor;
         private Method method;
         private MethodDescriptor methodDescriptor;
@@ -147,6 +150,11 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withPreDestroyMethods(List<Method> preDestroyMethods) {
             this.preDestroyMethods = preDestroyMethods;
+            return this;
+        }
+
+        public Builder withConditions(List<DependencyCondition> conditions) {
+            this.conditions = conditions;
             return this;
         }
 

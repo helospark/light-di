@@ -3,6 +3,9 @@ package com.helospark.lightdi.definitioncollector;
 import java.util.Arrays;
 import java.util.List;
 
+import com.helospark.lightdi.conditional.ConditionalAnnotationsExtractor;
+import com.helospark.lightdi.conditional.ConditionalAnnotationsExtractorFactory;
+
 public class BeanDefinitionProcessorChainFactory {
     private List<BeanDefinitionCollectorChainItem> beanDefinitionPreprocessorChain;
     private StereotypeBeanDefinitionCollectorChainItem stereotypeBeanDefinitionCollectorChainItem;
@@ -10,8 +13,10 @@ public class BeanDefinitionProcessorChainFactory {
     private ImportBeanDefinitionCollectorChainItem importBeanDefinitionCollectorChainItem;
 
     public BeanDefinitionProcessorChainFactory() {
-        stereotypeBeanDefinitionCollectorChainItem = new StereotypeBeanDefinitionCollectorChainItem();
-        configurationClassBeanDefinitionCollectorChainItem = new ConfigurationClassBeanDefinitionCollectorChainItem();
+        ConditionalAnnotationsExtractor conditionalAnnotationsExtractor = new ConditionalAnnotationsExtractorFactory()
+                .createConditionalAnnotationsExtractor();
+        stereotypeBeanDefinitionCollectorChainItem = new StereotypeBeanDefinitionCollectorChainItem(conditionalAnnotationsExtractor);
+        configurationClassBeanDefinitionCollectorChainItem = new ConfigurationClassBeanDefinitionCollectorChainItem(conditionalAnnotationsExtractor);
         importBeanDefinitionCollectorChainItem = new ImportBeanDefinitionCollectorChainItem(
                 configurationClassBeanDefinitionCollectorChainItem);
         this.beanDefinitionPreprocessorChain = Arrays.asList(stereotypeBeanDefinitionCollectorChainItem,

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
+import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.constructor.ConstructorDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.field.FieldDescriptor;
@@ -28,6 +29,7 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
         this.isPrimary = builder.isPrimary;
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
+        this.conditions = builder.conditions;
         this.constructorDescriptor = builder.constructorDescriptor;
         this.setterDescriptor = builder.setterDescriptor;
         this.fieldDescriptor = builder.fieldDescriptor;
@@ -108,6 +110,7 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
         private boolean isPrimary;
         private List<Method> postConstructMethods;
         private List<Method> preDestroyMethods;
+        private List<DependencyCondition> conditions;
         private List<ConstructorDescriptor> constructorDescriptor;
         private List<MethodDescriptor> setterDescriptor;
         private List<FieldDescriptor> fieldDescriptor;
@@ -147,6 +150,11 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withPreDestroyMethods(List<Method> preDestroyMethods) {
             this.preDestroyMethods = preDestroyMethods;
+            return this;
+        }
+
+        public Builder withConditions(List<DependencyCondition> conditions) {
+            this.conditions = conditions;
             return this;
         }
 

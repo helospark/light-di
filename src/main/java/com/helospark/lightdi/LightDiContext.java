@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.beanfactory.BeanFactoryFactory;
+import com.helospark.lightdi.conditional.ConditionalFilter;
 import com.helospark.lightdi.constants.LightDiConstants;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
 import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
@@ -62,12 +63,15 @@ public class LightDiContext implements AutoCloseable {
 
     private Environment environment = null;
 
+    private ConditionalFilter conditionalFilter;
+
     public LightDiContext() {
         this.initializedSingletonBeans = new HashMap<>();
         this.initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = new ArrayList<>();
         this.beanPostProcessors = new ArrayList<>();
         this.environment = new EnvironmentFactory().createEnvironment(this);
+        this.conditionalFilter = new ConditionalFilter();
 
         /** Moved from LightDi class **/
         lightDiClasspathScanner = new LightDiClasspathScanner();
@@ -252,11 +256,14 @@ public class LightDiContext implements AutoCloseable {
     public void loadDependencies(String packageName) {
         try {
             List<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
+
+            environment = environmentInitializer.initializeEnvironment(environment, loadedDescriptors);
+
+            loadedDescriptors = conditionalFilter.filterDependencies(this, loadedDescriptors);
+
             dependencyDescriptors.addAll(loadedDescriptors);
 
             wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
-
-            environment = environmentInitializer.initializeEnvironment(environment, dependencyDescriptors);
 
             autowireSupportUtil = new AutowirePostProcessor(
                     beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),

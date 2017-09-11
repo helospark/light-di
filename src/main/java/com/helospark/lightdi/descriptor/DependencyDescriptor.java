@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
+import com.helospark.lightdi.conditional.condition.DependencyCondition;
+
 public abstract class DependencyDescriptor implements InjectionDescriptor {
     protected Class<?> clazz;
     protected String qualifier;
@@ -13,6 +15,8 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
 
     protected List<Method> postConstructMethods = Collections.emptyList();
     protected List<Method> preDestroyMethods = Collections.emptyList();
+
+    protected List<DependencyCondition> conditions = Collections.emptyList();
 
     public Class<?> getClazz() {
         return clazz;
@@ -68,6 +72,10 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
 
     public void setLazy(boolean isLazy) {
         this.isLazy = isLazy;
+    }
+
+    public List<DependencyCondition> getConditions() {
+        return conditions;
     }
 
     @Override
