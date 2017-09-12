@@ -10,6 +10,7 @@ public class Environment {
     public static final int DEFAULT_PROPERTY_ORDER = 0;
     public static final int HIGHEST_PROPERTY_ORDER = Integer.MIN_VALUE + 1;
     public static final int LOWEST_PROPERTY_ORDER = Integer.MAX_VALUE;
+    public static final int SYSTEM_PROPERTY_ORDER = HIGHEST_PROPERTY_ORDER + 100;
 
     private SortedSet<PropertySourceHolder> propertySources;
     private LightDiContext context;
