@@ -1,19 +1,21 @@
 package com.helospark.lightdi.beanfactory.chain;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.beanfactory.chain.support.InjectDescriptorsToDependencies;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
-import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.bean.BeanDependencyDescriptor;
 import com.helospark.lightdi.reflection.MethodInvoker;
 
 public class ConfigurationBeanFacotoryChainItem implements BeanFactoryChainItem {
     private MethodInvoker methodInvoker;
+    private InjectDescriptorsToDependencies injectDescriptorsToDependencies;
 
-    public ConfigurationBeanFacotoryChainItem(MethodInvoker methodInvoker) {
+    public ConfigurationBeanFacotoryChainItem(MethodInvoker methodInvoker,
+            InjectDescriptorsToDependencies injectDescriptorsToDependencies) {
         this.methodInvoker = methodInvoker;
+        this.injectDescriptorsToDependencies = injectDescriptorsToDependencies;
     }
 
     @Override
@@ -33,13 +35,6 @@ public class ConfigurationBeanFacotoryChainItem implements BeanFactoryChainItem 
     @Override
     public List<DependencyDescriptor> extractDependencies(DependencyDescriptor dependencyToCreate) {
         BeanDependencyDescriptor beanDependencyDescriptor = (BeanDependencyDescriptor) dependencyToCreate;
-        return streamToInject(beanDependencyDescriptor.getMethodDescriptor().getInjectionDescriptor());
-    }
-
-    private List<DependencyDescriptor> streamToInject(List<InjectionDescriptor> list) {
-        return list.stream()
-                .filter(injectDescriptor -> injectDescriptor instanceof DependencyDescriptor)
-                .map(injectDescriptor -> (DependencyDescriptor) injectDescriptor)
-                .collect(Collectors.toList());
+        return injectDescriptorsToDependencies.extract(beanDependencyDescriptor.getMethodDescriptor().getInjectionDescriptor());
     }
 }

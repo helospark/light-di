@@ -8,6 +8,7 @@ import com.helospark.lightdi.beanfactory.chain.ConfigurationBeanFacotoryChainIte
 import com.helospark.lightdi.beanfactory.chain.ManualBeanFactoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.StereotypeAnnotatedBeanFactoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.support.AutowirePostProcessSupport;
+import com.helospark.lightdi.beanfactory.chain.support.InjectDescriptorsToDependencies;
 import com.helospark.lightdi.reflection.ConstructorInvoker;
 import com.helospark.lightdi.reflection.FieldSetInvoker;
 import com.helospark.lightdi.reflection.MethodInvoker;
@@ -42,11 +43,14 @@ public class BeanFactoryFactory {
 
         postConstructInvoker = new PostConstructInvoker();
         autowirePostProcessSupport = new AutowirePostProcessSupport(setterInvoker, fieldSetInvoker);
+
+        InjectDescriptorsToDependencies injectDescriptorsToDependencies = new InjectDescriptorsToDependencies();
+
         stereotypeAnnotatedBeanFactoryChainItem = new StereotypeAnnotatedBeanFactoryChainItem(
-                constructorInvoker, autowirePostProcessSupport);
+                constructorInvoker, autowirePostProcessSupport, injectDescriptorsToDependencies);
         manualBeanFactoryChainItem = new ManualBeanFactoryChainItem();
         configurationBeanFacotoryChainItem = new ConfigurationBeanFacotoryChainItem(
-                methodInvoker);
+                methodInvoker, injectDescriptorsToDependencies);
     }
 
     public BeanFactory createBeanFactory() {
