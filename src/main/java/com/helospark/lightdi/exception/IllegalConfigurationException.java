@@ -6,4 +6,8 @@ public class IllegalConfigurationException extends RuntimeException {
         super(cause);
     }
 
+    public IllegalConfigurationException(String message, ReflectiveOperationException cause) {
+        super(message, cause);
+    }
+
 }

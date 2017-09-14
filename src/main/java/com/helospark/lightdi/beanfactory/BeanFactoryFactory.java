@@ -13,9 +13,11 @@ import com.helospark.lightdi.reflection.FieldSetInvoker;
 import com.helospark.lightdi.reflection.MethodInvoker;
 import com.helospark.lightdi.reflection.PostConstructInvoker;
 import com.helospark.lightdi.reflection.SetterInvoker;
+import com.helospark.lightdi.reflection.chain.DependencyCollectionResolverChainItem;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
 import com.helospark.lightdi.reflection.chain.DependentObjectResolverChainItem;
 import com.helospark.lightdi.reflection.chain.PropertyObjectResolverChainItem;
+import com.helospark.lightdi.util.CollectionFactory;
 
 public class BeanFactoryFactory {
     private AutowirePostProcessSupport autowirePostProcessSupport;
@@ -27,9 +29,11 @@ public class BeanFactoryFactory {
     public BeanFactoryFactory() {
         DependentObjectResolverChainItem dependentObjectResolverChainItem = new DependentObjectResolverChainItem();
         PropertyObjectResolverChainItem propertyObjectResolverChainItem = new PropertyObjectResolverChainItem();
+        DependencyCollectionResolverChainItem dependencyCollectionResolverChainItem = new DependencyCollectionResolverChainItem(
+                new CollectionFactory());
 
         DependencyObjectResolverHandler dependencyObjectResolverHandler = new DependencyObjectResolverHandler(
-                Arrays.asList(dependentObjectResolverChainItem, propertyObjectResolverChainItem));
+                Arrays.asList(dependentObjectResolverChainItem, propertyObjectResolverChainItem, dependencyCollectionResolverChainItem));
 
         ConstructorInvoker constructorInvoker = new ConstructorInvoker(dependencyObjectResolverHandler);
         MethodInvoker methodInvoker = new MethodInvoker(dependencyObjectResolverHandler);
