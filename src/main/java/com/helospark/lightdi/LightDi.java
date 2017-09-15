@@ -8,4 +8,8 @@ public class LightDi {
         return lightDiContext;
     }
 
+    public int version() {
+        return 1;
+    }
+
 }

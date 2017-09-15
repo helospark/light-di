@@ -12,6 +12,10 @@ import com.helospark.lightdi.it.conditionaltest.ConditionalOnBeanShouldNotCreate
 import com.helospark.lightdi.it.conditionaltest.ConditionalOnBeanToConditionalOnClass;
 import com.helospark.lightdi.it.conditionaltest.ConditionalOnClassShouldCreateBean;
 import com.helospark.lightdi.it.conditionaltest.ConditionalOnClassShouldNotCreateBean;
+import com.helospark.lightdi.it.conditionaltest.ConditionalOnMissingBeanShouldCreateBean;
+import com.helospark.lightdi.it.conditionaltest.ConditionalOnMissingBeanShouldNotCreateBean;
+import com.helospark.lightdi.it.conditionaltest.ConditionalOnMissingClassShouldCreateBean;
+import com.helospark.lightdi.it.conditionaltest.ConditionalOnMissingClassShouldNotCreateBean;
 import com.helospark.lightdi.it.conditionaltest.ConditionalOnPropertyShouldCreateBean;
 import com.helospark.lightdi.it.conditionaltest.ConditionalOnPropertyShouldNotCreateBean;
 import com.helospark.lightdi.it.conditionaltest.TestConfiguration;
@@ -96,5 +100,47 @@ public class ConditionalIT {
 
         // THEN
         assertNotNull(result);
+    }
+
+    @Test
+    public void testConditionalOnMissingBeanShouldCreateBean() {
+        // GIVEN
+
+        // WHEN
+        ConditionalOnMissingBeanShouldCreateBean result = context.getBean(ConditionalOnMissingBeanShouldCreateBean.class);
+
+        // THEN
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testConditionalOnMissingClassShouldCreateBean() {
+        // GIVEN
+
+        // WHEN
+        ConditionalOnMissingClassShouldCreateBean result = context.getBean(ConditionalOnMissingClassShouldCreateBean.class);
+
+        // THEN
+        assertNotNull(result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConditionalOnMissingClassShouldNotCreateBean() {
+        // GIVEN
+
+        // WHEN
+        context.getBean(ConditionalOnMissingClassShouldNotCreateBean.class);
+
+        // THEN throws
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConditionalOnMissingBeanShouldNotCreateBean() {
+        // GIVEN
+
+        // WHEN
+        context.getBean(ConditionalOnMissingBeanShouldNotCreateBean.class);
+
+        // THEN throws
     }
 }

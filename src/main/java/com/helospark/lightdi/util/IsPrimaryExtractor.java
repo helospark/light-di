@@ -1,8 +1,8 @@
-package com.helospark.lightdi.annotation;
+package com.helospark.lightdi.util;
 
 import java.lang.reflect.Method;
 
-import com.helospark.lightdi.util.AnnotationUtil;
+import com.helospark.lightdi.annotation.Primary;
 
 public class IsPrimaryExtractor {
 

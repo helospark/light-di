@@ -7,12 +7,12 @@ import java.util.Collections;
 import java.util.List;
 
 import com.helospark.lightdi.annotation.Component;
-import com.helospark.lightdi.annotation.IsPrimaryExtractor;
 import com.helospark.lightdi.annotation.Service;
 import com.helospark.lightdi.conditional.ConditionalAnnotationsExtractor;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.util.IsLazyExtractor;
+import com.helospark.lightdi.util.IsPrimaryExtractor;
 import com.helospark.lightdi.util.QualifierExtractor;
 
 public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {

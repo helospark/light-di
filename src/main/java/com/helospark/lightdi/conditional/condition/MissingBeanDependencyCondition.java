@@ -3,16 +3,16 @@ package com.helospark.lightdi.conditional.condition;
 import java.util.List;
 
 import com.helospark.lightdi.LightDiContext;
-import com.helospark.lightdi.annotation.ConditionalOnBean;
+import com.helospark.lightdi.annotation.ConditionalOnMissingBean;
 import com.helospark.lightdi.conditional.condition.evaluator.BeanDependencyConditionEvaluator;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 
-public class BeanDependencyCondition implements DependencyCondition {
+public class MissingBeanDependencyCondition implements DependencyCondition {
     private DependencyDescriptorQuery dependencyDescriptorQuery;
     private BeanDependencyConditionEvaluator beanDependencyConditionEvaluator;
 
-    public BeanDependencyCondition(ConditionalOnBean conditionalOnBean,
+    public MissingBeanDependencyCondition(ConditionalOnMissingBean conditionalOnBean,
             BeanDependencyConditionEvaluator beanDependencyConditionEvaluator) {
         dependencyDescriptorQuery = DependencyDescriptorQuery.builder()
                 .withClazz(conditionalOnBean.value())
@@ -22,7 +22,7 @@ public class BeanDependencyCondition implements DependencyCondition {
 
     @Override
     public boolean evaluate(LightDiContext context, List<DependencyDescriptor> dependencies) {
-        return beanDependencyConditionEvaluator.isBeanExists(dependencyDescriptorQuery, dependencies);
+        return !beanDependencyConditionEvaluator.isBeanExists(dependencyDescriptorQuery, dependencies);
     }
 
 }

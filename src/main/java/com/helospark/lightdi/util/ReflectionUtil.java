@@ -27,7 +27,7 @@ public class ReflectionUtil {
     }
 
     public static Optional<Class<?>> extractFirstGenericType(Parameter parameter) {
-        Optional<Type> asd = Optional.ofNullable(parameter)
+        Optional<Type> extractedType = Optional.ofNullable(parameter)
                 .map(param -> param.getParameterizedType())
                 .filter(type -> type instanceof ParameterizedType)
                 .map(type -> (ParameterizedType) type)
@@ -36,8 +36,8 @@ public class ReflectionUtil {
                 .orElse(Stream.empty())
                 .findFirst();
 
-        if (asd.isPresent()) {
-            Type type = asd.get();
+        if (extractedType.isPresent()) {
+            Type type = extractedType.get();
 
             if (type instanceof Class) {
                 return Optional.of((Class<?>) type);

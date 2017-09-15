@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Bean;
 import com.helospark.lightdi.annotation.Configuration;
-import com.helospark.lightdi.annotation.IsPrimaryExtractor;
 import com.helospark.lightdi.conditional.ConditionalAnnotationsExtractor;
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.bean.BeanDependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.util.IsLazyExtractor;
+import com.helospark.lightdi.util.IsPrimaryExtractor;
 import com.helospark.lightdi.util.QualifierExtractor;
 
 public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
