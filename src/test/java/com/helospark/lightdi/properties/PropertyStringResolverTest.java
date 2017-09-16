@@ -56,14 +56,22 @@ public class PropertyStringResolverTest {
         assertThat(result, is(expectedOutput));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testMissingValueShouldThrow() {
+        // GIVEN
+
+        // WHEN
+        underTest.resolve("${EMPTY}", propertySourceHolder);
+
+        // THEN throws
+    }
+
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[] { "${TEST_VALUE}", "testValueResolved" },
                 new Object[] { "test=${TEST_VALUE}", "test=testValueResolved" },
                 new Object[] { "${NESTED_VALUE}", "nested=testValueResolved" },
-                new Object[] { "${DOUBLE_NESTED}", "nested=testValueResolved=testValueResolved" },
-                new Object[] { "${EMPTY}", "" },
-                new Object[] { "isItEmpty=${EMPTY}", "isItEmpty=" });
+                new Object[] { "${DOUBLE_NESTED}", "nested=testValueResolved=testValueResolved" });
     }
 }

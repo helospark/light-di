@@ -44,23 +44,31 @@ public class RecursiveDependencyDescriptorCollector {
         return dependencyDescriptors;
     }
 
+    public List<DependencyDescriptor> collectDependenciesStartingFromClass(Class<?> clazz) {
+        return collectClasses(new ArrayList<>(), Collections.singletonList(clazz.getName()));
+    }
+
     private List<DependencyDescriptor> collectDepenenciesRecursively(String packageName, List<String> alreadyScannerPackages) {
         if (!alreadyScannerPackages.contains(packageName)) {
             alreadyScannerPackages.add(packageName);
 
             List<String> classes = lightDiClasspathScanner.scanClasspathForBeanClassNames(packageName);
-            List<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector.collectDependencyDescriptors(classes);
-
-            List<String> findOtherPackages = componentScanCollector.collectComponentScan(dependencyDescriptors);
-
-            findOtherPackages.stream()
-                    .filter(scannedPackageName -> !alreadyScannerPackages.contains(scannedPackageName))
-                    .forEach(scannedPackageName -> dependencyDescriptors
-                            .addAll(collectDepenenciesRecursively(scannedPackageName, alreadyScannerPackages)));
-
-            return dependencyDescriptors;
+            return collectClasses(alreadyScannerPackages, classes);
         } else {
             return Collections.emptyList();
         }
+    }
+
+    private List<DependencyDescriptor> collectClasses(List<String> alreadyScannerPackages, List<String> classes) {
+        List<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector.collectDependencyDescriptors(classes);
+
+        List<String> findOtherPackages = componentScanCollector.collectComponentScan(dependencyDescriptors);
+
+        findOtherPackages.stream()
+                .filter(scannedPackageName -> !alreadyScannerPackages.contains(scannedPackageName))
+                .forEach(scannedPackageName -> dependencyDescriptors
+                        .addAll(collectDepenenciesRecursively(scannedPackageName, alreadyScannerPackages)));
+
+        return dependencyDescriptors;
     }
 }

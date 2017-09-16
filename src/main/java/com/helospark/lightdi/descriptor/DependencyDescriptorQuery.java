@@ -9,11 +9,13 @@ import javax.annotation.Generated;
 public class DependencyDescriptorQuery {
     private Optional<Class<?>> clazz;
     private Optional<String> qualifier;
+    private boolean required;
 
     @Generated("SparkTools")
     private DependencyDescriptorQuery(Builder builder) {
         this.clazz = ofNullable(builder.clazz);
         this.qualifier = ofNullable(builder.qualifier);
+        this.required = builder.required;
     }
 
     public Optional<Class<?>> getClazz() {
@@ -22,6 +24,10 @@ public class DependencyDescriptorQuery {
 
     public Optional<String> getQualifier() {
         return qualifier;
+    }
+
+    public boolean isRequired() {
+        return required;
     }
 
     @Generated("SparkTools")
@@ -38,6 +44,7 @@ public class DependencyDescriptorQuery {
     public static final class Builder {
         private Class<?> clazz;
         private String qualifier;
+        private boolean required = true;
 
         private Builder() {
         }
@@ -49,6 +56,11 @@ public class DependencyDescriptorQuery {
 
         public Builder withQualifier(String qualifier) {
             this.qualifier = qualifier;
+            return this;
+        }
+
+        public Builder withRequired(boolean required) {
+            this.required = required;
             return this;
         }
 

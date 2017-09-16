@@ -12,18 +12,21 @@ public class PropertyDescriptorFactory {
     public PropertyDescritor buildPropertyDescriptor(Parameter parameter) {
         Value valueAnnotation = parameter.getAnnotation(Value.class);
         String value = valueAnnotation.value();
-        return new PropertyDescritor(parameter.getType(), value);
+        boolean required = valueAnnotation.required();
+        return new PropertyDescritor(parameter.getType(), value, required);
     }
 
     public InjectionDescriptor buildPropertyDescriptor(Field field) {
         Value valueAnnotation = field.getAnnotation(Value.class);
         String value = valueAnnotation.value();
-        return new PropertyDescritor(field.getType(), value);
+        boolean required = valueAnnotation.required();
+        return new PropertyDescritor(field.getType(), value, required);
     }
 
     public InjectionDescriptor buildPropertyDescriptor(Method method) {
         Value valueAnnotation = method.getAnnotation(Value.class);
         String value = valueAnnotation.value();
-        return new PropertyDescritor(method.getParameterTypes()[0], value);
+        boolean required = valueAnnotation.required();
+        return new PropertyDescritor(method.getParameterTypes()[0], value, required);
     }
 }

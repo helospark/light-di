@@ -8,13 +8,19 @@ import com.helospark.lightdi.descriptor.DependencyCollectionDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
+import com.helospark.lightdi.descriptor.NullInjectDescriptor;
 import com.helospark.lightdi.util.DependencyChooser;
 
 public class FindInDependencySupport {
 
-    public DependencyDescriptor findOrThrow(List<DependencyDescriptor> dependencyDescriptors,
+    public InjectionDescriptor find(List<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptorQuery query) {
-        return DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
+        DependencyDescriptor findDependencyFromQuery = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
+        if (findDependencyFromQuery == null) {
+            return new NullInjectDescriptor();
+        } else {
+            return findDependencyFromQuery;
+        }
     }
 
     public InjectionDescriptor findListOrEmpty(List<DependencyDescriptor> dependencyDescriptors, DependencyDescriptorQuery query,

@@ -253,36 +253,46 @@ public class LightDiContext implements AutoCloseable {
         this.autowireSupportUtil = autowireSupportUtil;
     }
 
-    public void loadDependencies(String packageName) {
+    public void loadDependenciesFromPackage(String packageName) {
         try {
             List<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
-
-            environment = environmentInitializer.initializeEnvironment(environment, loadedDescriptors);
-
-            loadedDescriptors = conditionalFilter.filterDependencies(this, loadedDescriptors);
-
-            dependencyDescriptors.addAll(loadedDescriptors);
-
-            wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
-
-            autowireSupportUtil = new AutowirePostProcessor(
-                    beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
-                    preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
-                    this);
-
-            if (CHECK_FOR_INTEGRITY) {
-                beanFactory.assertValidConfiguration(dependencyDescriptors);
-            }
-
-            initializeEagerDependencies(dependencyDescriptors);
-
-            LOGGER.info("Context initialized");
-
-            this.beanPostProcessors.addAll(this.getListOfBeans(BeanPostProcessor.class));
-
+            processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);
         }
+    }
+
+    public void loadDependenciesFromClass(Class<?> clazz) {
+        try {
+            List<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(clazz);
+            processDescriptors(loadedDescriptors);
+        } catch (Exception e) {
+            throw new ContextInitializationFailedException("Context initialization failed", e);
+        }
+    }
+
+    public void processDescriptors(List<DependencyDescriptor> loadedDescriptors) {
+        environment = environmentInitializer.initializeEnvironment(environment, loadedDescriptors);
+        loadedDescriptors = conditionalFilter.filterDependencies(this, loadedDescriptors);
+
+        dependencyDescriptors.addAll(loadedDescriptors);
+
+        wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
+
+        autowireSupportUtil = new AutowirePostProcessor(
+                beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
+                preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
+                this);
+
+        if (CHECK_FOR_INTEGRITY) {
+            beanFactory.assertValidConfiguration(dependencyDescriptors);
+        }
+
+        initializeEagerDependencies(dependencyDescriptors);
+
+        LOGGER.info("Context initialized");
+
+        this.beanPostProcessors.addAll(this.getListOfBeans(BeanPostProcessor.class));
     }
 
     private void initializeEagerDependencies(List<DependencyDescriptor> dependencyDescriptors) {

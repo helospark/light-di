@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.helospark.lightdi.annotation.Autowired;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
@@ -25,8 +26,18 @@ public class MethodDependencyCollector {
 
     private InjectionDescriptor collectDependencyFor(Method method, Parameter parameter,
             List<DependencyDescriptor> dependencyDescriptors) {
+        boolean isRequired = extractRequired(method);
         return parameterDependencyDescriptorBuilder.build(parameter,
-                dependencyDescriptors);
+                dependencyDescriptors, isRequired);
+    }
+
+    private boolean extractRequired(Method method) {
+        Autowired annotation = method.getAnnotation(Autowired.class);
+        if (annotation != null) {
+            return annotation.required();
+        } else {
+            return true;
+        }
     }
 
 }

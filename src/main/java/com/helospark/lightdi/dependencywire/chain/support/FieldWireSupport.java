@@ -13,6 +13,7 @@ import com.helospark.lightdi.dependencywire.FindInDependencySupport;
 import com.helospark.lightdi.dependencywire.PropertyDescriptorFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
+import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.field.FieldDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
 
@@ -43,10 +44,10 @@ public class FieldWireSupport {
 
         for (Field field : fields) {
             DependencyDescriptorQuery query = createDependencyDescriptorQuery(field);
-            DependencyDescriptor dependencyDescriptor = findInDependencySupport.findOrThrow(dependencyDescriptors, query);
+            InjectionDescriptor dependencyDescriptor = findInDependencySupport.find(dependencyDescriptors, query);
             result.add(FieldDescriptor.builder()
                     .withField(field)
-                    .withInjectionDescriptor(dependencyDescriptor)
+                    .withInjectionDescriptor(dependencyDescriptor) // TODO: support collection for field inject
                     .build());
         }
         return result;
@@ -54,12 +55,17 @@ public class FieldWireSupport {
 
     private DependencyDescriptorQuery createDependencyDescriptorQuery(Field field) {
         Class<?> fieldType = field.getType();
-        DependencyDescriptorQuery query = DependencyDescriptorQuery
+        return DependencyDescriptorQuery
                 .builder()
                 .withClazz(fieldType)
                 .withQualifier(extractQualifierOrNull(field))
+                .withRequired(extractRequired(field))
                 .build();
-        return query;
+    }
+
+    private boolean extractRequired(Field field) {
+        Autowired annotation = field.getAnnotation(Autowired.class);
+        return annotation.required();
     }
 
     private String extractQualifierOrNull(Field field) {

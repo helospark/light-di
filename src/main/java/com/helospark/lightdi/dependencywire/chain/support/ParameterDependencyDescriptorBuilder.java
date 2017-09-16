@@ -25,7 +25,7 @@ public class ParameterDependencyDescriptorBuilder {
         this.propertyDescriptorFactory = propertyDescriptorFactory;
     }
 
-    public InjectionDescriptor build(Parameter parameter, List<DependencyDescriptor> dependencyDescriptors) {
+    public InjectionDescriptor build(Parameter parameter, List<DependencyDescriptor> dependencyDescriptors, boolean required) {
         // TODO: introduce chain here
         if (AnnotationUtil.hasAnnotation(parameter, Value.class)) {
             return propertyDescriptorFactory.buildPropertyDescriptor(parameter);
@@ -39,8 +39,9 @@ public class ParameterDependencyDescriptorBuilder {
             DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
                     .withClazz(parameter.getType())
                     .withQualifier(extractQualifierOrNull(parameter))
+                    .withRequired(required)
                     .build();
-            return findInDependencySupport.findOrThrow(dependencyDescriptors, query);
+            return findInDependencySupport.find(dependencyDescriptors, query);
         }
     }
 

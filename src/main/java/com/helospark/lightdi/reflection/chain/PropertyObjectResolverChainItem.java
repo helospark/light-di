@@ -6,12 +6,22 @@ import com.helospark.lightdi.descriptor.property.PropertyDescritor;
 import com.helospark.lightdi.properties.Environment;
 
 public class PropertyObjectResolverChainItem implements DependencyObjectResolverChainItem {
+    private static final String DEFAULT_PROPERTY_VALUE = "";
 
     @Override
     public Object resolve(LightDiContext context, InjectionDescriptor injectionDescriptor) {
         PropertyDescritor propertyDescriptor = ((PropertyDescritor) injectionDescriptor);
         Environment environment = context.getEnvironment();
-        return environment.resolve(propertyDescriptor.getValue(), propertyDescriptor.getClazz());
+        try {
+            Object resolved = environment.resolve(propertyDescriptor.getValue(), propertyDescriptor.getClazz());
+            return resolved;
+        } catch (IllegalArgumentException e) {
+            if (propertyDescriptor.isRequired()) {
+                throw new IllegalArgumentException("Cannot resolve " + propertyDescriptor.getValue(), e);
+            } else {
+                return DEFAULT_PROPERTY_VALUE;
+            }
+        }
     }
 
     @Override

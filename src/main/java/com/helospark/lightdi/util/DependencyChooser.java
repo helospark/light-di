@@ -12,7 +12,7 @@ public class DependencyChooser {
 
     public static DependencyDescriptor findDependencyFromQuery(Collection<DependencyDescriptor> dependencies, DependencyDescriptorQuery toFind) {
         List<DependencyDescriptor> found = findDependencyDescriptor(dependencies, toFind);
-        return findDependencyToGenerate(found);
+        return findDependencyToGenerate(found, toFind);
     }
 
     public static List<DependencyDescriptor> findDependencyDescriptor(Collection<DependencyDescriptor> dependencies,
@@ -23,15 +23,18 @@ public class DependencyChooser {
                 .collect(Collectors.toList());
     }
 
-    public static DependencyDescriptor findDependencyToGenerate(List<DependencyDescriptor> dependencyToCreate) {
+    public static DependencyDescriptor findDependencyToGenerate(List<DependencyDescriptor> dependencyToCreate, DependencyDescriptorQuery toFind) {
         Optional<DependencyDescriptor> primary = findPrimary(dependencyToCreate);
         if (dependencyToCreate.size() == 1) {
             return dependencyToCreate.get(0);
         } else if (primary.isPresent()) {
             return primary.get();
+        } else if (!toFind.isRequired()) {
+            return null;
         } else {
-            throw new IllegalArgumentException("No single match for found " + dependencyToCreate);
+            throw new IllegalArgumentException("No single match for found for " + toFind + ", found " + dependencyToCreate);
         }
+
     }
 
     public static Optional<DependencyDescriptor> findPrimary(

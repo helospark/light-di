@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +37,9 @@ import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.PrimaryTestBean;
 import com.helospark.lightdi.it.testcontext1.PrototypeBean;
 import com.helospark.lightdi.it.testcontext1.QualifiedBean;
+import com.helospark.lightdi.it.testcontext1.RequiredFalseFieldDependency;
+import com.helospark.lightdi.it.testcontext1.RequiredFalseSetterDependency;
+import com.helospark.lightdi.it.testcontext1.RequiredFalseValueMissing;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
 import com.helospark.lightdi.it.testcontext1.SetterDependency;
 import com.helospark.lightdi.it.thirdpackage.ThirdPackageConfiguration;
@@ -324,4 +328,38 @@ public class ContextLoadIT {
         // THEN
         assertThat(bean.getValue(), is("asd"));
     }
+
+    @Test
+    public void testRequiredFalseDependencyOnFieldShouldBeNull() {
+        // GIVEN
+
+        // WHEN
+        RequiredFalseFieldDependency bean = context.getBean(RequiredFalseFieldDependency.class);
+
+        // THEN
+        assertNull(bean.getNotABean());
+    }
+
+    @Test
+    public void testRequiredFalseDependencyOnSetterShouldBeNull() {
+        // GIVEN
+
+        // WHEN
+        RequiredFalseSetterDependency bean = context.getBean(RequiredFalseSetterDependency.class);
+
+        // THEN
+        assertNull(bean.getNotABean());
+    }
+
+    @Test
+    public void testRequiredFalseValueShouldBeEmpty() {
+        // GIVEN
+
+        // WHEN
+        RequiredFalseValueMissing bean = context.getBean(RequiredFalseValueMissing.class);
+
+        // THEN
+        assertThat(bean.getValue(), is(""));
+    }
+
 }

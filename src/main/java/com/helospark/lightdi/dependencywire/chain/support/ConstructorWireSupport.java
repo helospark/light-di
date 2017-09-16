@@ -11,6 +11,7 @@ import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.constructor.ConstructorDescriptor;
 
 public class ConstructorWireSupport {
+    private static final boolean CONSTRUCTOR_PARAMETER_REQUIRED = true;
     private ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder;
 
     public ConstructorWireSupport(ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder) {
@@ -29,7 +30,7 @@ public class ConstructorWireSupport {
             for (int i = 0; i < parameters.length; ++i) {
                 Parameter parameter = constructorToUse.getParameters()[i];
                 InjectionDescriptor injectDescriptor = parameterDependencyDescriptorBuilder.build(parameter,
-                        dependencyDescriptors);
+                        dependencyDescriptors, CONSTRUCTOR_PARAMETER_REQUIRED);
 
                 cons.add(ConstructorDescriptor.builder()
                         .withIndex(i)

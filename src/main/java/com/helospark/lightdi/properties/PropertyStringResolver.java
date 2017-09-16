@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PropertyStringResolver {
-    private static final String DEFAULT_PROPERTY_VALUE = "";
     private static final String PROPERTY_REGEX = "\\$\\{(.*?)\\}";
     private static final int MAX_ITERATIONS_FOR_PROPERTY_RESOLUTION = 30;
     Pattern pattern = Pattern.compile(PROPERTY_REGEX);
@@ -23,7 +22,8 @@ public class PropertyStringResolver {
                 break;
             }
             String groupValue = matcher.group(1);
-            String resolvedValue = propertyValueResolver.resolveOptional(groupValue, properties).orElse(DEFAULT_PROPERTY_VALUE);
+            String resolvedValue = propertyValueResolver.resolveOptional(groupValue, properties)
+                    .orElseThrow(() -> new IllegalArgumentException("Cannot resolve " + groupValue));
             value = matcher.replaceFirst(Matcher.quoteReplacement(resolvedValue));
             ++currentIteration;
         } while (currentIteration < MAX_ITERATIONS_FOR_PROPERTY_RESOLUTION);
