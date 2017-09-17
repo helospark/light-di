@@ -12,9 +12,9 @@ import com.helospark.lightdi.descriptor.stereotype.constructor.ConstructorDescri
 
 public class ConstructorWireSupport {
     private static final boolean CONSTRUCTOR_PARAMETER_REQUIRED = true;
-    private ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder;
+    private DependencyDescriptorBuilder parameterDependencyDescriptorBuilder;
 
-    public ConstructorWireSupport(ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder) {
+    public ConstructorWireSupport(DependencyDescriptorBuilder parameterDependencyDescriptorBuilder) {
         this.parameterDependencyDescriptorBuilder = parameterDependencyDescriptorBuilder;
     }
 

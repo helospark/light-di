@@ -8,10 +8,13 @@ import com.helospark.lightdi.dependencywire.chain.CommonDependencyWireChain;
 import com.helospark.lightdi.dependencywire.chain.ComponentDependencyWireChainItem;
 import com.helospark.lightdi.dependencywire.chain.DependencyWireChain;
 import com.helospark.lightdi.dependencywire.chain.support.ConstructorWireSupport;
+import com.helospark.lightdi.dependencywire.chain.support.DependencyDescriptorBuilder;
 import com.helospark.lightdi.dependencywire.chain.support.FieldWireSupport;
 import com.helospark.lightdi.dependencywire.chain.support.MethodDependencyCollector;
-import com.helospark.lightdi.dependencywire.chain.support.ParameterDependencyDescriptorBuilder;
 import com.helospark.lightdi.dependencywire.chain.support.SetterWireSupport;
+import com.helospark.lightdi.dependencywire.chain.support.chain.CollectionInjectDescriptorBuilderChainItem;
+import com.helospark.lightdi.dependencywire.chain.support.chain.DependencyInjectDescriptorBuilderChainItem;
+import com.helospark.lightdi.dependencywire.chain.support.chain.ValueInjectDescriptorBuilderChainItem;
 
 public class WiringProcessingServiceFactory {
     private ConstructorWireSupport constructorWireSupport;
@@ -29,8 +32,16 @@ public class WiringProcessingServiceFactory {
         findInDependencySupport = new FindInDependencySupport();
         PropertyDescriptorFactory propertyDescriptorFactory = new PropertyDescriptorFactory();
 
-        ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder = new ParameterDependencyDescriptorBuilder(
-                findInDependencySupport, propertyDescriptorFactory);
+        CollectionInjectDescriptorBuilderChainItem collectionInjectDescriptorBuilderChainItem = new CollectionInjectDescriptorBuilderChainItem(
+                findInDependencySupport);
+        DependencyInjectDescriptorBuilderChainItem dependencyInjectDescriptorBuilderChainItem = new DependencyInjectDescriptorBuilderChainItem(
+                findInDependencySupport);
+        ValueInjectDescriptorBuilderChainItem valueInjectDescriptorBuilderChainItem = new ValueInjectDescriptorBuilderChainItem(
+                propertyDescriptorFactory);
+
+        DependencyDescriptorBuilder parameterDependencyDescriptorBuilder = new DependencyDescriptorBuilder(
+                Arrays.asList(collectionInjectDescriptorBuilderChainItem,
+                        valueInjectDescriptorBuilderChainItem, dependencyInjectDescriptorBuilderChainItem));
 
         constructorWireSupport = new ConstructorWireSupport(parameterDependencyDescriptorBuilder);
 
@@ -38,7 +49,7 @@ public class WiringProcessingServiceFactory {
                 parameterDependencyDescriptorBuilder);
 
         setterWireSupport = new SetterWireSupport(propertyDescriptorFactory, methodDependencyCollector);
-        fieldWireSupport = new FieldWireSupport(findInDependencySupport, propertyDescriptorFactory);
+        fieldWireSupport = new FieldWireSupport(parameterDependencyDescriptorBuilder);
 
         beanDependencyWireChainItem = new BeanDependencyWireChainItem(
                 methodDependencyCollector);

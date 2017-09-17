@@ -11,9 +11,9 @@ import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
 public class MethodDependencyCollector {
-    private ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder;
+    private DependencyDescriptorBuilder parameterDependencyDescriptorBuilder;
 
-    public MethodDependencyCollector(ParameterDependencyDescriptorBuilder parameterDependencyDescriptorBuilder) {
+    public MethodDependencyCollector(DependencyDescriptorBuilder parameterDependencyDescriptorBuilder) {
         this.parameterDependencyDescriptorBuilder = parameterDependencyDescriptorBuilder;
     }
 

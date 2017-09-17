@@ -12,6 +12,8 @@ import com.helospark.lightdi.LightDi;
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.it.collectioninjecttest.BeanToInjectCollection;
 import com.helospark.lightdi.it.collectioninjecttest.BeanToInjectSet;
+import com.helospark.lightdi.it.collectioninjecttest.CollectionOnFieldBean;
+import com.helospark.lightdi.it.collectioninjecttest.CollectionOnSetterBean;
 import com.helospark.lightdi.it.collectioninjecttest.Implementation1;
 import com.helospark.lightdi.it.collectioninjecttest.Implementation2;
 
@@ -59,6 +61,28 @@ public class CollectionInjectIT {
 
         // WHEN
         BeanToInjectSet bean = context.getBean(BeanToInjectSet.class);
+
+        // THEN
+        assertThat(bean.getCommonInterface().size(), is(2));
+    }
+
+    @Test
+    public void testCollectionInjectOnField() {
+        // GIVEN
+
+        // WHEN
+        CollectionOnFieldBean bean = context.getBean(CollectionOnFieldBean.class);
+
+        // THEN
+        assertThat(bean.getCommonInterface().size(), is(2));
+    }
+
+    @Test
+    public void testCollectionInjectOnSetter() {
+        // GIVEN
+
+        // WHEN
+        CollectionOnSetterBean bean = context.getBean(CollectionOnSetterBean.class);
 
         // THEN
         assertThat(bean.getCommonInterface().size(), is(2));

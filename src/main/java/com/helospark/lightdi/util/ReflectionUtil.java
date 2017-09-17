@@ -27,8 +27,15 @@ public class ReflectionUtil {
     }
 
     public static Optional<Class<?>> extractFirstGenericType(Parameter parameter) {
-        Optional<Type> extractedType = Optional.ofNullable(parameter)
-                .map(param -> param.getParameterizedType())
+        return extractGenericTypeFromType(parameter.getParameterizedType());
+    }
+
+    public static Optional<Class<?>> extractFirstGenericType(Field field) {
+        return extractGenericTypeFromType(field.getGenericType());
+    }
+
+    public static Optional<Class<?>> extractGenericTypeFromType(Type genericType) {
+        Optional<Type> extractedType = Optional.of(genericType)
                 .filter(type -> type instanceof ParameterizedType)
                 .map(type -> (ParameterizedType) type)
                 .map(type -> type.getActualTypeArguments())

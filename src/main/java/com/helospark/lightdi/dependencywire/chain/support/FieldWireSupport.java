@@ -7,24 +7,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
-import com.helospark.lightdi.annotation.Qualifier;
 import com.helospark.lightdi.annotation.Value;
-import com.helospark.lightdi.dependencywire.FindInDependencySupport;
-import com.helospark.lightdi.dependencywire.PropertyDescriptorFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
-import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.field.FieldDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
 
 public class FieldWireSupport {
-    private FindInDependencySupport findInDependencySupport;
-    private PropertyDescriptorFactory propertyDescriptorFactory;
+    private DependencyDescriptorBuilder dependencyDescriptorBuilder;
 
-    public FieldWireSupport(FindInDependencySupport findInDependencySupport,
-            PropertyDescriptorFactory propertyDescriptorFactory) {
-        this.findInDependencySupport = findInDependencySupport;
-        this.propertyDescriptorFactory = propertyDescriptorFactory;
+    public FieldWireSupport(DependencyDescriptorBuilder dependencyDescriptorBuilder) {
+        this.dependencyDescriptorBuilder = dependencyDescriptorBuilder;
     }
 
     public List<FieldDescriptor> getFieldDependencies(Class<?> clazz,
@@ -43,37 +36,14 @@ public class FieldWireSupport {
                 .collect(Collectors.toList());
 
         for (Field field : fields) {
-            DependencyDescriptorQuery query = createDependencyDescriptorQuery(field);
-            InjectionDescriptor dependencyDescriptor = findInDependencySupport.find(dependencyDescriptors, query);
+            InjectionDescriptor injectDescriptor = dependencyDescriptorBuilder.build(field, dependencyDescriptors,
+                    field.getAnnotation(Autowired.class).required());
             result.add(FieldDescriptor.builder()
                     .withField(field)
-                    .withInjectionDescriptor(dependencyDescriptor) // TODO: support collection for field inject
+                    .withInjectionDescriptor(injectDescriptor)
                     .build());
         }
         return result;
-    }
-
-    private DependencyDescriptorQuery createDependencyDescriptorQuery(Field field) {
-        Class<?> fieldType = field.getType();
-        return DependencyDescriptorQuery
-                .builder()
-                .withClazz(fieldType)
-                .withQualifier(extractQualifierOrNull(field))
-                .withRequired(extractRequired(field))
-                .build();
-    }
-
-    private boolean extractRequired(Field field) {
-        Autowired annotation = field.getAnnotation(Autowired.class);
-        return annotation.required();
-    }
-
-    private String extractQualifierOrNull(Field field) {
-        Qualifier[] qualifierAnnotation = field.getAnnotationsByType(Qualifier.class);
-        if (qualifierAnnotation.length > 0) {
-            return qualifierAnnotation[0].value();
-        }
-        return null;
     }
 
     private List<FieldDescriptor> collectValueFields(Class<?> clazz,
@@ -84,9 +54,11 @@ public class FieldWireSupport {
                 .collect(Collectors.toList());
 
         for (Field field : fields) {
+            InjectionDescriptor injectDescriptor = dependencyDescriptorBuilder.build(field, dependencyDescriptors,
+                    field.getAnnotation(Value.class).required());
             result.add(FieldDescriptor.builder()
                     .withField(field)
-                    .withInjectionDescriptor(propertyDescriptorFactory.buildPropertyDescriptor(field))
+                    .withInjectionDescriptor(injectDescriptor)
                     .build());
         }
         return result;
