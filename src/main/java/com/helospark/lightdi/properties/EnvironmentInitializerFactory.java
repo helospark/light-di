@@ -2,6 +2,7 @@ package com.helospark.lightdi.properties;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,7 +20,7 @@ public class EnvironmentInitializerFactory {
         this.propertiesFileLoader = new PropertiesFileLoader();
     }
 
-    public Environment initializeEnvironment(Environment environment, List<DependencyDescriptor> dependencyDescriptors) {
+    public Environment initializeEnvironment(Environment environment, SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<PropertySourceHolder> propertySourceHolders = dependencyDescriptors.stream()
                 .filter(descriptor -> doesHavePropertySource(descriptor))
                 .flatMap(descriptor -> createPropertySourceResolver(descriptor))

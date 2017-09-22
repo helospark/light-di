@@ -1,6 +1,6 @@
 package com.helospark.lightdi.conditional.condition;
 
-import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.annotation.ConditionalOnClass;
@@ -17,7 +17,7 @@ public class ClassDependencyCondition implements DependencyCondition {
     }
 
     @Override
-    public boolean evaluate(LightDiContext context, List<DependencyDescriptor> dependencies) {
+    public boolean evaluate(LightDiContext context, SortedSet<DependencyDescriptor> dependencies) {
         return classDependencyConditionEvaluator.isClassExists(className);
     }
 

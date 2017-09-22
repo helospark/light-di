@@ -11,6 +11,7 @@ import com.helospark.lightdi.annotation.Service;
 import com.helospark.lightdi.conditional.ConditionalAnnotationsExtractor;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.util.BeanOrderExtractor;
 import com.helospark.lightdi.util.IsLazyExtractor;
 import com.helospark.lightdi.util.IsPrimaryExtractor;
 import com.helospark.lightdi.util.QualifierExtractor;
@@ -39,6 +40,7 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
                 .withIsLazy(IsLazyExtractor.isLazy(clazz))
                 .withIsPrimary(IsPrimaryExtractor.isPrimary(clazz))
                 .withConditions(conditionalAnnotationsExtractor.extractConditions(clazz))
+                .withOrder(BeanOrderExtractor.extractOrder(clazz))
                 .build();
         return Collections.singletonList(dependencyDescriptor);
     }

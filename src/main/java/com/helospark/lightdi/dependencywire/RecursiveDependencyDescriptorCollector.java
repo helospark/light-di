@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +31,8 @@ public class RecursiveDependencyDescriptorCollector {
         this.componentScanCollector = componentScanCollector;
     }
 
-    public List<DependencyDescriptor> collectDependencies(String packageName) {
-        List<DependencyDescriptor> dependencyDescriptors = new ArrayList<>();
+    public SortedSet<DependencyDescriptor> collectDependencies(String packageName) {
+        SortedSet<DependencyDescriptor> dependencyDescriptors = new TreeSet<>();
         List<String> alreadyScannedPackages = new ArrayList<>();
         List<String> packagesToScan = Arrays.asList(packageName, DEFAULT_CONVERTER_PACKAGE);
 
@@ -44,23 +46,23 @@ public class RecursiveDependencyDescriptorCollector {
         return dependencyDescriptors;
     }
 
-    public List<DependencyDescriptor> collectDependenciesStartingFromClass(Class<?> clazz) {
+    public SortedSet<DependencyDescriptor> collectDependenciesStartingFromClass(Class<?> clazz) {
         return collectClasses(new ArrayList<>(), Collections.singletonList(clazz.getName()));
     }
 
-    private List<DependencyDescriptor> collectDepenenciesRecursively(String packageName, List<String> alreadyScannerPackages) {
+    private SortedSet<DependencyDescriptor> collectDepenenciesRecursively(String packageName, List<String> alreadyScannerPackages) {
         if (!alreadyScannerPackages.contains(packageName)) {
             alreadyScannerPackages.add(packageName);
 
             List<String> classes = lightDiClasspathScanner.scanClasspathForBeanClassNames(packageName);
             return collectClasses(alreadyScannerPackages, classes);
         } else {
-            return Collections.emptyList();
+            return new TreeSet<>();
         }
     }
 
-    private List<DependencyDescriptor> collectClasses(List<String> alreadyScannerPackages, List<String> classes) {
-        List<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector.collectDependencyDescriptors(classes);
+    private SortedSet<DependencyDescriptor> collectClasses(List<String> alreadyScannerPackages, List<String> classes) {
+        SortedSet<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector.collectDependencyDescriptors(classes);
 
         List<String> findOtherPackages = componentScanCollector.collectComponentScan(dependencyDescriptors);
 

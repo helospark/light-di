@@ -2,6 +2,7 @@ package com.helospark.lightdi.dependencywire;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -10,7 +11,7 @@ import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
 public class ComponentScanCollector {
 
-    public List<String> collectComponentScan(List<DependencyDescriptor> dependencyDescriptors) {
+    public List<String> collectComponentScan(SortedSet<DependencyDescriptor> dependencyDescriptors) {
         return dependencyDescriptors.stream()
                 .flatMap(descriptor -> addClasses(descriptor))
                 .distinct()

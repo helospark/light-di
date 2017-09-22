@@ -1,6 +1,7 @@
 package com.helospark.lightdi.conditional;
 
-import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -13,15 +14,15 @@ import com.helospark.lightdi.descriptor.DependencyDescriptor;
 public class ConditionalFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConditionalFilter.class);
 
-    public List<DependencyDescriptor> filterDependencies(LightDiContext context, List<DependencyDescriptor> dependencyDescriptors) {
-        List<DependencyDescriptor> previousDependencies;
-        List<DependencyDescriptor> filteredDependencies = dependencyDescriptors;
+    public SortedSet<DependencyDescriptor> filterDependencies(LightDiContext context, SortedSet<DependencyDescriptor> dependencyDescriptors) {
+        SortedSet<DependencyDescriptor> previousDependencies;
+        SortedSet<DependencyDescriptor> filteredDependencies = dependencyDescriptors;
         do {
             previousDependencies = filteredDependencies;
-            List<DependencyDescriptor> previousDependencies2 = previousDependencies; // TODO: must be effectively final for the lambda
+            SortedSet<DependencyDescriptor> effectivelyFinalDependencies = previousDependencies; // TODO: must be effectively final for the lambda
             filteredDependencies = previousDependencies.stream()
-                    .filter(descriptor -> evaluateDescriptor(descriptor, context, previousDependencies2))
-                    .collect(Collectors.toList());
+                    .filter(descriptor -> evaluateDescriptor(descriptor, context, effectivelyFinalDependencies))
+                    .collect(Collectors.toCollection(() -> new TreeSet<>()));
             LOGGER.debug("Filtering iteration done, remaining number of dependencies: " + filteredDependencies.size());
         } while (filteredDependencies.size() < previousDependencies.size());
         // TODO: This loop is added to handle the conditional on conditional bean case.
@@ -32,7 +33,8 @@ public class ConditionalFilter {
         return filteredDependencies;
     }
 
-    public boolean evaluateDescriptor(DependencyDescriptor descriptor, LightDiContext context, List<DependencyDescriptor> dependencyDescriptors) {
+    public boolean evaluateDescriptor(DependencyDescriptor descriptor, LightDiContext context,
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         boolean result = true;
         for (DependencyCondition condition : descriptor.getConditions()) {
             boolean canditionalValue = condition.evaluate(context, dependencyDescriptors);

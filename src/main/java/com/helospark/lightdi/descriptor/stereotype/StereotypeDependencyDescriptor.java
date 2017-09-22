@@ -27,6 +27,7 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
         this.scope = builder.scope;
         this.isLazy = builder.isLazy;
         this.isPrimary = builder.isPrimary;
+        this.order = builder.order;
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
         this.conditions = builder.conditions;
@@ -108,6 +109,7 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
         private String scope;
         private boolean isLazy;
         private boolean isPrimary;
+        private int order;
         private List<Method> postConstructMethods;
         private List<Method> preDestroyMethods;
         private List<DependencyCondition> conditions;
@@ -140,6 +142,11 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withIsPrimary(boolean isPrimary) {
             this.isPrimary = isPrimary;
+            return this;
+        }
+
+        public Builder withOrder(int order) {
+            this.order = order;
             return this;
         }
 

@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
+import com.helospark.lightdi.conditional.condition.DependencyCondition;
+
 public class ManualDependencyDescriptor extends DependencyDescriptor {
 
     @Generated("SparkTools")
@@ -15,8 +17,10 @@ public class ManualDependencyDescriptor extends DependencyDescriptor {
         this.scope = builder.scope;
         this.isLazy = builder.isLazy;
         this.isPrimary = builder.isPrimary;
+        this.order = builder.order;
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
+        this.conditions = builder.conditions;
     }
 
     @Generated("SparkTools")
@@ -31,8 +35,10 @@ public class ManualDependencyDescriptor extends DependencyDescriptor {
         private String scope;
         private boolean isLazy;
         private boolean isPrimary;
+        private int order;
         private List<Method> postConstructMethods = Collections.emptyList();
         private List<Method> preDestroyMethods = Collections.emptyList();
+        private List<DependencyCondition> conditions = Collections.emptyList();
 
         private Builder() {
         }
@@ -62,6 +68,11 @@ public class ManualDependencyDescriptor extends DependencyDescriptor {
             return this;
         }
 
+        public Builder withOrder(int order) {
+            this.order = order;
+            return this;
+        }
+
         public Builder withPostConstructMethods(List<Method> postConstructMethods) {
             this.postConstructMethods = postConstructMethods;
             return this;
@@ -69,6 +80,11 @@ public class ManualDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withPreDestroyMethods(List<Method> preDestroyMethods) {
             this.preDestroyMethods = preDestroyMethods;
+            return this;
+        }
+
+        public Builder withConditions(List<DependencyCondition> conditions) {
+            this.conditions = conditions;
             return this;
         }
 

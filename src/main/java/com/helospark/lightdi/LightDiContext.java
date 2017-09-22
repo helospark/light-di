@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -255,7 +256,7 @@ public class LightDiContext implements AutoCloseable {
 
     public void loadDependenciesFromPackage(String packageName) {
         try {
-            List<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
+            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);
@@ -264,14 +265,14 @@ public class LightDiContext implements AutoCloseable {
 
     public void loadDependenciesFromClass(Class<?> clazz) {
         try {
-            List<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(clazz);
+            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(clazz);
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);
         }
     }
 
-    public void processDescriptors(List<DependencyDescriptor> loadedDescriptors) {
+    public void processDescriptors(SortedSet<DependencyDescriptor> loadedDescriptors) {
         environment = environmentInitializer.initializeEnvironment(environment, loadedDescriptors);
         loadedDescriptors = conditionalFilter.filterDependencies(this, loadedDescriptors);
 

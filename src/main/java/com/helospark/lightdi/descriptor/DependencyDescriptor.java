@@ -5,13 +5,15 @@ import java.util.Collections;
 import java.util.List;
 
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
+import com.helospark.lightdi.constants.LightDiConstants;
 
-public abstract class DependencyDescriptor implements InjectionDescriptor {
+public abstract class DependencyDescriptor implements InjectionDescriptor, Comparable<DependencyDescriptor> {
     protected Class<?> clazz;
     protected String qualifier;
     protected String scope;
     protected boolean isLazy = true;
     protected boolean isPrimary = false;
+    protected int order = LightDiConstants.DEFAULT_ORDER;
 
     protected List<Method> postConstructMethods = Collections.emptyList();
     protected List<Method> preDestroyMethods = Collections.emptyList();
@@ -78,10 +80,15 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
         return conditions;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
     @Override
     public String toString() {
         return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary="
-                + isPrimary + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + "]";
+                + isPrimary + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods
+                + ", conditions=" + conditions + "]";
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {
@@ -89,7 +96,7 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
                 .map(clazz -> clazz.isAssignableFrom(this.getClazz()))
                 .orElse(true);
         boolean qualifierMatch = toFind.getQualifier()
-                .map(toFindQualifier -> this.getQualifier().equals(toFindQualifier))
+                .map(toFindQualifier -> toFindQualifier.equals(this.getQualifier()))
                 .orElse(true);
         return classMatch && qualifierMatch;
     }
@@ -99,11 +106,8 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
-        result = prime * result + (isPrimary ? 1231 : 1237);
-        result = prime * result + ((postConstructMethods == null) ? 0 : postConstructMethods.hashCode());
-        result = prime * result + ((preDestroyMethods == null) ? 0 : preDestroyMethods.hashCode());
+        result = prime * result + order;
         result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
-        result = prime * result + ((scope == null) ? 0 : scope.hashCode());
         return result;
     }
 
@@ -121,29 +125,30 @@ public abstract class DependencyDescriptor implements InjectionDescriptor {
                 return false;
         } else if (!clazz.equals(other.clazz))
             return false;
-        if (isPrimary != other.isPrimary)
-            return false;
-        if (postConstructMethods == null) {
-            if (other.postConstructMethods != null)
-                return false;
-        } else if (!postConstructMethods.equals(other.postConstructMethods))
-            return false;
-        if (preDestroyMethods == null) {
-            if (other.preDestroyMethods != null)
-                return false;
-        } else if (!preDestroyMethods.equals(other.preDestroyMethods))
+        if (order != other.order)
             return false;
         if (qualifier == null) {
             if (other.qualifier != null)
                 return false;
         } else if (!qualifier.equals(other.qualifier))
             return false;
-        if (scope == null) {
-            if (other.scope != null)
-                return false;
-        } else if (!scope.equals(other.scope))
-            return false;
         return true;
+    }
+
+    @Override
+    public int compareTo(DependencyDescriptor other) {
+        int orderDiff = this.order - other.order;
+        if (this.equals(other)) {
+            return 0;
+        } else if (orderDiff != 0) {
+            return orderDiff;
+        } else {
+            int classCompareResult = this.clazz.getName().compareTo(other.clazz.getName());
+            if (classCompareResult != 0) {
+                return classCompareResult;
+            }
+            return qualifier.compareTo(other.qualifier);
+        }
     }
 
 }

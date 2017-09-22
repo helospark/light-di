@@ -2,8 +2,9 @@ package com.helospark.lightdi.definitioncollector;
 
 import static com.helospark.lightdi.util.ReflectionUtil.createClassForName;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
@@ -14,8 +15,8 @@ public class BeanDefinitionCollector {
         this.beanDefinitionCollectorChain = beanDefinitionCollectorChain;
     }
 
-    public List<DependencyDescriptor> collectDependencyDescriptors(List<String> classes) {
-        List<DependencyDescriptor> dependencyDescriptors = new ArrayList<>();
+    public SortedSet<DependencyDescriptor> collectDependencyDescriptors(List<String> classes) {
+        SortedSet<DependencyDescriptor> dependencyDescriptors = new TreeSet<>();
         for (String className : classes) {
             Class<?> clazz = createClassForName(className);
             beanDefinitionCollectorChain.stream()

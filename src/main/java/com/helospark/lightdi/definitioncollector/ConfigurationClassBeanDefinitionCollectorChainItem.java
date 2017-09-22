@@ -18,6 +18,7 @@ import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.bean.BeanDependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.util.BeanOrderExtractor;
 import com.helospark.lightdi.util.IsLazyExtractor;
 import com.helospark.lightdi.util.IsPrimaryExtractor;
 import com.helospark.lightdi.util.QualifierExtractor;
@@ -73,6 +74,7 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
                 .withIsPrimary(IsPrimaryExtractor.isPrimary(method))
                 .withConfigurationDescriptor(configurationDescriptor)
                 .withConditions(getConditions(method, configurationDescriptor))
+                .withOrder(BeanOrderExtractor.extractOrder(method))
                 .build();
     }
 

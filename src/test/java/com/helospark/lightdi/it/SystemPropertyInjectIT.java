@@ -22,5 +22,6 @@ public class SystemPropertyInjectIT {
 
         // THEN
         assertThat(instance.getValue(), is("systemPropertyOverride"));
+        System.clearProperty("TEST_VALUE");
     }
 }

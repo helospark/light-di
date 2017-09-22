@@ -21,6 +21,7 @@ public class CollectionFactory {
         defaultCollections.put(List.class, () -> new ArrayList<>());
         defaultCollections.put(Set.class, () -> new HashSet<>());
         defaultCollections.put(Queue.class, () -> new ArrayDeque<>());
+        defaultCollections.put(Collection.class, () -> new ArrayList<>());
     }
 
     public Collection<?> createCollectionFor(Class<? extends Collection<?>> clazz) {
