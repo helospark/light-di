@@ -1,6 +1,7 @@
 package com.helospark.lightdi.dependencywire;
 
 import java.util.List;
+import java.util.SortedSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ public class WiringProcessingService {
         this.wireChain = wireChain;
     }
 
-    public void wireTogetherDependencies(List<DependencyDescriptor> dependencyDescriptors) {
+    public void wireTogetherDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors) {
         dependencyDescriptors.stream()
                 .forEach(dependency -> initializeAllWiring(dependency, dependencyDescriptors));
 
@@ -27,7 +28,7 @@ public class WiringProcessingService {
     }
 
     public void initializeAllWiring(DependencyDescriptor dependency,
-            List<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         wireChain.stream()
                 .forEach(chainItem -> chainItem.collectDependencies(dependencyDescriptors, dependency));
     }

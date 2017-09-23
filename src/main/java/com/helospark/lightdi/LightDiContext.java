@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class LightDiContext implements AutoCloseable {
     private List<BeanPostProcessor> beanPostProcessors;
     private ValueResolver valueResolver;
     private AutowirePostProcessor autowireSupportUtil;
-    private List<DependencyDescriptor> dependencyDescriptors;
+    private SortedSet<DependencyDescriptor> dependencyDescriptors;
 
     private Environment environment = null;
 
@@ -69,7 +70,7 @@ public class LightDiContext implements AutoCloseable {
     public LightDiContext() {
         this.initializedSingletonBeans = new HashMap<>();
         this.initializedPrototypeBeans = new HashMap<>();
-        this.dependencyDescriptors = new ArrayList<>();
+        this.dependencyDescriptors = new TreeSet<>();
         this.beanPostProcessors = new ArrayList<>();
         this.environment = new EnvironmentFactory().createEnvironment(this);
         this.conditionalFilter = new ConditionalFilter();
@@ -188,12 +189,12 @@ public class LightDiContext implements AutoCloseable {
     }
 
     private Optional<DependencyDescriptor> findInitializedSingletonDescriptor(DependencyDescriptorQuery toFind) {
-        List<DependencyDescriptor> foundDependencies = DependencyChooser.findDependencyDescriptor(initializedSingletonBeans.keySet(),
+        SortedSet<DependencyDescriptor> foundDependencies = DependencyChooser.findDependencyDescriptor(initializedSingletonBeans.keySet(),
                 toFind);
         if (foundDependencies.isEmpty()) {
             return Optional.empty();
         } else if (foundDependencies.size() == 1) {
-            return Optional.of(foundDependencies.get(0));
+            return Optional.of(foundDependencies.first());
         } else {
             return findPrimary(foundDependencies);
         }
@@ -242,7 +243,7 @@ public class LightDiContext implements AutoCloseable {
         }
     }
 
-    public List<DependencyDescriptor> getDependencyDescriptors() {
+    public SortedSet<DependencyDescriptor> getDependencyDescriptors() {
         return dependencyDescriptors;
     }
 
@@ -296,7 +297,7 @@ public class LightDiContext implements AutoCloseable {
         this.beanPostProcessors.addAll(this.getListOfBeans(BeanPostProcessor.class));
     }
 
-    private void initializeEagerDependencies(List<DependencyDescriptor> dependencyDescriptors) {
+    private void initializeEagerDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors) {
         dependencyDescriptors.stream()
                 .filter(dependency -> !dependency.isLazy())
                 .forEach(dependency -> getBean(dependency));

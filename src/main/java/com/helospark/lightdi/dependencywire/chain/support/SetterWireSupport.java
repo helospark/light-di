@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
@@ -27,7 +28,7 @@ public class SetterWireSupport {
     }
 
     public List<MethodDescriptor> getSetterDependencies(Class<?> clazz,
-            List<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<MethodDescriptor> result = new ArrayList<>();
         result.addAll(collectInjectMethods(clazz, dependencyDescriptors));
         result.addAll(collectValueMethods(clazz, dependencyDescriptors));
@@ -35,7 +36,7 @@ public class SetterWireSupport {
     }
 
     private List<MethodDescriptor> collectInjectMethods(Class<?> clazz,
-            List<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<MethodDescriptor> result = new ArrayList<>();
         List<Method> setters = Arrays.stream(clazz.getMethods())
                 .filter(method -> isAutowiredSetter(method))
@@ -53,7 +54,7 @@ public class SetterWireSupport {
     }
 
     private List<MethodDescriptor> collectValueMethods(Class<?> clazz,
-            List<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<MethodDescriptor> result = new ArrayList<>();
         List<Method> setters = Arrays.stream(clazz.getMethods())
                 .filter(method -> isValueSetter(method))

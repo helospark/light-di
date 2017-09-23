@@ -2,6 +2,7 @@ package com.helospark.lightdi.dependencywire;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.descriptor.DependencyCollectionDescriptor;
@@ -13,7 +14,7 @@ import com.helospark.lightdi.util.DependencyChooser;
 
 public class FindInDependencySupport {
 
-    public InjectionDescriptor find(List<DependencyDescriptor> dependencyDescriptors,
+    public InjectionDescriptor find(SortedSet<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptorQuery query) {
         DependencyDescriptor findDependencyFromQuery = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
         if (findDependencyFromQuery == null) {
@@ -23,7 +24,7 @@ public class FindInDependencySupport {
         }
     }
 
-    public InjectionDescriptor findListOrEmpty(List<DependencyDescriptor> dependencyDescriptors, DependencyDescriptorQuery query,
+    public InjectionDescriptor findListOrEmpty(SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptorQuery query,
             Class<? extends Collection<?>> collectionType) {
         List<DependencyDescriptor> matchingDependencies = dependencyDescriptors.stream()
                 .filter(descriptor -> descriptor.doesMatch(query))

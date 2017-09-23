@@ -1,6 +1,7 @@
 package com.helospark.lightdi.dependencywire.chain;
 
 import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.dependencywire.chain.support.ConstructorWireSupport;
 import com.helospark.lightdi.dependencywire.chain.support.FieldWireSupport;
@@ -24,7 +25,7 @@ public class ComponentDependencyWireChainItem implements DependencyWireChain {
     }
 
     @Override
-    public void collectDependencies(List<DependencyDescriptor> dependencyDescriptors,
+    public void collectDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptor dependencyDescriptor) {
         if (canHandle(dependencyDescriptor)) {
             handleInternal(dependencyDescriptors, dependencyDescriptor);
@@ -35,7 +36,7 @@ public class ComponentDependencyWireChainItem implements DependencyWireChain {
         return dependencyDescriptor instanceof StereotypeDependencyDescriptor;
     }
 
-    private void handleInternal(List<DependencyDescriptor> dependencyDescriptors,
+    private void handleInternal(SortedSet<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptor dependencyDescriptor) {
         StereotypeDependencyDescriptor dependency = (StereotypeDependencyDescriptor) dependencyDescriptor;
 

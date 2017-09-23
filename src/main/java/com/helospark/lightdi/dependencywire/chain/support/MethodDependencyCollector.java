@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
@@ -18,14 +19,14 @@ public class MethodDependencyCollector {
     }
 
     public List<InjectionDescriptor> getSetterDependencies(Method method,
-            List<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         return Arrays.stream(method.getParameters())
                 .map(methodParam -> collectDependencyFor(method, methodParam, dependencyDescriptors))
                 .collect(Collectors.toList());
     }
 
     private InjectionDescriptor collectDependencyFor(Method method, Parameter parameter,
-            List<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
         boolean isRequired = extractRequired(method);
         return parameterDependencyDescriptorBuilder.build(parameter,
                 dependencyDescriptors, isRequired);

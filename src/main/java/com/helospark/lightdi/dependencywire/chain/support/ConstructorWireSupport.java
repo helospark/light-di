@@ -5,6 +5,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
@@ -18,7 +19,7 @@ public class ConstructorWireSupport {
         this.parameterDependencyDescriptorBuilder = parameterDependencyDescriptorBuilder;
     }
 
-    public List<ConstructorDescriptor> getConstructors(List<DependencyDescriptor> dependencyDescriptors,
+    public List<ConstructorDescriptor> getConstructors(SortedSet<DependencyDescriptor> dependencyDescriptors,
             Class<?> clazz) {
         List<Constructor<?>> constructors = Arrays.asList(clazz.getConstructors());
         List<ConstructorDescriptor> cons = new ArrayList<>();

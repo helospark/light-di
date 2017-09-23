@@ -2,14 +2,14 @@ package com.helospark.lightdi.dependencywire.chain.support.chain;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.SortedSet;
 
 import javax.annotation.Generated;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
 public class InjectDescriptorBuilderRequest {
-    private List<DependencyDescriptor> dependencyDescriptors;
+    private SortedSet<DependencyDescriptor> dependencyDescriptors;
     private AnnotatedElement parameter;
     private Class<?> type;
     private Type genericType;
@@ -24,7 +24,7 @@ public class InjectDescriptorBuilderRequest {
         this.required = builder.required;
     }
 
-    public List<DependencyDescriptor> getDependencyDescriptors() {
+    public SortedSet<DependencyDescriptor> getDependencyDescriptors() {
         return dependencyDescriptors;
     }
 
@@ -51,7 +51,7 @@ public class InjectDescriptorBuilderRequest {
 
     @Generated("SparkTools")
     public static final class Builder {
-        private List<DependencyDescriptor> dependencyDescriptors;
+        private SortedSet<DependencyDescriptor> dependencyDescriptors;
         private AnnotatedElement parameter;
         private Class<?> type;
         private Type genericType;
@@ -60,7 +60,7 @@ public class InjectDescriptorBuilderRequest {
         private Builder() {
         }
 
-        public Builder withDependencyDescriptors(List<DependencyDescriptor> dependencyDescriptors) {
+        public Builder withDependencyDescriptors(SortedSet<DependencyDescriptor> dependencyDescriptors) {
             this.dependencyDescriptors = dependencyDescriptors;
             return this;
         }

@@ -2,6 +2,7 @@ package com.helospark.lightdi.dependencywire.chain;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.dependencywire.chain.support.MethodDependencyCollector;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
@@ -17,7 +18,7 @@ public class BeanDependencyWireChainItem implements DependencyWireChain {
     }
 
     @Override
-    public void collectDependencies(List<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependency) {
+    public void collectDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependency) {
         if (dependency instanceof BeanDependencyDescriptor) {
             BeanDependencyDescriptor beanDescriptor = (BeanDependencyDescriptor) dependency;
 

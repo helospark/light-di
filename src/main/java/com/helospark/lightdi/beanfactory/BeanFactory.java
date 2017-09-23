@@ -4,6 +4,7 @@ import static com.helospark.lightdi.util.LogMessageBeanNameFormatter.convertToBe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.aware.ContextAware;
@@ -44,7 +45,7 @@ public class BeanFactory {
                                 + dependencyToCreate.getClass().getName()));
     }
 
-    public void assertValidConfiguration(List<DependencyDescriptor> earlierInRoute) {
+    public void assertValidConfiguration(SortedSet<DependencyDescriptor> earlierInRoute) {
         for (DependencyDescriptor descriptor : earlierInRoute) {
             assertValidConfiguration(descriptor, new ArrayList<>());
         }

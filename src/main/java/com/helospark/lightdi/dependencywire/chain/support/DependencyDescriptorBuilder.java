@@ -3,6 +3,7 @@ package com.helospark.lightdi.dependencywire.chain.support;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.dependencywire.chain.support.chain.InjectDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.InjectDescriptorBuilderRequest;
@@ -16,7 +17,7 @@ public class DependencyDescriptorBuilder {
         this.chain = chain;
     }
 
-    public InjectionDescriptor build(Parameter parameter, List<DependencyDescriptor> dependencyDescriptors, boolean required) {
+    public InjectionDescriptor build(Parameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
         InjectDescriptorBuilderRequest request = InjectDescriptorBuilderRequest.builder()
                 .withDependencyDescriptors(dependencyDescriptors)
                 .withRequired(required)
@@ -27,7 +28,7 @@ public class DependencyDescriptorBuilder {
         return findWithChain(request);
     }
 
-    public InjectionDescriptor build(Field parameter, List<DependencyDescriptor> dependencyDescriptors, boolean required) {
+    public InjectionDescriptor build(Field parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
         InjectDescriptorBuilderRequest request = InjectDescriptorBuilderRequest.builder()
                 .withDependencyDescriptors(dependencyDescriptors)
                 .withRequired(required)

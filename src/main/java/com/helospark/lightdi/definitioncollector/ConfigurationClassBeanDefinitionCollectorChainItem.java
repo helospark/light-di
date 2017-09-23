@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Bean;
@@ -54,12 +56,12 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
                 .build();
     }
 
-    private List<DependencyDescriptor> collectBeanMethodDescriptors(Class<?> clazz,
+    private SortedSet<DependencyDescriptor> collectBeanMethodDescriptors(Class<?> clazz,
             StereotypeDependencyDescriptor configurationDescriptor) {
         return Arrays.stream(clazz.getMethods())
                 .filter(method -> hasAnnotation(method, Bean.class))
                 .map(method -> createDescriptor(method, configurationDescriptor))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> new TreeSet<>()));
     }
 
     private DependencyDescriptor createDescriptor(Method method,

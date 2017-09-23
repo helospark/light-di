@@ -1,8 +1,9 @@
 package com.helospark.lightdi.util;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
@@ -11,22 +12,23 @@ import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 public class DependencyChooser {
 
     public static DependencyDescriptor findDependencyFromQuery(Collection<DependencyDescriptor> dependencies, DependencyDescriptorQuery toFind) {
-        List<DependencyDescriptor> found = findDependencyDescriptor(dependencies, toFind);
+        SortedSet<DependencyDescriptor> found = findDependencyDescriptor(dependencies, toFind);
         return findDependencyToGenerate(found, toFind);
     }
 
-    public static List<DependencyDescriptor> findDependencyDescriptor(Collection<DependencyDescriptor> dependencies,
+    public static SortedSet<DependencyDescriptor> findDependencyDescriptor(Collection<DependencyDescriptor> dependencies,
             DependencyDescriptorQuery toFind) {
         return dependencies
                 .stream()
                 .filter(dependencyEntry -> dependencyEntry.doesMatch(toFind))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> new TreeSet<>()));
     }
 
-    public static DependencyDescriptor findDependencyToGenerate(List<DependencyDescriptor> dependencyToCreate, DependencyDescriptorQuery toFind) {
+    public static DependencyDescriptor findDependencyToGenerate(SortedSet<DependencyDescriptor> dependencyToCreate,
+            DependencyDescriptorQuery toFind) {
         Optional<DependencyDescriptor> primary = findPrimary(dependencyToCreate);
         if (dependencyToCreate.size() == 1) {
-            return dependencyToCreate.get(0);
+            return dependencyToCreate.first();
         } else if (primary.isPresent()) {
             return primary.get();
         } else if (!toFind.isRequired()) {
@@ -38,7 +40,7 @@ public class DependencyChooser {
     }
 
     public static Optional<DependencyDescriptor> findPrimary(
-            List<DependencyDescriptor> foundDependencies) {
+            SortedSet<DependencyDescriptor> foundDependencies) {
         return foundDependencies.stream()
                 .filter(dependency -> dependency.isPrimary())
                 .findFirst();

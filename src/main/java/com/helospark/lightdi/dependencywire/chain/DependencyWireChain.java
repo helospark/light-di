@@ -1,11 +1,11 @@
 package com.helospark.lightdi.dependencywire.chain;
 
-import java.util.List;
+import java.util.SortedSet;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
 public interface DependencyWireChain {
 
-    void collectDependencies(List<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependency);
+    void collectDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependency);
 
 }
