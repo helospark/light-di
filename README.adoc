@@ -21,6 +21,7 @@ Similar to Spring annotation-support.
 * `@Primary` can be used to declare a bean as primary in case of bean collision (useful for mocking out dependencies)
 * `@ComponentScan` and `@Import` support to load more beans in other packages
 * Conditional bean support, based on existance of other beans, classes, properties
+* `@ComponentScan` only for current jar file, therefore increasing performance, and decreasing bugs from accidentally picking up classes
 * JUnit test support (`@Autowire` to test, and automatically create Mockito mocks (`@MockBean`, `@SpyBean`) and inject into the test to test)
 * Fast startup time, small memory footprint (see performance section (soon))
 
@@ -40,6 +41,8 @@ If you started a project with LightDI, but realize, that you will need more feat
 If you started a project in Spring, and only used DI features, moving to LightDI should also be fairly straightforward, following the above steps in reverse. Therefore you could get a more lightweight application.
 
 == Performance
+
+See project: https://github.com/helospark/lightdi-performance-test
 
 _Statistics coming soon_
 
