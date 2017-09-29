@@ -23,7 +23,7 @@ public class CollectionInjectIT {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextByPackage(BeanToInjectCollection.class.getPackage().getName());
+        context = lightDi.initContextUsingFullClasspathScan(BeanToInjectCollection.class.getPackage().getName());
     }
 
     @After

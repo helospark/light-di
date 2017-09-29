@@ -2,7 +2,13 @@ package com.helospark.lightdi;
 
 public class LightDi {
 
-    public LightDiContext initContextByPackage(String packageName) {
+    public LightDiContext initContextUsingFullClasspathScan(String packageName) {
+        LightDiContext lightDiContext = new LightDiContext();
+        lightDiContext.loadDependenciesFromPackage(packageName);
+        return lightDiContext;
+    }
+
+    public LightDiContext initContextUsing(String packageName, Class<?> jarRelativeClass) {
         LightDiContext lightDiContext = new LightDiContext();
         lightDiContext.loadDependenciesFromPackage(packageName);
         return lightDiContext;

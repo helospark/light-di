@@ -15,4 +15,5 @@ public @interface ComponentScan {
 
     public Class<?>[] basePackageClasses() default {};
 
+    public boolean onlyScanThisJar() default true;
 }

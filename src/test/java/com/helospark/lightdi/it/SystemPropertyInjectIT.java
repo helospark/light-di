@@ -15,7 +15,7 @@ public class SystemPropertyInjectIT {
     public void testSystemPropertyShouldInject() {
         // GIVEN
         System.setProperty("TEST_VALUE", "systemPropertyOverride");
-        LightDiContext context = new LightDi().initContextByPackage(ComponentWithConstructorValue.class.getPackage().getName());
+        LightDiContext context = new LightDi().initContextUsingFullClasspathScan(ComponentWithConstructorValue.class.getPackage().getName());
 
         // WHEN
         ComponentWithConstructorValue instance = context.getBean(ComponentWithConstructorValue.class);

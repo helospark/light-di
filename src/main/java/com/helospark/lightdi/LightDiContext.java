@@ -37,7 +37,11 @@ import com.helospark.lightdi.properties.Environment;
 import com.helospark.lightdi.properties.EnvironmentFactory;
 import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
 import com.helospark.lightdi.properties.ValueResolver;
-import com.helospark.lightdi.scanner.LightDiClasspathScanner;
+import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
+import com.helospark.lightdi.properties.converter.StringPropertyConverter;
+import com.helospark.lightdi.scanner.ClasspathScannerChain;
+import com.helospark.lightdi.scanner.ClasspathScannerChainFactory;
+import com.helospark.lightdi.scanner.FastClasspathScannerChainItem;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 import com.helospark.lightdi.util.DependencyChooser;
 
@@ -50,22 +54,20 @@ public class LightDiContext implements AutoCloseable {
     private BeanDefinitionCollector beanDefinitionCollector;
     private EnvironmentInitializerFactory environmentInitializer;
     private RecursiveDependencyDescriptorCollector recursiveDependencyDescriptorCollector;
-    private LightDiClasspathScanner lightDiClasspathScanner;
-
+    private FastClasspathScannerChainItem lightDiClasspathScanner;
     private WiringProcessingServiceFactory preprocessWireServiceFactory;
     private BeanFactoryFactory beanFactoryFactory;
     private BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory;
+    private ValueResolver valueResolver;
+    private AutowirePostProcessor autowireSupportUtil;
+    private ConditionalFilter conditionalFilter;
 
+    // State
+    private SortedSet<DependencyDescriptor> dependencyDescriptors;
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
     private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
     private List<BeanPostProcessor> beanPostProcessors;
-    private ValueResolver valueResolver;
-    private AutowirePostProcessor autowireSupportUtil;
-    private SortedSet<DependencyDescriptor> dependencyDescriptors;
-
     private Environment environment = null;
-
-    private ConditionalFilter conditionalFilter;
 
     public LightDiContext() {
         this.initializedSingletonBeans = new HashMap<>();
@@ -76,7 +78,7 @@ public class LightDiContext implements AutoCloseable {
         this.conditionalFilter = new ConditionalFilter();
 
         /** Moved from LightDi class **/
-        lightDiClasspathScanner = new LightDiClasspathScanner();
+        lightDiClasspathScanner = new FastClasspathScannerChainItem();
 
         beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
         beanDefinitionCollector = beanDefinitionProcessorChainFactory.createBeanDefinitionProcessorChain();
@@ -91,12 +93,16 @@ public class LightDiContext implements AutoCloseable {
 
         ComponentScanCollector componentScanCollector = new ComponentScanCollector();
 
-        recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(lightDiClasspathScanner, beanDefinitionCollector,
+        ClasspathScannerChain classpathScannerChain = new ClasspathScannerChainFactory().create();
+
+        recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(classpathScannerChain, beanDefinitionCollector,
                 componentScanCollector);
 
         /** Register stuff */
         registerSingleton(environment);
         registerSingleton(this);
+        registerSingleton(new IntegerPropertyConverter());
+        registerSingleton(new StringPropertyConverter());
     }
 
     public <T> T getBean(Class<T> clazz) {
@@ -219,7 +225,7 @@ public class LightDiContext implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         initializedSingletonBeans.entrySet()
                 .stream()
                 .forEach(entry -> closeDependency(entry));
@@ -257,7 +263,7 @@ public class LightDiContext implements AutoCloseable {
 
     public void loadDependenciesFromPackage(String packageName) {
         try {
-            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependencies(packageName);
+            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependenciesUsingFullClasspathScan(packageName);
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);

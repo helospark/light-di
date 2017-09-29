@@ -22,7 +22,7 @@ public class ContextWithCircleTest {
 
         // WHEN
         try {
-            lightDi.initContextByPackage(ClassA.class.getPackage().getName());
+            lightDi.initContextUsingFullClasspathScan(ClassA.class.getPackage().getName());
         } catch (Exception e) {
             thrownException = e;
         }

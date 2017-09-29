@@ -21,7 +21,7 @@ public class ContextOrderIT {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextByPackage(CommonOrderInterface.class.getPackage().getName());
+        context = lightDi.initContextUsingFullClasspathScan(CommonOrderInterface.class.getPackage().getName());
     }
 
     @After
