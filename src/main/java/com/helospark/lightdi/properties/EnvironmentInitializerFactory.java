@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.helospark.lightdi.annotation.PropertySource;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.NoPropertyFileFoundException;
+import com.helospark.lightdi.util.AnnotationUtil;
 
 public class EnvironmentInitializerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentInitializerFactory.class);
@@ -38,12 +39,12 @@ public class EnvironmentInitializerFactory {
     }
 
     private boolean doesHavePropertySource(DependencyDescriptor descriptor) {
-        return descriptor.getClazz().getAnnotationsByType(PropertySource.class).length > 0;
+        return AnnotationUtil.hasAnnotation(descriptor.getClazz(), PropertySource.class);
     }
 
     private Stream<PropertySourceHolder> createPropertySourceResolver(DependencyDescriptor descriptor) {
-        PropertySource[] annotations = descriptor.getClazz().getAnnotationsByType(PropertySource.class);
-        return Arrays.stream(annotations)
+        return AnnotationUtil.getAnnotationsOfType(descriptor.getClazz(), PropertySource.class)
+                .stream()
                 .flatMap(annotation -> loadPropertySource(annotation));
     }
 

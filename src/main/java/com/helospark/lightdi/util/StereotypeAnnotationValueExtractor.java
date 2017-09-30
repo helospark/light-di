@@ -1,22 +1,24 @@
 package com.helospark.lightdi.util;
 
+import java.util.Set;
+
 import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.Configuration;
 import com.helospark.lightdi.annotation.Service;
 
 public class StereotypeAnnotationValueExtractor {
     public static String getStereotypeAnnotationValue(Class<?> clazz) {
-        Component[] component = clazz.getAnnotationsByType(Component.class);
-        if (component.length > 0) {
-            return component[0].value();
+        Set<Component> component = AnnotationUtil.getAnnotationsOfType(clazz, Component.class);
+        if (component.size() > 0) {
+            return component.stream().findFirst().get().value();
         }
-        Service[] service = clazz.getAnnotationsByType(Service.class);
-        if (service.length > 0) {
-            return service[0].value();
+        Set<Service> service = AnnotationUtil.getAnnotationsOfType(clazz, Service.class);
+        if (service.size() > 0) {
+            return service.stream().findFirst().get().value();
         }
-        Configuration[] configuration = clazz.getAnnotationsByType(Configuration.class);
-        if (configuration.length > 0) {
-            return configuration[0].value();
+        Set<Configuration> configuration = AnnotationUtil.getAnnotationsOfType(clazz, Configuration.class);
+        if (configuration.size() > 0) {
+            return configuration.stream().findFirst().get().value();
         }
         return "";
     }

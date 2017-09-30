@@ -24,7 +24,7 @@ public class BeanNameGenerator {
     }
 
     public static String createQualifierForMethodAnnotatedWithBean(Method method) {
-        String annotationValue = method.getAnnotationsByType(Bean.class)[0].value();
+        String annotationValue = AnnotationUtil.getSingleAnnotationOfType(method, Bean.class).value();
         return annotationValue.isEmpty() ? method.getName() : annotationValue;
     }
 }

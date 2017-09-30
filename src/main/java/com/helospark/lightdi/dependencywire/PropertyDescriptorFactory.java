@@ -1,5 +1,7 @@
 package com.helospark.lightdi.dependencywire;
 
+import static com.helospark.lightdi.util.AnnotationUtil.getSingleAnnotationOfType;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -11,7 +13,7 @@ import com.helospark.lightdi.descriptor.property.PropertyDescritor;
 
 public class PropertyDescriptorFactory {
     public PropertyDescritor buildPropertyDescriptor(AnnotatedElement parameter, Class<?> type) {
-        Value valueAnnotation = parameter.getAnnotation(Value.class);
+        Value valueAnnotation = getSingleAnnotationOfType(parameter, Value.class);
         String value = valueAnnotation.value();
         boolean required = valueAnnotation.required();
         return new PropertyDescritor(type, value, required);

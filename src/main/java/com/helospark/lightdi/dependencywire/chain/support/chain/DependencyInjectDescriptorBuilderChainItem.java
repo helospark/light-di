@@ -6,6 +6,7 @@ import com.helospark.lightdi.annotation.Qualifier;
 import com.helospark.lightdi.dependencywire.FindInDependencySupport;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
+import com.helospark.lightdi.util.AnnotationUtil;
 
 public class DependencyInjectDescriptorBuilderChainItem implements InjectDescriptorBuilderChainItem {
     private FindInDependencySupport findInDependencySupport;
@@ -30,10 +31,10 @@ public class DependencyInjectDescriptorBuilderChainItem implements InjectDescrip
     }
 
     private String extractQualifierOrNull(AnnotatedElement parameter) {
-        Qualifier[] qualifierAnnotation = parameter.getAnnotationsByType(Qualifier.class);
-        if (qualifierAnnotation.length > 0) {
-            return qualifierAnnotation[0].value();
+        if (AnnotationUtil.hasAnnotation(parameter, Qualifier.class)) {
+            return AnnotationUtil.getSingleAnnotationOfType(parameter, Qualifier.class).value();
+        } else {
+            return null;
         }
-        return null;
     }
 }

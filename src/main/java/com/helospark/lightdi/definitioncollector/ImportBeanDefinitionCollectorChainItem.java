@@ -9,6 +9,7 @@ import com.helospark.lightdi.annotation.Configuration;
 import com.helospark.lightdi.annotation.Import;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
+import com.helospark.lightdi.util.AnnotationUtil;
 
 public class ImportBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
     private ConfigurationClassBeanDefinitionCollectorChainItem configurationClassBeanDefinitionCollectorChainItem;
@@ -21,7 +22,7 @@ public class ImportBeanDefinitionCollectorChainItem implements BeanDefinitionCol
     @Override
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
         if (isSupported(clazz)) {
-            Import importAnnotation = clazz.getAnnotation(Import.class);
+            Import importAnnotation = AnnotationUtil.getSingleAnnotationOfType(clazz, Import.class);
             Class<?> importedConfiguration = importAnnotation.value();
             if (!hasAnnotation(importedConfiguration, Configuration.class)) {
                 throw new IllegalConfigurationException("Importing a class that is not a configuration");

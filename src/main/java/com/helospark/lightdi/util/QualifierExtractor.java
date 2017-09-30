@@ -11,7 +11,7 @@ public class QualifierExtractor {
 
     public static String extractScope(Class<?> clazz) {
         if (hasAnnotation(clazz, Scope.class)) {
-            Scope scope = clazz.getAnnotationsByType(Scope.class)[0];
+            Scope scope = AnnotationUtil.getSingleAnnotationOfType(clazz, Scope.class);
             return scope.value();
         }
         return LightDiConstants.SCOPE_SINGLETON;
@@ -19,7 +19,7 @@ public class QualifierExtractor {
 
     public static String extractScope(Method method) {
         if (hasAnnotation(method, Scope.class)) {
-            Scope scope = method.getAnnotationsByType(Scope.class)[0];
+            Scope scope = AnnotationUtil.getSingleAnnotationOfType(method, Scope.class);
             return scope.value();
         }
         return LightDiConstants.SCOPE_SINGLETON;
