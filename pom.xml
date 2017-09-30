@@ -10,6 +10,7 @@
 			<groupId>io.github.lukehutch</groupId>
 			<artifactId>fast-classpath-scanner</artifactId>
 			<version>2.4.5</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -76,6 +77,7 @@
 							<exclude>org.mockito:mockito-all</exclude>
 							<exclude>junit:junit</exclude>
 							<exclude>org.hamcrest:hamcrest-core</exclude>
+							<exclude>io.github.lukehutch:fast-classpath-scanner</exclude> <!-- Only required for full classpath scan -->
 						</excludes>
 					</artifactSet>
 					<keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
