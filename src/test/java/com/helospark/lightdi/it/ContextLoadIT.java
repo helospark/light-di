@@ -42,6 +42,7 @@ import com.helospark.lightdi.it.testcontext1.RequiredFalseSetterDependency;
 import com.helospark.lightdi.it.testcontext1.RequiredFalseValueMissing;
 import com.helospark.lightdi.it.testcontext1.ServiceAnnotatedComponent;
 import com.helospark.lightdi.it.testcontext1.SetterDependency;
+import com.helospark.lightdi.it.testcontext1.TestDependency.InnerClass;
 import com.helospark.lightdi.it.thirdpackage.ThirdPackageConfiguration;
 
 public class ContextLoadIT {
@@ -50,7 +51,7 @@ public class ContextLoadIT {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextUsingFullClasspathScan(ConstructorDependency.class.getPackage().getName());
+        context = lightDi.initContextUsing(ConstructorDependency.class.getPackage().getName(), this.getClass());
     }
 
     @After
@@ -360,6 +361,17 @@ public class ContextLoadIT {
 
         // THEN
         assertThat(bean.getValue(), is(""));
+    }
+
+    @Test
+    public void testInnerClassShouldWork() {
+        // GIVEN
+
+        // WHEN
+        InnerClass bean = context.getBean(InnerClass.class);
+
+        // THEN
+        assertNotNull(bean);
     }
 
 }

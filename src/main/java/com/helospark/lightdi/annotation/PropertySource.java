@@ -13,4 +13,6 @@ public @interface PropertySource {
     public String[] value();
 
     public int order() default DEFAULT_PROPERTY_ORDER;
+
+    public boolean ignoreResourceNotFound() default false;
 }

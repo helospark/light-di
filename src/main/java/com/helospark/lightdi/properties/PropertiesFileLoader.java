@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.helospark.lightdi.exception.NoPropertyFileFoundException;
+
 public class PropertiesFileLoader {
 
     public Map<String, String> load(String name) {
@@ -15,7 +17,7 @@ public class PropertiesFileLoader {
         } else if (name.startsWith("file:")) {
             return loadFromFile(name.replaceFirst("file:", ""));
         } else {
-            throw new IllegalArgumentException("No file named " + name);
+            throw new IllegalArgumentException("Use 'file:' or 'classpath:' in the name of the file: " + name);
         }
     }
 
@@ -23,10 +25,10 @@ public class PropertiesFileLoader {
         try {
             InputStream input = PropertiesFileLoader.class.getClassLoader().getResourceAsStream(fileName);
             if (input == null) {
-                throw new IllegalArgumentException("No such file " + fileName);
+                throw new NoPropertyFileFoundException("No such file " + fileName);
             }
             return loadPropertiesInternal(input);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

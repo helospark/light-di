@@ -2,6 +2,8 @@ package com.helospark.lightdi.properties;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.annotation.PropertySource;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
+import com.helospark.lightdi.exception.NoPropertyFileFoundException;
 
 public class EnvironmentInitializerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentInitializerFactory.class);
@@ -46,7 +49,21 @@ public class EnvironmentInitializerFactory {
 
     private Stream<PropertySourceHolder> loadPropertySource(PropertySource annotation) {
         return Arrays.stream(annotation.value())
-                .map(value -> propertiesFileLoader.load(value))
+                .map(value -> loadProperties(value, annotation))
+                .filter(value -> value.isPresent())
+                .map(value -> value.get())
                 .map(loadedProperty -> new PropertySourceHolder(annotation.order(), loadedProperty));
+    }
+
+    private Optional<Map<String, String>> loadProperties(String value, PropertySource annotation) {
+        try {
+            return Optional.of(propertiesFileLoader.load(value));
+        } catch (NoPropertyFileFoundException e) {
+            if (annotation.ignoreResourceNotFound()) {
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
     }
 }

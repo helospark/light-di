@@ -8,4 +8,9 @@ public class TestDependency {
     public TestDependency() {
 
     }
+
+    @Component
+    public static class InnerClass {
+
+    }
 }
