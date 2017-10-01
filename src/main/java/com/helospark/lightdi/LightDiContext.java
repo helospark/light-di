@@ -41,20 +41,20 @@ import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
 import com.helospark.lightdi.properties.converter.StringPropertyConverter;
 import com.helospark.lightdi.scanner.ClasspathScannerChain;
 import com.helospark.lightdi.scanner.ClasspathScannerChainFactory;
-import com.helospark.lightdi.scanner.FastClasspathScannerChainItem;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 import com.helospark.lightdi.util.DependencyChooser;
 
 public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
-    private static boolean CHECK_FOR_INTEGRITY = true;
+    // Configuration
+    private LightDiContextConfiguration lightDiContextConfiguration;
 
+    // Helpers
     private BeanFactory beanFactory;
     private WiringProcessingService wiringProcessingService;
     private BeanDefinitionCollector beanDefinitionCollector;
     private EnvironmentInitializerFactory environmentInitializer;
     private RecursiveDependencyDescriptorCollector recursiveDependencyDescriptorCollector;
-    private FastClasspathScannerChainItem lightDiClasspathScanner;
     private WiringProcessingServiceFactory preprocessWireServiceFactory;
     private BeanFactoryFactory beanFactoryFactory;
     private BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory;
@@ -70,6 +70,14 @@ public class LightDiContext implements AutoCloseable {
     private Environment environment = null;
 
     public LightDiContext() {
+        this(LightDiContextConfiguration.builder()
+                .withCheckForIntegrity(true)
+                .build());
+    }
+
+    public LightDiContext(LightDiContextConfiguration lightDiContextConfiguration) {
+        this.lightDiContextConfiguration = lightDiContextConfiguration;
+
         this.initializedSingletonBeans = new HashMap<>();
         this.initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = new TreeSet<>();
@@ -78,7 +86,6 @@ public class LightDiContext implements AutoCloseable {
         this.conditionalFilter = new ConditionalFilter();
 
         /** Moved from LightDi class **/
-        lightDiClasspathScanner = new FastClasspathScannerChainItem();
 
         beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
         beanDefinitionCollector = beanDefinitionProcessorChainFactory.createBeanDefinitionProcessorChain();
@@ -263,7 +270,8 @@ public class LightDiContext implements AutoCloseable {
 
     public void loadDependenciesFromPackage(String packageName) {
         try {
-            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependenciesUsingFullClasspathScan(packageName);
+            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector
+                    .collectDependenciesUsingFullClasspathScan(packageName);
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);
@@ -292,7 +300,7 @@ public class LightDiContext implements AutoCloseable {
                 preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
                 this);
 
-        if (CHECK_FOR_INTEGRITY) {
+        if (lightDiContextConfiguration.isCheckForIntegrity()) {
             beanFactory.assertValidConfiguration(dependencyDescriptors);
         }
 

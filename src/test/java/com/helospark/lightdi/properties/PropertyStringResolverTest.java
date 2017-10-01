@@ -43,6 +43,7 @@ public class PropertyStringResolverTest {
         when(propertyValueResolver.resolveOptional("NESTED_VALUE", propertySourceHolder)).thenReturn(of("nested=${TEST_VALUE}"));
         when(propertyValueResolver.resolveOptional("DOUBLE_NESTED", propertySourceHolder)).thenReturn(of("${NESTED_VALUE}=${TEST_VALUE}"));
         when(propertyValueResolver.resolveOptional("EMPTY", propertySourceHolder)).thenReturn(empty());
+        when(propertyValueResolver.resolveOptional("NOT_FOUND_PROPERTY", propertySourceHolder)).thenReturn(empty());
     }
 
     @Test
@@ -56,22 +57,14 @@ public class PropertyStringResolverTest {
         assertThat(result, is(expectedOutput));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testMissingValueShouldThrow() {
-        // GIVEN
-
-        // WHEN
-        underTest.resolve("${EMPTY}", propertySourceHolder);
-
-        // THEN throws
-    }
-
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[] { "${TEST_VALUE}", "testValueResolved" },
                 new Object[] { "test=${TEST_VALUE}", "test=testValueResolved" },
                 new Object[] { "${NESTED_VALUE}", "nested=testValueResolved" },
-                new Object[] { "${DOUBLE_NESTED}", "nested=testValueResolved=testValueResolved" });
+                new Object[] { "${DOUBLE_NESTED}", "nested=testValueResolved=testValueResolved" },
+                new Object[] { "${TEST_VALUE:defaultValue}", "testValueResolved" },
+                new Object[] { "${NOT_FOUND_PROPERTY:defaultValue}", "defaultValue" });
     }
 }

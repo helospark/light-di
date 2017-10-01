@@ -27,7 +27,7 @@ public class EnvironmentInitializerFactory {
     public Environment initializeEnvironment(Environment environment, SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<PropertySourceHolder> propertySourceHolders = dependencyDescriptors.stream()
                 .filter(descriptor -> doesHavePropertySource(descriptor))
-                .flatMap(descriptor -> createPropertySourceResolver(descriptor))
+                .flatMap(descriptor -> createPropertySourceResolver(descriptor, environment))
                 .collect(Collectors.toList());
 
         if (LOGGER.isDebugEnabled()) {
@@ -42,14 +42,15 @@ public class EnvironmentInitializerFactory {
         return AnnotationUtil.hasAnnotation(descriptor.getClazz(), PropertySource.class);
     }
 
-    private Stream<PropertySourceHolder> createPropertySourceResolver(DependencyDescriptor descriptor) {
+    private Stream<PropertySourceHolder> createPropertySourceResolver(DependencyDescriptor descriptor, Environment environment) {
         return AnnotationUtil.getAnnotationsOfType(descriptor.getClazz(), PropertySource.class)
                 .stream()
-                .flatMap(annotation -> loadPropertySource(annotation));
+                .flatMap(annotation -> loadPropertySource(annotation, environment));
     }
 
-    private Stream<PropertySourceHolder> loadPropertySource(PropertySource annotation) {
+    private Stream<PropertySourceHolder> loadPropertySource(PropertySource annotation, Environment environment) {
         return Arrays.stream(annotation.value())
+                .map(value -> environment.resolve(value))
                 .map(value -> loadProperties(value, annotation))
                 .filter(value -> value.isPresent())
                 .map(value -> value.get())

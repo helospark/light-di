@@ -20,6 +20,24 @@ public class LightDi {
         return lightDiContext;
     }
 
+    public LightDiContext initContextUsingFullClasspathScan(String packageName, LightDiContextConfiguration configuration) {
+        LightDiContext lightDiContext = new LightDiContext(configuration);
+        lightDiContext.loadDependenciesFromPackage(packageName);
+        return lightDiContext;
+    }
+
+    public LightDiContext initContextUsing(String packageName, Class<?> jarRelativeClass, LightDiContextConfiguration configuration) {
+        LightDiContext lightDiContext = new LightDiContext(configuration);
+        lightDiContext.loadDependenciesFromPackage(packageName);
+        return lightDiContext;
+    }
+
+    public LightDiContext initContextByClass(Class<?> clazz, LightDiContextConfiguration configuration) {
+        LightDiContext lightDiContext = new LightDiContext(configuration);
+        lightDiContext.loadDependenciesFromClass(clazz);
+        return lightDiContext;
+    }
+
     public int version() {
         return 1;
     }
