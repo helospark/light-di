@@ -32,6 +32,7 @@ import com.helospark.lightdi.it.testcontext1.EnvironmentInjectTest;
 import com.helospark.lightdi.it.testcontext1.FieldDependency;
 import com.helospark.lightdi.it.testcontext1.LazyComponent;
 import com.helospark.lightdi.it.testcontext1.ManuallyRegisteredBean;
+import com.helospark.lightdi.it.testcontext1.MultiConstructorServer;
 import com.helospark.lightdi.it.testcontext1.NonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.OtherNonAnnotatedClass;
 import com.helospark.lightdi.it.testcontext1.PrimaryTestBean;
@@ -374,4 +375,15 @@ public class ContextLoadIT {
         assertNotNull(bean);
     }
 
+    @Test
+    public void testMultiConstructorWithSingleAutowired() {
+        // GIVEN
+
+        // WHEN
+        MultiConstructorServer bean = context.getBean(MultiConstructorServer.class);
+
+        // THEN
+        assertNotNull(bean.getTestDependency());
+        assertThat(bean.getValue(), is("setFromConstructor"));
+    }
 }

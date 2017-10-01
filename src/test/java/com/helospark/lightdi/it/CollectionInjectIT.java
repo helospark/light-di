@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.helospark.lightdi.LightDi;
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.it.collectioninjecttest.ArrayListCollectionOnSetterBean;
 import com.helospark.lightdi.it.collectioninjecttest.BeanToInjectCollection;
 import com.helospark.lightdi.it.collectioninjecttest.BeanToInjectSet;
 import com.helospark.lightdi.it.collectioninjecttest.CollectionOnFieldBean;
@@ -83,6 +84,17 @@ public class CollectionInjectIT {
 
         // WHEN
         CollectionOnSetterBean bean = context.getBean(CollectionOnSetterBean.class);
+
+        // THEN
+        assertThat(bean.getCommonInterface().size(), is(2));
+    }
+
+    @Test
+    public void testArrayListInjectOnSetter() {
+        // GIVEN
+
+        // WHEN
+        ArrayListCollectionOnSetterBean bean = context.getBean(ArrayListCollectionOnSetterBean.class);
 
         // THEN
         assertThat(bean.getCommonInterface().size(), is(2));

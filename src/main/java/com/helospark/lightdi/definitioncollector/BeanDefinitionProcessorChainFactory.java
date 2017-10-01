@@ -31,8 +31,4 @@ public class BeanDefinitionProcessorChainFactory {
         return stereotypeBeanDefinitionCollectorChainItem;
     }
 
-    public ConfigurationClassBeanDefinitionCollectorChainItem getConfigurationClassBeanDefinitionCollectorChainItem() {
-        return configurationClassBeanDefinitionCollectorChainItem;
-    }
-
 }

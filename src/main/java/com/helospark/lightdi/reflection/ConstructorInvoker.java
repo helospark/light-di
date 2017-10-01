@@ -2,6 +2,7 @@ package com.helospark.lightdi.reflection;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Optional;
 
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
@@ -28,9 +29,22 @@ public class ConstructorInvoker {
             params[descriptor.getIndex()] = dependencyObjectResolverHandler.resolve(lightDiContext,
                     injectionDescriptor);
         }
-        Constructor<?> method = dependencyToCreate.getClazz().getConstructors()[0]; // bug
+        Optional<Constructor<?>> method = getConstructorToUse(constructorDescriptors, dependencyToCreate);
 
-        return method.newInstance(params);
+        if (method.isPresent()) {
+            return method.get().newInstance(params);
+        } else {
+            return dependencyToCreate.getClazz().newInstance(); // without constructor
+        }
+    }
+
+    private Optional<Constructor<?>> getConstructorToUse(List<ConstructorDescriptor> constructorDescriptors,
+            StereotypeDependencyDescriptor dependencyToCreate) {
+        if (constructorDescriptors.size() > 0) {
+            return Optional.of(constructorDescriptors.get(0).getConstructor()); // all element has the same constructor
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

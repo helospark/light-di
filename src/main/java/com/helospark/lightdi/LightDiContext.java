@@ -268,10 +268,20 @@ public class LightDiContext implements AutoCloseable {
         this.autowireSupportUtil = autowireSupportUtil;
     }
 
-    public void loadDependenciesFromPackage(String packageName) {
+    public void loadDependenciesFromPackageUsingFullClasspathScan(String packageName) {
         try {
             SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector
                     .collectDependenciesUsingFullClasspathScan(packageName);
+            processDescriptors(loadedDescriptors);
+        } catch (Exception e) {
+            throw new ContextInitializationFailedException("Context initialization failed", e);
+        }
+    }
+
+    public void loadDependenciesFromPackage(String packageName, Class<?> referenceClass) {
+        try {
+            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector
+                    .collectDependenciesUsingJarClasspathScan(packageName, referenceClass);
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);

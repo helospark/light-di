@@ -37,7 +37,7 @@ public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
 
         preinitializeMocks(result);
 
-        context.loadDependenciesFromPackage(packageName);
+        context.loadDependenciesFromPackageUsingFullClasspathScan(packageName);
         AutowirePostProcessor autowireSupportUtil = context.getAutowireSupportUtil();
         autowireSupportUtil.autowireFieldsTo(result);
         return result;

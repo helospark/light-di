@@ -65,6 +65,7 @@ public class PropertyStringResolverTest {
                 new Object[] { "${NESTED_VALUE}", "nested=testValueResolved" },
                 new Object[] { "${DOUBLE_NESTED}", "nested=testValueResolved=testValueResolved" },
                 new Object[] { "${TEST_VALUE:defaultValue}", "testValueResolved" },
-                new Object[] { "${NOT_FOUND_PROPERTY:defaultValue}", "defaultValue" });
+                new Object[] { "${NOT_FOUND_PROPERTY:defaultValue}", "defaultValue" },
+                new Object[] { "${NOT_FOUND_PROPERTY:}", "" });
     }
 }

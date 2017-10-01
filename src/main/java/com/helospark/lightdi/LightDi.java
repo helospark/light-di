@@ -4,13 +4,13 @@ public class LightDi {
 
     public LightDiContext initContextUsingFullClasspathScan(String packageName) {
         LightDiContext lightDiContext = new LightDiContext();
-        lightDiContext.loadDependenciesFromPackage(packageName);
+        lightDiContext.loadDependenciesFromPackageUsingFullClasspathScan(packageName);
         return lightDiContext;
     }
 
-    public LightDiContext initContextUsing(String packageName, Class<?> jarRelativeClass) {
+    public LightDiContext initContextUsing(String packageName, Class<?> jarReferenceClass) {
         LightDiContext lightDiContext = new LightDiContext();
-        lightDiContext.loadDependenciesFromPackage(packageName);
+        lightDiContext.loadDependenciesFromPackage(packageName, jarReferenceClass);
         return lightDiContext;
     }
 
@@ -22,13 +22,13 @@ public class LightDi {
 
     public LightDiContext initContextUsingFullClasspathScan(String packageName, LightDiContextConfiguration configuration) {
         LightDiContext lightDiContext = new LightDiContext(configuration);
-        lightDiContext.loadDependenciesFromPackage(packageName);
+        lightDiContext.loadDependenciesFromPackageUsingFullClasspathScan(packageName);
         return lightDiContext;
     }
 
     public LightDiContext initContextUsing(String packageName, Class<?> jarRelativeClass, LightDiContextConfiguration configuration) {
         LightDiContext lightDiContext = new LightDiContext(configuration);
-        lightDiContext.loadDependenciesFromPackage(packageName);
+        lightDiContext.loadDependenciesFromPackageUsingFullClasspathScan(packageName);
         return lightDiContext;
     }
 
