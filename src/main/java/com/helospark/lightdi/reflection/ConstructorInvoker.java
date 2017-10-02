@@ -9,6 +9,7 @@ import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.constructor.ConstructorDescriptor;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
+import com.helospark.lightdi.specialinject.InjectionPoint;
 
 public class ConstructorInvoker {
     private DependencyObjectResolverHandler dependencyObjectResolverHandler;
@@ -26,8 +27,14 @@ public class ConstructorInvoker {
             ConstructorDescriptor descriptor = constructorDescriptors.get(i);
             InjectionDescriptor injectionDescriptor = descriptor.getDependencyDescriptor();
 
+            InjectionPoint injectionPoint = InjectionPoint.builder()
+                    .withConstructorDescriptor(Optional.of(descriptor))
+                    .withInjectionDescriptor(injectionDescriptor)
+                    .withDependencyDescriptor(dependencyToCreate)
+                    .build();
+
             params[descriptor.getIndex()] = dependencyObjectResolverHandler.resolve(lightDiContext,
-                    injectionDescriptor);
+                    injectionDescriptor, injectionPoint);
         }
         Optional<Constructor<?>> method = getConstructorToUse(constructorDescriptors, dependencyToCreate);
 

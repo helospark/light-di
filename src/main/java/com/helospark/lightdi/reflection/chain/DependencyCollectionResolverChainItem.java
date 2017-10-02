@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.descriptor.DependencyCollectionDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
+import com.helospark.lightdi.specialinject.InjectionPoint;
 import com.helospark.lightdi.util.CollectionFactory;
 
 public class DependencyCollectionResolverChainItem implements DependencyObjectResolverChainItem {
@@ -15,7 +16,7 @@ public class DependencyCollectionResolverChainItem implements DependencyObjectRe
     }
 
     @Override
-    public Object resolve(LightDiContext context, InjectionDescriptor injectionDescriptor) {
+    public Object resolve(LightDiContext context, InjectionDescriptor injectionDescriptor, InjectionPoint injectionPoint) {
         DependencyCollectionDescriptor collectionDescriptor = (DependencyCollectionDescriptor) injectionDescriptor;
         Class<? extends Collection<?>> collectionType = collectionDescriptor.getCollectionType();
         Collection<Object> collection = (Collection<Object>) collectionFactoryUtil.createCollectionFor(collectionType);

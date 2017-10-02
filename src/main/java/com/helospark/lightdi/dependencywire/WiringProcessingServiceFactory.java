@@ -14,6 +14,7 @@ import com.helospark.lightdi.dependencywire.chain.support.MethodDependencyCollec
 import com.helospark.lightdi.dependencywire.chain.support.SetterWireSupport;
 import com.helospark.lightdi.dependencywire.chain.support.chain.CollectionInjectDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.DependencyInjectDescriptorBuilderChainItem;
+import com.helospark.lightdi.dependencywire.chain.support.chain.SpecialValueInjectDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.ValueInjectDescriptorBuilderChainItem;
 
 public class WiringProcessingServiceFactory {
@@ -38,10 +39,12 @@ public class WiringProcessingServiceFactory {
                 findInDependencySupport);
         ValueInjectDescriptorBuilderChainItem valueInjectDescriptorBuilderChainItem = new ValueInjectDescriptorBuilderChainItem(
                 propertyDescriptorFactory);
+        SpecialValueInjectDescriptorBuilderChainItem specialValueInjectDescriptorBuilderChainItem = new SpecialValueInjectDescriptorBuilderChainItem();
 
         DependencyDescriptorBuilder parameterDependencyDescriptorBuilder = new DependencyDescriptorBuilder(
                 Arrays.asList(collectionInjectDescriptorBuilderChainItem,
-                        valueInjectDescriptorBuilderChainItem, dependencyInjectDescriptorBuilderChainItem));
+                        valueInjectDescriptorBuilderChainItem, specialValueInjectDescriptorBuilderChainItem,
+                        dependencyInjectDescriptorBuilderChainItem));
 
         constructorWireSupport = new ConstructorWireSupport(parameterDependencyDescriptorBuilder);
 

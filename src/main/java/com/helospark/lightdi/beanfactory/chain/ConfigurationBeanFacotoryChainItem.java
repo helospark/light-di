@@ -24,7 +24,7 @@ public class ConfigurationBeanFacotoryChainItem implements BeanFactoryChainItem 
         Object configurationBean = lightDiContext
                 .getBean(beanDependencyDescriptor.getConfigurationDescriptor());
         return methodInvoker.invokeMethod(lightDiContext, beanDependencyDescriptor.getMethodDescriptor(),
-                configurationBean);
+                configurationBean, dependencyToCreate);
     }
 
     @Override

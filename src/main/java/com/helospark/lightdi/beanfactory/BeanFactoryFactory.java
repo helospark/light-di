@@ -17,6 +17,7 @@ import com.helospark.lightdi.reflection.SetterInvoker;
 import com.helospark.lightdi.reflection.chain.DependencyCollectionResolverChainItem;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
 import com.helospark.lightdi.reflection.chain.DependentObjectResolverChainItem;
+import com.helospark.lightdi.reflection.chain.InjectionPointResolverChainItem;
 import com.helospark.lightdi.reflection.chain.NullInjectResolverChainItem;
 import com.helospark.lightdi.reflection.chain.PropertyObjectResolverChainItem;
 import com.helospark.lightdi.util.CollectionFactory;
@@ -34,10 +35,11 @@ public class BeanFactoryFactory {
         DependencyCollectionResolverChainItem dependencyCollectionResolverChainItem = new DependencyCollectionResolverChainItem(
                 new CollectionFactory());
         NullInjectResolverChainItem nullInjectResolverChainItem = new NullInjectResolverChainItem();
+        InjectionPointResolverChainItem injectionPointResolverChainItem = new InjectionPointResolverChainItem();
 
         DependencyObjectResolverHandler dependencyObjectResolverHandler = new DependencyObjectResolverHandler(
                 Arrays.asList(dependentObjectResolverChainItem, propertyObjectResolverChainItem, dependencyCollectionResolverChainItem,
-                        nullInjectResolverChainItem));
+                        nullInjectResolverChainItem, injectionPointResolverChainItem));
 
         ConstructorInvoker constructorInvoker = new ConstructorInvoker(dependencyObjectResolverHandler);
         MethodInvoker methodInvoker = new MethodInvoker(dependencyObjectResolverHandler);
