@@ -27,6 +27,28 @@ Similar to Spring annotation-support.
 
 == Usage
 
+=== Include library
+
+Include the jar file in your project.
+You can do this using Maven:
+
+[source,xml]
+     <dependency>
+      <groupId>com.helospark</groupId>
+      <artifactId>lightdi</artifactId>
+      <version>${lightdi.version}</version>
+     </dependency>
+
+(Check mvnrespotiroy.com for the latest version).
+
+You can also download the single-jar version from Maven central for direct usage:
+
+https://repo1.maven.org/maven2/com/helospark/lightdi/0.0.1/lightdi-{insert.light.version.here}-jar-with-dependencies.jar
+
+(jar-with-dependencies is a Maven classifier, if you would like to use the fat jar using Maven)
+
+=== Library usage
+
 Annotate beans with above annotations
 
 [source,java]
