@@ -1,12 +1,12 @@
 package com.helospark.lightdi.dependencywire.chain.support;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.SortedSet;
 
 import com.helospark.lightdi.dependencywire.chain.support.chain.InjectDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.InjectDescriptorBuilderRequest;
+import com.helospark.lightdi.dependencywire.chain.support.domain.CompatibleParameter;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
@@ -17,13 +17,13 @@ public class DependencyDescriptorBuilder {
         this.chain = chain;
     }
 
-    public InjectionDescriptor build(Parameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
+    public InjectionDescriptor build(CompatibleParameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
         InjectDescriptorBuilderRequest request = InjectDescriptorBuilderRequest.builder()
                 .withDependencyDescriptors(dependencyDescriptors)
                 .withRequired(required)
-                .withType(parameter.getType())
-                .withGenericType(parameter.getParameterizedType())
-                .withParameter(parameter)
+                .withType(parameter.getParameterType())
+                .withGenericType(parameter.getGenericType())
+                .withParameter(parameter.getAnnotatedParameterTypes())
                 .build();
         return findWithChain(request);
     }

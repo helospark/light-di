@@ -3,32 +3,37 @@ package com.helospark.lightdi.dependencywire.chain.support;
 import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
+import com.helospark.lightdi.dependencywire.chain.support.domain.CompatibleParameter;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
 
 public class MethodDependencyCollector {
     private DependencyDescriptorBuilder parameterDependencyDescriptorBuilder;
+    private CompatibleParameterFactory compatibleParameterFactory;
 
-    public MethodDependencyCollector(DependencyDescriptorBuilder parameterDependencyDescriptorBuilder) {
+    public MethodDependencyCollector(DependencyDescriptorBuilder parameterDependencyDescriptorBuilder,
+            CompatibleParameterFactory compatibleParameterFactory) {
         this.parameterDependencyDescriptorBuilder = parameterDependencyDescriptorBuilder;
+        this.compatibleParameterFactory = compatibleParameterFactory;
     }
 
     public List<InjectionDescriptor> getSetterDependencies(Method method,
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
-        return Arrays.stream(method.getParameters())
-                .map(methodParam -> collectDependencyFor(method, methodParam, dependencyDescriptors))
-                .collect(Collectors.toList());
+        List<InjectionDescriptor> result = new ArrayList<>();
+        for (int i = 0; i < method.getParameterCount(); ++i) {
+            CompatibleParameter methodParameter = compatibleParameterFactory.createParameter(method, i);
+            result.add(collectDependencyFor(method, methodParameter, dependencyDescriptors));
+        }
+        return result;
     }
 
-    private InjectionDescriptor collectDependencyFor(Method method, Parameter parameter,
+    private InjectionDescriptor collectDependencyFor(Method method, CompatibleParameter parameter,
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
         boolean isRequired = extractRequired(method);
         return parameterDependencyDescriptorBuilder.build(parameter,
