@@ -14,9 +14,11 @@ public class ClasspathScannerChainFactory {
 
         SimpleJarScanner simpleJarScanner = new SimpleJarScanner(classPathToClassName, classToSource);
         SimpleDirectoryScanner simpleDirectoryScanner = new SimpleDirectoryScanner(classPathToClassName, classToSource);
+        PreprocessedAnnotationScannerChainItem preprocessedAnnotationScanner = new PreprocessedAnnotationScannerChainItem();
         FastClasspathScannerChainItem fastClasspathScannerChainItem = new FastClasspathScannerChainItem();
 
-        List<ClasspathScannerChainItem> chain = Arrays.asList(simpleJarScanner, simpleDirectoryScanner, fastClasspathScannerChainItem);
+        List<ClasspathScannerChainItem> chain = Arrays.asList(preprocessedAnnotationScanner, simpleJarScanner, simpleDirectoryScanner,
+                fastClasspathScannerChainItem);
 
         return new ClasspathScannerChain(chain);
     }

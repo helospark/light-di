@@ -9,6 +9,7 @@ Designed specifically for small applications, that has to have small memory foot
 Similar to Spring annotation-support.
 
 * Classpath scanning for beans
+* Android support
 * Stereotype annotations to create a bean `@Component`, `@Service`
 * `@Configuration` can be applied to classes, annotated class can contain multiple `@Bean` annotated methods, these methods will be automatically called, and their return value will be injected to the context
 * `@Autowired` can be applied to constructor, fields, setters to automatically set dependency (or even collection of dependencies)
@@ -62,6 +63,35 @@ If you started a project with LightDI, but realize, that you will need more feat
 
 If you started a project in Spring, and only used DI features, moving to LightDI should also be fairly straightforward, following the above steps in reverse. Therefore you could get a more lightweight application.
 
+=== Notes for Android
+
+LightDI is usable for Android, but please note the following:
+
+The library is built using Java 8, so you need to add the following option to your Gradle file:
+
+[source,json]
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+      }
+    }
+
+Since Android does not support runtime classpath scanning (see DexFile class), therefore compile time annotation processing is added.
+While this is a standard Java feature, IDEs may not turn it on by default to get support in Android Studio you need to enable it at:
+
+    Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing
+
+and add the LightDi jar as a annotationProcessor explicitly in your `build.gradle` file, like:
+
+[source,json]
+    dependencies {
+       ...
+       implementation 'com.helospark:lightdi:{version you would like to use}'
+       annotationProcessor 'com.helospark:lightdi:{version you would like to use}'
+       ...
+    }
+
 == Performance
 
 See project: https://github.com/helospark/lightdi-performance-test
@@ -92,6 +122,6 @@ There are already large number of other DI frameworks out there, but I have not 
 You can build using Maven:
 
 [source,bash]
-     mvn clean install
+     mvn clean install -DskipGpgSign
 
 Feel free to open issues / pull requests.
