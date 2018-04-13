@@ -6,16 +6,16 @@ import java.lang.reflect.Type;
 import javax.annotation.Generated;
 
 /**
- * Same as java 8 Parameter class, but compatible with Java 7.
+ * Similar to Java 8 Parameter class, but compatible with Java 7.
  * @author helospark
  */
-public class CompatibleParameter {
+public class CustomParameter {
     private AnnotatedElement annotatedParameterTypes;
     private Class<?> parameterType;
     private Type genericType;
 
     @Generated("SparkTools")
-    private CompatibleParameter(Builder builder) {
+    private CustomParameter(Builder builder) {
         this.annotatedParameterTypes = builder.annotatedParameterTypes;
         this.parameterType = builder.parameterType;
         this.genericType = builder.genericType;
@@ -62,8 +62,8 @@ public class CompatibleParameter {
             return this;
         }
 
-        public CompatibleParameter build() {
-            return new CompatibleParameter(this);
+        public CustomParameter build() {
+            return new CustomParameter(this);
         }
     }
 

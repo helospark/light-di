@@ -9,7 +9,7 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.annotation.Autowired;
-import com.helospark.lightdi.dependencywire.chain.support.domain.CompatibleParameter;
+import com.helospark.lightdi.dependencywire.chain.support.domain.CustomParameter;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.constructor.ConstructorDescriptor;
@@ -34,7 +34,7 @@ public class ConstructorWireSupport {
             Constructor<?> constructorToUse = constructorToUseOptional.get();
             Class<?>[] parameters = constructorToUse.getParameterTypes();
             for (int i = 0; i < parameters.length; ++i) {
-                CompatibleParameter parameter = compatibleParameterFactory.createParameter(constructorToUse, i);
+                CustomParameter parameter = compatibleParameterFactory.createParameter(constructorToUse, i);
                 InjectionDescriptor injectDescriptor = parameterDependencyDescriptorBuilder.build(parameter,
                         dependencyDescriptors, CONSTRUCTOR_PARAMETER_REQUIRED);
 

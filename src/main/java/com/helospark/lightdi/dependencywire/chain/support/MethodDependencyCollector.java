@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.SortedSet;
 
 import com.helospark.lightdi.annotation.Autowired;
-import com.helospark.lightdi.dependencywire.chain.support.domain.CompatibleParameter;
+import com.helospark.lightdi.dependencywire.chain.support.domain.CustomParameter;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
@@ -27,13 +27,13 @@ public class MethodDependencyCollector {
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<InjectionDescriptor> result = new ArrayList<>();
         for (int i = 0; i < method.getParameterCount(); ++i) {
-            CompatibleParameter methodParameter = compatibleParameterFactory.createParameter(method, i);
+            CustomParameter methodParameter = compatibleParameterFactory.createParameter(method, i);
             result.add(collectDependencyFor(method, methodParameter, dependencyDescriptors));
         }
         return result;
     }
 
-    private InjectionDescriptor collectDependencyFor(Method method, CompatibleParameter parameter,
+    private InjectionDescriptor collectDependencyFor(Method method, CustomParameter parameter,
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
         boolean isRequired = extractRequired(method);
         return parameterDependencyDescriptorBuilder.build(parameter,

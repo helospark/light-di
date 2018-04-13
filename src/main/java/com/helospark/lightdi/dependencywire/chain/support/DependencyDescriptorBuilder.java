@@ -6,7 +6,7 @@ import java.util.SortedSet;
 
 import com.helospark.lightdi.dependencywire.chain.support.chain.InjectDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.InjectDescriptorBuilderRequest;
-import com.helospark.lightdi.dependencywire.chain.support.domain.CompatibleParameter;
+import com.helospark.lightdi.dependencywire.chain.support.domain.CustomParameter;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
@@ -17,7 +17,7 @@ public class DependencyDescriptorBuilder {
         this.chain = chain;
     }
 
-    public InjectionDescriptor build(CompatibleParameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
+    public InjectionDescriptor build(CustomParameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
         InjectDescriptorBuilderRequest request = InjectDescriptorBuilderRequest.builder()
                 .withDependencyDescriptors(dependencyDescriptors)
                 .withRequired(required)

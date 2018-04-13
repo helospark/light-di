@@ -4,10 +4,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
 
-public class CompatibleAnnotatedElement implements AnnotatedElement {
+/**
+ * Similar to Java 8 AnnotatedType, but compatible with Java 7.
+ * @author helospark
+ */
+public class CustomAnnotatedElement implements AnnotatedElement {
     private Annotation[] annotations;
 
-    public CompatibleAnnotatedElement(Annotation[] annotations) {
+    public CustomAnnotatedElement(Annotation[] annotations) {
         this.annotations = annotations;
     }
 

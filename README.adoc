@@ -77,18 +77,20 @@ android {
       }
     }
 
-Since Android does not support runtime classpath scanning, make sure to not disable annotation preprocessor during compile time (ex. do NOT add `-proc:none`).
-While annotation processing is a standard Java feature, IDEs may not support it by default.
-(For Eclipse you can enable it, by installing `m2e-apt` plugin, for Android Studio (IDEA) you can enable by `Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing`.)
-Also you need to define the jar as a annotationProcessor explicitly in your build.gradle file. You file should look like:
+Since Android does not support runtime classpath scanning (see DexFile class), therefore compile time annotation processing is added.
+While this is a standard Java feature, IDEs may not turn it on by default to get support in Android Studio you need to enable it at:
+
+    Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing
+
+and add the LightDi jar as a annotationProcessor explicitly in your `build.gradle` file, like:
 
 [source,json]
-	dependencies {
-		...
-    	implementation 'com.helospark:lightdi:{version you would like to use}'
-    	annotationProcessor 'com.helospark:lightdi:{version you would like to use}'
-		...
-	}
+    dependencies {
+       ...
+       implementation 'com.helospark:lightdi:{version you would like to use}'
+       annotationProcessor 'com.helospark:lightdi:{version you would like to use}'
+       ...
+    }
 
 == Performance
 
