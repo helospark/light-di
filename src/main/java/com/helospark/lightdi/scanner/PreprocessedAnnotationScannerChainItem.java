@@ -31,7 +31,7 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
 
     @Override
     public boolean doesSupport(ComponentScanPackage componentScanPackage) {
-        return componentScanPackage.isOnlyCurrentJar() && getInputStream() != null;
+        return getInputStream() != null;
     }
 
     private InputStream getInputStream() {

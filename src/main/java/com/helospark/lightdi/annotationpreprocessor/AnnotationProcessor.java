@@ -14,6 +14,8 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
@@ -25,6 +27,7 @@ import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.Configuration;
 import com.helospark.lightdi.annotation.Service;
 
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class AnnotationProcessor extends AbstractProcessor {
     public static final String RESOURCE_FILE_NAME = "preprocessed";
     public static final String RESOURCE_FOLDER = "resources.lightdi";
@@ -48,7 +51,6 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> elements, RoundEnvironment environment) {
-        System.out.println("########################### Processing annotations " + this);
         try {
 
             if (writer == null) {

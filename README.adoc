@@ -65,6 +65,8 @@ If you started a project in Spring, and only used DI features, moving to LightDI
 
 === Notes for Android
 
+LightDI is usable for Android, but please note the following:
+
 The library is built using Java 8, so you need to add the following option to your Gradle file:
 
 [source,json]
@@ -77,7 +79,16 @@ android {
 
 Since Android does not support runtime classpath scanning, make sure to not disable annotation preprocessor during compile time (ex. do NOT add `-proc:none`).
 While annotation processing is a standard Java feature, IDEs may not support it by default.
-For Eclipse you can enable it, by installing `m2e-apt` plugin, for Android Studio (IDEA) you can enable by `Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing`
+(For Eclipse you can enable it, by installing `m2e-apt` plugin, for Android Studio (IDEA) you can enable by `Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing`.)
+Also you need to define the jar as a annotationProcessor explicitly in your build.gradle file. You file should look like:
+
+[source,json]
+	dependencies {
+		...
+    	implementation 'com.helospark:lightdi:{version you would like to use}'
+    	annotationProcessor 'com.helospark:lightdi:{version you would like to use}'
+		...
+	}
 
 == Performance
 
@@ -109,6 +120,6 @@ There are already large number of other DI frameworks out there, but I have not 
 You can build using Maven:
 
 [source,bash]
-     mvn clean install
+     mvn clean install -DskipGpgSign
 
 Feel free to open issues / pull requests.
