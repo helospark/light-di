@@ -26,6 +26,12 @@ Similar to Spring annotation-support.
 * JUnit test support (`@Autowire` to test, and automatically create Mockito mocks (`@MockBean`, `@SpyBean`) and inject into the test to test)
 * Fast startup time, small memory footprint (see performance section (soon))
 
+== Samples
+
+See samples in:
+
+https://github.com/helospark/lightdi-samples
+
 == Usage
 
 === Include library
