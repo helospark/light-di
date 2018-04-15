@@ -26,7 +26,7 @@ public class MethodDependencyCollector {
     public List<InjectionDescriptor> getSetterDependencies(Method method,
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<InjectionDescriptor> result = new ArrayList<>();
-        for (int i = 0; i < method.getParameterCount(); ++i) {
+        for (int i = 0; i < method.getParameterTypes().length; ++i) {
             CustomParameter methodParameter = compatibleParameterFactory.createParameter(method, i);
             result.add(collectDependencyFor(method, methodParameter, dependencyDescriptors));
         }

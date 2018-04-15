@@ -63,7 +63,7 @@ public class BeanFactory {
         for (DependencyDescriptor dependency : dependencies) {
             earlierInRoute.add(dependency);
             assertValidConfiguration(dependency, earlierInRoute);
-            earlierInRoute.remove(dependencies);
+            earlierInRoute.remove(dependency);
         }
     }
 

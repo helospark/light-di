@@ -268,6 +268,10 @@ public class LightDiContext implements AutoCloseable {
         this.autowireSupportUtil = autowireSupportUtil;
     }
 
+    public void processAutowireTo(Object instance) {
+        this.autowireSupportUtil.autowireFieldsTo(instance);
+    }
+
     public void loadDependenciesFromPackageUsingFullClasspathScan(String packageName) {
         try {
             SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector
