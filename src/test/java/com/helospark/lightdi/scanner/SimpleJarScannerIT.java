@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
-import com.helospark.lightdi.scanner.SimpleJarScanner;
 import com.helospark.lightdi.scanner.support.ClassPathToClassNameConverter;
 import com.helospark.lightdi.scanner.support.ClassToSourceConverter;
 
