@@ -32,18 +32,20 @@ public class ConstructorInvoker {
         Optional<Constructor<?>> method = getConstructorToUse(constructorDescriptors, dependencyToCreate);
 
         if (method.isPresent()) {
-            return method.get().newInstance(params);
+            Constructor<?> constructor = method.get();
+            constructor.setAccessible(true);
+            return constructor.newInstance(params);
         } else {
-            return dependencyToCreate.getClazz().newInstance(); // without constructor
+            return dependencyToCreate.getClazz().newInstance(); // No constructor found
         }
     }
 
     private Optional<Constructor<?>> getConstructorToUse(List<ConstructorDescriptor> constructorDescriptors,
-            StereotypeDependencyDescriptor dependencyToCreate) {
+            StereotypeDependencyDescriptor dependencyToCreate) throws NoSuchMethodException, SecurityException {
         if (constructorDescriptors.size() > 0) {
             return Optional.of(constructorDescriptors.get(0).getConstructor()); // all element has the same constructor
         } else {
-            return Optional.empty();
+            return Optional.ofNullable(dependencyToCreate.getClazz().getDeclaredConstructor());
         }
     }
 

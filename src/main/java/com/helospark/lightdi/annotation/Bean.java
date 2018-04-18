@@ -10,5 +10,15 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 public @interface Bean {
 
+    /**
+     * Bean name. Alias for name().
+     * @return bean name
+     */
     public String value() default "";
+
+    /**
+     * Bean name. Alias for value().
+     * @return bean name
+     */
+    public String name() default "";
 }

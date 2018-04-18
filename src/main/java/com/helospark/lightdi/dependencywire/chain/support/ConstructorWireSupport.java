@@ -50,7 +50,7 @@ public class ConstructorWireSupport {
     }
 
     private Optional<Constructor<?>> getConstructorToUse(Class<?> clazz) {
-        List<Constructor<?>> constructors = Arrays.asList(clazz.getConstructors());
+        List<Constructor<?>> constructors = Arrays.asList(clazz.getDeclaredConstructors());
         if (constructors.size() == 1) {
             return Optional.of(constructors.get(0));
         } else if (constructors.size() > 1) {
