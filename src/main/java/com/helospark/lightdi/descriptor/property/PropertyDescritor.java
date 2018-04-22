@@ -1,19 +1,20 @@
 package com.helospark.lightdi.descriptor.property;
 
+import com.helospark.lightdi.descriptor.GenericClass;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
 public class PropertyDescritor implements InjectionDescriptor {
-    private Class<?> clazz;
+    private GenericClass clazz;
     private String value;
     private boolean required;
 
-    public PropertyDescritor(Class<?> clazz, String value, boolean required) {
+    public PropertyDescritor(GenericClass clazz, String value, boolean required) {
         this.clazz = clazz;
         this.value = value;
         this.required = required;
     }
 
-    public Class<?> getClazz() {
+    public GenericClass getClazz() {
         return clazz;
     }
 

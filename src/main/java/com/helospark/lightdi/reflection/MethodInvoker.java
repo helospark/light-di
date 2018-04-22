@@ -1,5 +1,6 @@
 package com.helospark.lightdi.reflection;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,9 @@ public class MethodInvoker {
                     .map(dependency -> resolveDependency(lightDiContext, dependency))
                     .collect(Collectors.toList())
                     .toArray();
-            return methodDescriptor.getMethod().invoke(result, arguments);
+            Method method = methodDescriptor.getMethod();
+            method.setAccessible(true);
+            return method.invoke(result, arguments);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to call setter " + methodDescriptor, e);
         }

@@ -28,7 +28,8 @@ import com.helospark.lightdi.util.QualifierExtractor;
 public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
     private ConditionalAnnotationsExtractor conditionalAnnotationsExtractor;
 
-    public ConfigurationClassBeanDefinitionCollectorChainItem(ConditionalAnnotationsExtractor conditionalAnnotationsExtractor) {
+    public ConfigurationClassBeanDefinitionCollectorChainItem(
+            ConditionalAnnotationsExtractor conditionalAnnotationsExtractor) {
         this.conditionalAnnotationsExtractor = conditionalAnnotationsExtractor;
     }
 
@@ -46,19 +47,16 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
     }
 
     private StereotypeDependencyDescriptor createConfigurationBeanDescriptor(Class<?> clazz) {
-        return StereotypeDependencyDescriptor.builder()
-                .withClazz(clazz)
+        return StereotypeDependencyDescriptor.builder().withClazz(clazz)
                 .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
-                .withScope(QualifierExtractor.extractScope(clazz))
-                .withIsLazy(IsLazyExtractor.isLazy(clazz))
+                .withScope(QualifierExtractor.extractScope(clazz)).withIsLazy(IsLazyExtractor.isLazy(clazz))
                 .withIsPrimary(IsPrimaryExtractor.isPrimary(clazz))
-                .withConditions(conditionalAnnotationsExtractor.extractConditions(clazz))
-                .build();
+                .withConditions(conditionalAnnotationsExtractor.extractConditions(clazz)).build();
     }
 
     private SortedSet<DependencyDescriptor> collectBeanMethodDescriptors(Class<?> clazz,
             StereotypeDependencyDescriptor configurationDescriptor) {
-        return Arrays.stream(clazz.getMethods())
+        return Arrays.stream(clazz.getDeclaredMethods())
                 .filter(method -> hasAnnotation(method, Bean.class))
                 .map(method -> createDescriptor(method, configurationDescriptor))
                 .collect(Collectors.toCollection(() -> new TreeSet<>()));
@@ -67,20 +65,17 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
     private DependencyDescriptor createDescriptor(Method method,
             StereotypeDependencyDescriptor configurationDescriptor) {
         Class<?> returnType = method.getReturnType();
-        return BeanDependencyDescriptor.builder()
-                .withClazz(returnType)
-                .withScope(QualifierExtractor.extractScope(method))
-                .withMethod(method)
+        return BeanDependencyDescriptor.builder().withClazz(returnType)
+                .withScope(QualifierExtractor.extractScope(method)).withMethod(method)
                 .withQualifier(createQualifierForMethodAnnotatedWithBean(method))
-                .withIsLazy(IsLazyExtractor.isLazy(method))
-                .withIsPrimary(IsPrimaryExtractor.isPrimary(method))
+                .withIsLazy(IsLazyExtractor.isLazy(method)).withIsPrimary(IsPrimaryExtractor.isPrimary(method))
                 .withConfigurationDescriptor(configurationDescriptor)
                 .withConditions(getConditions(method, configurationDescriptor))
-                .withOrder(BeanOrderExtractor.extractOrder(method))
-                .build();
+                .withOrder(BeanOrderExtractor.extractOrder(method)).build();
     }
 
-    private List<DependencyCondition> getConditions(Method method, StereotypeDependencyDescriptor configurationDescriptor) {
+    private List<DependencyCondition> getConditions(Method method,
+            StereotypeDependencyDescriptor configurationDescriptor) {
         List<DependencyCondition> conditions = new ArrayList<>();
         conditions.addAll(configurationDescriptor.getConditions());
         conditions.addAll(conditionalAnnotationsExtractor.extractConditions(method));

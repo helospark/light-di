@@ -41,8 +41,8 @@ public class WiringProcessingServiceFactory {
                 propertyDescriptorFactory);
 
         DependencyDescriptorBuilder parameterDependencyDescriptorBuilder = new DependencyDescriptorBuilder(
-                Arrays.asList(collectionInjectDescriptorBuilderChainItem,
-                        valueInjectDescriptorBuilderChainItem, dependencyInjectDescriptorBuilderChainItem));
+                Arrays.asList(valueInjectDescriptorBuilderChainItem, collectionInjectDescriptorBuilderChainItem,
+                        dependencyInjectDescriptorBuilderChainItem));
         CompatibleParameterFactory compatibleParameterFactory = new CompatibleParameterFactory();
 
         constructorWireSupport = new ConstructorWireSupport(parameterDependencyDescriptorBuilder, compatibleParameterFactory);

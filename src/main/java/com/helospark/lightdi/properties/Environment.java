@@ -5,6 +5,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.descriptor.GenericClass;
 
 public class Environment {
     public static final int DEFAULT_PROPERTY_ORDER = 0;
@@ -24,10 +25,10 @@ public class Environment {
     }
 
     public String resolve(String value) {
-        return valueResolver.resolve(value, String.class, context, propertySources);
+        return valueResolver.resolve(value, new GenericClass(String.class), context, propertySources);
     }
 
-    public <T> T resolve(String value, Class<T> type) {
+    public <T> T resolve(String value, GenericClass type) {
         return valueResolver.resolve(value, type, context, propertySources);
     }
 

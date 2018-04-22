@@ -10,13 +10,12 @@ import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.it.propertysourcewithvalue.PropertySourceWithEnvironmentVariableConfiguration;
 
 public class PropertySourceWithValueIT {
-    private LightDi lightDi = new LightDi();
 
     @Test
     public void testShouldParseStagingConfiguration() {
         // GIVEN
         System.setProperty("lightdi.environment", "staging");
-        LightDiContext context = lightDi.initContextByClass(PropertySourceWithEnvironmentVariableConfiguration.class);
+        LightDiContext context = LightDi.initContextByClass(PropertySourceWithEnvironmentVariableConfiguration.class);
 
         // WHEN
         PropertySourceWithEnvironmentVariableConfiguration result = context.getBean(PropertySourceWithEnvironmentVariableConfiguration.class);
@@ -31,7 +30,7 @@ public class PropertySourceWithValueIT {
     @Test
     public void testShouldParseDefaultConfiguration() {
         // GIVEN
-        LightDiContext context = lightDi.initContextByClass(PropertySourceWithEnvironmentVariableConfiguration.class);
+        LightDiContext context = LightDi.initContextByClass(PropertySourceWithEnvironmentVariableConfiguration.class);
 
         // WHEN
         PropertySourceWithEnvironmentVariableConfiguration result = context.getBean(PropertySourceWithEnvironmentVariableConfiguration.class);

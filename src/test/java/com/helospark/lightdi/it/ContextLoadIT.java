@@ -11,6 +11,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +20,12 @@ import org.junit.Test;
 import com.helospark.lightdi.LightDi;
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.it.othertestpackage.TestComponentInDifferentPackage;
+import com.helospark.lightdi.it.testcontext1.ComponentWithCollectionValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithConstructorValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithFieldValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithNoEagernessAnnotation;
 import com.helospark.lightdi.it.testcontext1.ComponentWithPostConstruct;
+import com.helospark.lightdi.it.testcontext1.ComponentWithPrimitiveValue;
 import com.helospark.lightdi.it.testcontext1.ComponentWithQualifiedDependency;
 import com.helospark.lightdi.it.testcontext1.ComponentWithSetterValue;
 import com.helospark.lightdi.it.testcontext1.ConfigurationClass;
@@ -142,6 +146,32 @@ public class ContextLoadIT {
 
         // THEN
         assertThat(component.getValue(), is("value=asd"));
+    }
+
+    @Test
+    public void testValueShouldInjectWhenAutoboxingCanBeDone() {
+        // GIVEN
+
+        // WHEN
+        ComponentWithPrimitiveValue component = context
+                .getBean(ComponentWithPrimitiveValue.class);
+
+        // THEN
+        assertThat(component.getIntValue(), is(1));
+    }
+
+    @Test
+    public void testValueOnCollections() {
+        // GIVEN
+
+        // WHEN
+        ComponentWithCollectionValue bean = context.getBean(ComponentWithCollectionValue.class);
+
+        // THEN
+        assertThat(bean.getIntArray(), is(new Integer[] { 1, 2, 3 }));
+        assertThat(bean.getIntArrayAsCollection(), is(Arrays.asList(1, 2, 3)));
+        //        assertThat(bean.getSpaceSeparatedIntArray(), is(new int[] { 1, 2, 3 }));
+        assertThat(bean.getStringArray(), is(new String[] { "a", "b", "c" }));
     }
 
     @Test

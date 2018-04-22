@@ -5,13 +5,16 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.util.CollectionFactory;
 
 public class EnvironmentFactory {
 
     public Environment createEnvironment(LightDiContext context) {
         PropertyValueResolver propertyValueResolver = new PropertyValueResolver();
         PropertyStringResolver propertyStringResolver = new PropertyStringResolver(propertyValueResolver);
-        ValueResolver valueResolver = new ValueResolver(propertyStringResolver);
+        AssignablePredicate assignablePredicate = new AssignablePredicate();
+        CollectionFactory collectionFactory = new CollectionFactory();
+        ValueResolver valueResolver = new ValueResolver(propertyStringResolver, assignablePredicate, collectionFactory);
         Environment environment = new Environment(context, valueResolver);
 
         environment.addPropertySource(createPropertySourceFromSystemProperties());

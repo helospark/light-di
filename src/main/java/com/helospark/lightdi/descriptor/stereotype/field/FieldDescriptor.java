@@ -24,6 +24,11 @@ public class FieldDescriptor {
         return injectionDescriptor;
     }
 
+    @Override
+    public String toString() {
+        return "FieldDescriptor [injectionDescriptor=" + injectionDescriptor + ", field=" + field + "]";
+    }
+
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();

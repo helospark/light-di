@@ -37,6 +37,7 @@ import com.helospark.lightdi.properties.Environment;
 import com.helospark.lightdi.properties.EnvironmentFactory;
 import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
 import com.helospark.lightdi.properties.ValueResolver;
+import com.helospark.lightdi.properties.converter.BooleanPropertyConverter;
 import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
 import com.helospark.lightdi.properties.converter.StringPropertyConverter;
 import com.helospark.lightdi.scanner.ClasspathScannerChain;
@@ -105,11 +106,12 @@ public class LightDiContext implements AutoCloseable {
         recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(classpathScannerChain, beanDefinitionCollector,
                 componentScanCollector);
 
-        /** Register stuff */
+        /** Register default beans */
         registerSingleton(environment);
         registerSingleton(this);
         registerSingleton(new IntegerPropertyConverter());
         registerSingleton(new StringPropertyConverter());
+        registerSingleton(new BooleanPropertyConverter());
     }
 
     public <T> T getBean(Class<T> clazz) {
