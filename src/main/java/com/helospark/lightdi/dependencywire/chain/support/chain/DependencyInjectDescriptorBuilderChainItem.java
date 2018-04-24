@@ -31,10 +31,10 @@ public class DependencyInjectDescriptorBuilderChainItem implements InjectDescrip
     }
 
     private String extractQualifierOrNull(AnnotatedElement parameter) {
-        if (AnnotationUtil.hasAnnotation(parameter, Qualifier.class)) {
-            return AnnotationUtil.getSingleAnnotationOfType(parameter, Qualifier.class).value();
-        } else {
-            return null;
-        }
+        return AnnotationUtil.getAnnotationsOfType(parameter, Qualifier.class)
+                .stream()
+                .findFirst()
+                .map(ann -> ann.getAttributeAs(Qualifier.ATTRIBUTE_NAME, String.class))
+                .orElse(null);
     }
 }

@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface Scope {
+    public static final String SCOPE_ATTRIBUTE_NAME = "value";
+
     public String value();
 }

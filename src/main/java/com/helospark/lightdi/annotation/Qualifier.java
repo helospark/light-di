@@ -9,5 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ PARAMETER })
 public @interface Qualifier {
+    public static final String ATTRIBUTE_NAME = "value";
+
     public String value();
 }

@@ -7,15 +7,16 @@ import com.helospark.lightdi.annotation.ConditionalOnMissingBean;
 import com.helospark.lightdi.conditional.condition.evaluator.BeanDependencyConditionEvaluator;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
 public class MissingBeanDependencyCondition implements DependencyCondition {
     private DependencyDescriptorQuery dependencyDescriptorQuery;
     private BeanDependencyConditionEvaluator beanDependencyConditionEvaluator;
 
-    public MissingBeanDependencyCondition(ConditionalOnMissingBean conditionalOnBean,
+    public MissingBeanDependencyCondition(LightDiAnnotation annotation,
             BeanDependencyConditionEvaluator beanDependencyConditionEvaluator) {
         dependencyDescriptorQuery = DependencyDescriptorQuery.builder()
-                .withClazz(conditionalOnBean.value())
+                .withClazz(annotation.getAttributeAs(ConditionalOnMissingBean.ATTRIBUTE_NAME, Class.class))
                 .build();
         this.beanDependencyConditionEvaluator = beanDependencyConditionEvaluator;
     }

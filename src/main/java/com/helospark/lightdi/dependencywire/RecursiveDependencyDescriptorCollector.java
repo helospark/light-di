@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,13 @@ public class RecursiveDependencyDescriptorCollector {
         return collectDependenciesInternal(componentScanPackage);
     }
 
+    public SortedSet<DependencyDescriptor> collectDependenciesUsingFullClasspathScan(List<String> packages) {
+        SortedSet<DependencyDescriptor> result = new TreeSet<>();
+        packages.stream()
+                .forEach(pkg -> result.addAll(collectDependenciesUsingFullClasspathScan(pkg)));
+        return result;
+    }
+
     public SortedSet<DependencyDescriptor> collectDependenciesUsingJarClasspathScan(String packageName, Class<?> jarRootClass) {
         ComponentScanPackage componentScanPackage = ComponentScanPackage.builder()
                 .withPackageName(packageName)
@@ -59,6 +67,13 @@ public class RecursiveDependencyDescriptorCollector {
 
     public SortedSet<DependencyDescriptor> collectDependenciesStartingFromClass(Class<?> clazz) {
         return collectClasses(new ArrayList<>(), Collections.singletonList(clazz.getName()));
+    }
+
+    public SortedSet<DependencyDescriptor> collectDependenciesStartingFromClass(List<Class<?>> classes) {
+        List<String> classNames = classes.stream()
+                .map(clazz -> clazz.getName())
+                .collect(Collectors.toList());
+        return collectClasses(new ArrayList<>(), classNames);
     }
 
     private SortedSet<DependencyDescriptor> collectDepenenciesRecursively(ComponentScanPackage packageName,
@@ -85,4 +100,5 @@ public class RecursiveDependencyDescriptorCollector {
 
         return dependencyDescriptors;
     }
+
 }

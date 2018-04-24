@@ -2,14 +2,18 @@ package com.helospark.lightdi.definitioncollector;
 
 import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.helospark.lightdi.annotation.Configuration;
 import com.helospark.lightdi.annotation.Import;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
 import com.helospark.lightdi.util.AnnotationUtil;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
 public class ImportBeanDefinitionCollectorChainItem implements BeanDefinitionCollectorChainItem {
     private ConfigurationClassBeanDefinitionCollectorChainItem configurationClassBeanDefinitionCollectorChainItem;
@@ -22,15 +26,26 @@ public class ImportBeanDefinitionCollectorChainItem implements BeanDefinitionCol
     @Override
     public List<DependencyDescriptor> collectDefinitions(Class<?> clazz) {
         if (isSupported(clazz)) {
-            Import importAnnotation = AnnotationUtil.getSingleAnnotationOfType(clazz, Import.class);
-            Class<?> importedConfiguration = importAnnotation.value();
-            if (!hasAnnotation(importedConfiguration, Configuration.class)) {
-                throw new IllegalConfigurationException("Importing a class that is not a configuration");
-            }
-            return configurationClassBeanDefinitionCollectorChainItem.collectDefinitions(importedConfiguration);
+            return AnnotationUtil.getAnnotationsOfType(clazz, Import.class)
+                    .stream()
+                    .flatMap(importAnnotation -> processImport(importAnnotation))
+                    .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
+    }
+
+    private Stream<DependencyDescriptor> processImport(LightDiAnnotation annotation) {
+        Class<?>[] importedConfiguration = annotation.getAttributeAs(Import.ATTRIBUTE_NAME, Class[].class);
+        return Arrays.stream(importedConfiguration)
+                .flatMap(a -> processSingleClass(a));
+    }
+
+    private Stream<DependencyDescriptor> processSingleClass(Class<?> importedConfiguration) {
+        if (!hasAnnotation(importedConfiguration, Configuration.class)) {
+            throw new IllegalConfigurationException("Importing a class that is not a configuration");
+        }
+        return configurationClassBeanDefinitionCollectorChainItem.collectDefinitions(importedConfiguration).stream();
     }
 
     public boolean isSupported(Class<?> clazz) {

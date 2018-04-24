@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Target(TYPE)
+@RepeatableAnnotationContainer
 public @interface PropertySources {
     PropertySource[] value();
 }

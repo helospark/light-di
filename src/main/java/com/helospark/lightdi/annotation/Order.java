@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface Order {
+    public static final String ORDER_ATTRIBUTE_NAME = "value";
 
     public int value();
 

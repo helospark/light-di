@@ -6,6 +6,7 @@ import static com.helospark.lightdi.util.DependencyChooser.findPrimary;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -274,29 +275,31 @@ public class LightDiContext implements AutoCloseable {
         this.autowireSupportUtil.autowireFieldsTo(instance);
     }
 
+    /**
+     * Loads context from package
+     * @param packageName
+     * 
+     * @deprecated use loadDependenciesFromPackage
+     */
+    @Deprecated
     public void loadDependenciesFromPackageUsingFullClasspathScan(String packageName) {
-        try {
-            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector
-                    .collectDependenciesUsingFullClasspathScan(packageName);
-            processDescriptors(loadedDescriptors);
-        } catch (Exception e) {
-            throw new ContextInitializationFailedException("Context initialization failed", e);
-        }
+        addDependencies(Collections.singletonList(packageName), Collections.emptyList());
     }
 
     public void loadDependenciesFromPackage(String packageName, Class<?> referenceClass) {
-        try {
-            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector
-                    .collectDependenciesUsingJarClasspathScan(packageName, referenceClass);
-            processDescriptors(loadedDescriptors);
-        } catch (Exception e) {
-            throw new ContextInitializationFailedException("Context initialization failed", e);
-        }
+        addDependencies(Collections.singletonList(packageName), Collections.emptyList());
     }
 
     public void loadDependenciesFromClass(Class<?> clazz) {
+        addDependencies(Collections.emptyList(), Collections.singletonList(clazz));
+    }
+
+    public void addDependencies(List<String> packages, List<Class<?>> classes) {
         try {
-            SortedSet<DependencyDescriptor> loadedDescriptors = recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(clazz);
+            SortedSet<DependencyDescriptor> loadedDescriptors = new TreeSet<>();
+            loadedDescriptors.addAll(recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(classes));
+            loadedDescriptors.addAll(recursiveDependencyDescriptorCollector
+                    .collectDependenciesUsingFullClasspathScan(packages));
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);

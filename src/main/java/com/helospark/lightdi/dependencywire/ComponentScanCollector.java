@@ -1,5 +1,9 @@
 package com.helospark.lightdi.dependencywire;
 
+import static com.helospark.lightdi.annotation.ComponentScan.BASE_PACKAGE_ATTRIBUTE_NAME;
+import static com.helospark.lightdi.annotation.ComponentScan.ONLY_SCAN_THIS_JAR_ATTRIBUTE_NAME;
+import static com.helospark.lightdi.annotation.ComponentScan.VALUE_ATTRIBUTE_NAME;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +15,7 @@ import com.helospark.lightdi.annotation.ComponentScan;
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
 public class ComponentScanCollector {
 
@@ -22,7 +27,7 @@ public class ComponentScanCollector {
     }
 
     private Stream<ComponentScanPackage> addClasses(DependencyDescriptor descriptor) {
-        Set<ComponentScan> annotations = AnnotationUtil.getAnnotationsOfType(descriptor.getClazz(), ComponentScan.class);
+        Set<LightDiAnnotation> annotations = AnnotationUtil.getAnnotationsOfType(descriptor.getClazz(), ComponentScan.class);
         if (annotations.isEmpty()) {
             return Stream.empty();
         } else {
@@ -31,23 +36,26 @@ public class ComponentScanCollector {
         }
     }
 
-    private Stream<ComponentScanPackage> processComponentScan(ComponentScan componentScan, DependencyDescriptor descriptor) {
-        if (componentScan.value().length > 0) {
-            return Arrays.stream(componentScan.value())
+    private Stream<ComponentScanPackage> processComponentScan(LightDiAnnotation componentScan, DependencyDescriptor descriptor) {
+        String[] value = componentScan.getAttributeAs(VALUE_ATTRIBUTE_NAME, String[].class);
+        Class<?>[] basePackages = componentScan.getAttributeAs(BASE_PACKAGE_ATTRIBUTE_NAME, Class[].class);
+        if (value.length > 0) {
+            return Arrays.stream(value)
                     .map(packageName -> packageToComponentScanPackage(packageName, componentScan, descriptor));
-        } else if (componentScan.basePackageClasses().length > 0) {
-            return Arrays.stream(componentScan.basePackageClasses())
+        } else if (basePackages.length > 0) {
+            return Arrays.stream(basePackages)
                     .map(clazz -> packageToComponentScanPackage(clazz.getPackage().getName(), componentScan, descriptor));
         } else {
             return Stream.of(packageToComponentScanPackage(descriptor.getClazz().getPackage().getName(), componentScan, descriptor));
         }
+
     }
 
-    private ComponentScanPackage packageToComponentScanPackage(String packageName, ComponentScan componentScan, DependencyDescriptor descriptor) {
+    private ComponentScanPackage packageToComponentScanPackage(String packageName, LightDiAnnotation componentScan, DependencyDescriptor descriptor) {
         return ComponentScanPackage.builder()
                 .withPackageName(packageName)
                 .withRootClass(descriptor.getClazz())
-                .withOnlyCurrentJar(componentScan.onlyScanThisJar())
+                .withOnlyCurrentJar(componentScan.getAttributeAs(ONLY_SCAN_THIS_JAR_ATTRIBUTE_NAME, Boolean.class))
                 .build();
     }
 }

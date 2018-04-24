@@ -1,14 +1,13 @@
 package com.helospark.lightdi.conditional.condition.factory;
 
-import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
-import com.helospark.lightdi.annotation.ConditionalOnBean;
 import com.helospark.lightdi.conditional.condition.BeanDependencyCondition;
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.conditional.condition.evaluator.BeanDependencyConditionEvaluator;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
-public class ConditionalOnBeanConverter implements Function<Annotation, DependencyCondition> {
+public class ConditionalOnBeanConverter implements Function<LightDiAnnotation, DependencyCondition> {
     private BeanDependencyConditionEvaluator beanDependencyConditionEvaluator;
 
     public ConditionalOnBeanConverter(BeanDependencyConditionEvaluator beanDependencyConditionEvaluator) {
@@ -16,8 +15,7 @@ public class ConditionalOnBeanConverter implements Function<Annotation, Dependen
     }
 
     @Override
-    public DependencyCondition apply(Annotation annotation) {
-        ConditionalOnBean conditionalOnBean = (ConditionalOnBean) annotation;
-        return new BeanDependencyCondition(conditionalOnBean, beanDependencyConditionEvaluator);
+    public DependencyCondition apply(LightDiAnnotation annotation) {
+        return new BeanDependencyCondition(annotation, beanDependencyConditionEvaluator);
     }
 }

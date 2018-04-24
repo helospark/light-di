@@ -10,7 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface Import {
+    public static final String ATTRIBUTE_NAME = "value";
 
-    Class<?> value();
+    Class<?>[] value();
 
 }

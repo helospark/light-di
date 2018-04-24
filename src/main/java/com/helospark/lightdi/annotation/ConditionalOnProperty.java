@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface ConditionalOnProperty {
+    public static final String PROPERTY_ATTRIBUTE_NAME = "property";
+    public static final String HAVING_VALUE_ATTRIBUTE_NAME = "havingValue";
 
     public String property();
 

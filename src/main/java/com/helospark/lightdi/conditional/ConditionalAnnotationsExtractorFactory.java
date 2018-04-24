@@ -18,11 +18,13 @@ import com.helospark.lightdi.conditional.condition.factory.ConditionalOnClassCon
 import com.helospark.lightdi.conditional.condition.factory.ConditionalOnMissingBeanConverter;
 import com.helospark.lightdi.conditional.condition.factory.ConditionalOnMissingClassConverter;
 import com.helospark.lightdi.conditional.condition.factory.ConditionalOnPropertyConverter;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
 public class ConditionalAnnotationsExtractorFactory {
 
+    // TODO: Most likely the additional redirection can be removed since LightDiAnnotation was added
     public ConditionalAnnotationsExtractor createConditionalAnnotationsExtractor() {
-        Map<Class<? extends Annotation>, Function<Annotation, DependencyCondition>> converters = new HashMap<>();
+        Map<Class<? extends Annotation>, Function<LightDiAnnotation, DependencyCondition>> converters = new HashMap<>();
 
         BeanDependencyConditionEvaluator beanDependencyConditionEvaluator = new BeanDependencyConditionEvaluator();
         ClassDependencyConditionEvaluator classDependencyConditionEvaluator = new ClassDependencyConditionEvaluator();

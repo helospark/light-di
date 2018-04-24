@@ -12,6 +12,10 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 @Repeatable(PropertySources.class)
 public @interface PropertySource {
+    public static final String VALUE_ATTRIBUTE_NAME = "value";
+    public static final String ORDER_ATTRIBUTE_NAME = "order";
+    public static final String IGNORE_RESOURCE_NOT_FOUND_ATTRIBUTE_NAME = "ignoreResourceNotFound";
+
     public String[] value();
 
     public int order() default DEFAULT_PROPERTY_ORDER;

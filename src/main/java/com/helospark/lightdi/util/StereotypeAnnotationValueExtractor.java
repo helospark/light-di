@@ -1,25 +1,40 @@
 package com.helospark.lightdi.util;
 
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 import java.util.Set;
 
 import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.Configuration;
 import com.helospark.lightdi.annotation.Service;
+import com.helospark.lightdi.exception.IllegalConfigurationException;
 
 public class StereotypeAnnotationValueExtractor {
     public static String getStereotypeAnnotationValue(Class<?> clazz) {
-        Set<Component> component = AnnotationUtil.getAnnotationsOfType(clazz, Component.class);
-        if (component.size() > 0) {
-            return component.stream().findFirst().get().value();
+        Optional<String> component = getAtMaxOneAnnotation(clazz, Component.class, Component.NAME_ATTRIBUTE_NAME);
+        if (component.isPresent()) {
+            return component.get();
         }
-        Set<Service> service = AnnotationUtil.getAnnotationsOfType(clazz, Service.class);
-        if (service.size() > 0) {
-            return service.stream().findFirst().get().value();
+        Optional<String> service = getAtMaxOneAnnotation(clazz, Service.class, Service.NAME_ATTRIBUTE_NAME);
+        if (service.isPresent()) {
+            return service.get();
         }
-        Set<Configuration> configuration = AnnotationUtil.getAnnotationsOfType(clazz, Configuration.class);
-        if (configuration.size() > 0) {
-            return configuration.stream().findFirst().get().value();
+        Optional<String> configuration = getAtMaxOneAnnotation(clazz, Configuration.class, Configuration.NAME_ATTRIBUTE_NAME);
+        if (configuration.isPresent()) {
+            return configuration.get();
         }
         return "";
+    }
+
+    private static Optional<String> getAtMaxOneAnnotation(Class<?> clazz, Class<? extends Annotation> annotationType, String attributeName) {
+        Set<LightDiAnnotation> component = AnnotationUtil.getAnnotationsOfType(clazz, annotationType);
+        if (component.size() > 1) {
+            throw new IllegalConfigurationException("There can be at max one annotation of type " + annotationType + "on " + clazz);
+        }
+        if (component.size() > 0) {
+            return Optional.of(component.stream().findFirst().get().getAttributeAs(attributeName, String.class));
+        } else {
+            return Optional.empty();
+        }
     }
 }

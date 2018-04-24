@@ -38,7 +38,8 @@ public class FieldWireSupport {
 
         for (Field field : fields) {
             InjectionDescriptor injectDescriptor = dependencyDescriptorBuilder.build(field, dependencyDescriptors,
-                    AnnotationUtil.getSingleAnnotationOfType(field, Autowired.class).required());
+                    AnnotationUtil.getSingleAnnotationOfType(field, Autowired.class).getAttributeAs(Autowired.REQUIRED_ATTRIBUTE_NAME,
+                            Boolean.class));
             result.add(FieldDescriptor.builder()
                     .withField(field)
                     .withInjectionDescriptor(injectDescriptor)
@@ -56,7 +57,7 @@ public class FieldWireSupport {
 
         for (Field field : fields) {
             InjectionDescriptor injectDescriptor = dependencyDescriptorBuilder.build(field, dependencyDescriptors,
-                    AnnotationUtil.getSingleAnnotationOfType(field, Value.class).required());
+                    AnnotationUtil.getSingleAnnotationOfType(field, Value.class).getAttributeAs(Autowired.REQUIRED_ATTRIBUTE_NAME, Boolean.class));
             result.add(FieldDescriptor.builder()
                     .withField(field)
                     .withInjectionDescriptor(injectDescriptor)

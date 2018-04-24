@@ -55,8 +55,7 @@ public class ContextLoadIT {
 
     @Before
     public void setUp() {
-        LightDi lightDi = new LightDi();
-        context = lightDi.initContextUsing(ConstructorDependency.class.getPackage().getName(), this.getClass());
+        context = LightDi.initContextUsing(ConstructorDependency.class.getPackage().getName(), this.getClass());
     }
 
     @After

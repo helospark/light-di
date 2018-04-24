@@ -42,7 +42,7 @@ public class MethodDependencyCollector {
 
     private boolean extractRequired(Method method) {
         if (hasAnnotation(method, Autowired.class)) {
-            return AnnotationUtil.getSingleAnnotationOfType(method, Autowired.class).required();
+            return AnnotationUtil.getSingleAnnotationOfType(method, Autowired.class).getAttributeAs(Autowired.REQUIRED_ATTRIBUTE_NAME, Boolean.class);
         } else {
             return true;
         }

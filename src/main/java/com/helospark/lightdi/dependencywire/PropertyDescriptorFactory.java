@@ -1,5 +1,7 @@
 package com.helospark.lightdi.dependencywire;
 
+import static com.helospark.lightdi.annotation.Value.REQUIRED_ATTRIBUTE_NAME;
+import static com.helospark.lightdi.annotation.Value.VALUE_ATTRIBUTE_NAME;
 import static com.helospark.lightdi.util.AnnotationUtil.getSingleAnnotationOfType;
 
 import java.lang.reflect.AnnotatedElement;
@@ -12,13 +14,14 @@ import com.helospark.lightdi.annotation.Value;
 import com.helospark.lightdi.descriptor.GenericClass;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.property.PropertyDescritor;
+import com.helospark.lightdi.util.LightDiAnnotation;
 import com.helospark.lightdi.util.ReflectionUtil;
 
 public class PropertyDescriptorFactory {
     public PropertyDescritor buildPropertyDescriptor(AnnotatedElement parameter, Class<?> type, Optional<Class<?>> firstGenericType) {
-        Value valueAnnotation = getSingleAnnotationOfType(parameter, Value.class);
-        String value = valueAnnotation.value();
-        boolean required = valueAnnotation.required();
+        LightDiAnnotation valueAnnotation = getSingleAnnotationOfType(parameter, Value.class);
+        String value = valueAnnotation.getAttributeAs(VALUE_ATTRIBUTE_NAME, String.class);
+        boolean required = valueAnnotation.getAttributeAs(REQUIRED_ATTRIBUTE_NAME, Boolean.class);
         GenericClass genericClass = new GenericClass(type, firstGenericType);
         return new PropertyDescritor(genericClass, value, required);
     }

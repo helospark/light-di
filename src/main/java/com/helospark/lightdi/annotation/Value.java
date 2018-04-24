@@ -11,6 +11,9 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ FIELD, PARAMETER, METHOD })
 public @interface Value {
+    public static final String VALUE_ATTRIBUTE_NAME = "value";
+    public static final String REQUIRED_ATTRIBUTE_NAME = "required";
+
     public String value();
 
     public boolean required() default true;

@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface ConditionalOnClass {
+    public static final String ATTRIBUTE_NAME = "value";
 
     public String value();
 
