@@ -37,6 +37,7 @@ import com.helospark.lightdi.postprocessor.BeanPostProcessor;
 import com.helospark.lightdi.properties.Environment;
 import com.helospark.lightdi.properties.EnvironmentFactory;
 import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
+import com.helospark.lightdi.properties.PropertySourceHolder;
 import com.helospark.lightdi.properties.ValueResolver;
 import com.helospark.lightdi.properties.converter.BooleanPropertyConverter;
 import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
@@ -340,4 +341,7 @@ public class LightDiContext implements AutoCloseable {
         return environment;
     }
 
+    public void addPropertySource(PropertySourceHolder propertySourceHolder) {
+        environment.addPropertySource(propertySourceHolder);
+    }
 }
