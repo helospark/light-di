@@ -1,7 +1,6 @@
 package com.helospark.lightdi.dependencywire;
 
 import static com.helospark.lightdi.annotation.ComponentScan.BASE_PACKAGE_ATTRIBUTE_NAME;
-import static com.helospark.lightdi.annotation.ComponentScan.ONLY_SCAN_THIS_JAR_ATTRIBUTE_NAME;
 import static com.helospark.lightdi.annotation.ComponentScan.VALUE_ATTRIBUTE_NAME;
 
 import java.util.Arrays;
@@ -54,8 +53,6 @@ public class ComponentScanCollector {
     private ComponentScanPackage packageToComponentScanPackage(String packageName, LightDiAnnotation componentScan, DependencyDescriptor descriptor) {
         return ComponentScanPackage.builder()
                 .withPackageName(packageName)
-                .withRootClass(descriptor.getClazz())
-                .withOnlyCurrentJar(componentScan.getAttributeAs(ONLY_SCAN_THIS_JAR_ATTRIBUTE_NAME, Boolean.class))
                 .build();
     }
 }

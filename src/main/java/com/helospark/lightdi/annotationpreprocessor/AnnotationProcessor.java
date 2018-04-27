@@ -52,7 +52,6 @@ public class AnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> elements, RoundEnvironment environment) {
         try {
-
             if (writer == null) {
                 FileObject newFile = filer.createResource(StandardLocation.CLASS_OUTPUT, RESOURCE_FOLDER, RESOURCE_FILE_NAME);
                 writer = new OutputStreamWriter(newFile.openOutputStream(), UTF_8);

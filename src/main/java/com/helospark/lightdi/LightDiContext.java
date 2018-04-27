@@ -284,18 +284,18 @@ public class LightDiContext implements AutoCloseable {
      */
     @Deprecated
     public void loadDependenciesFromPackageUsingFullClasspathScan(String packageName) {
-        addDependencies(Collections.singletonList(packageName), Collections.emptyList());
+        loadDependencies(Collections.singletonList(packageName), Collections.emptyList());
     }
 
     public void loadDependenciesFromPackage(String packageName, Class<?> referenceClass) {
-        addDependencies(Collections.singletonList(packageName), Collections.emptyList());
+        loadDependencies(Collections.singletonList(packageName), Collections.emptyList());
     }
 
     public void loadDependenciesFromClass(Class<?> clazz) {
-        addDependencies(Collections.emptyList(), Collections.singletonList(clazz));
+        loadDependencies(Collections.emptyList(), Collections.singletonList(clazz));
     }
 
-    public void addDependencies(List<String> packages, List<Class<?>> classes) {
+    public void loadDependencies(List<String> packages, List<Class<?>> classes) {
         try {
             SortedSet<DependencyDescriptor> loadedDescriptors = new TreeSet<>();
             loadedDescriptors.addAll(recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(classes));

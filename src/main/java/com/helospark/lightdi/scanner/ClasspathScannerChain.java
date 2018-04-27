@@ -15,7 +15,8 @@ public class ClasspathScannerChain {
         return chain.stream()
                 .filter(chainItem -> chainItem.doesSupport(componentScanPackage))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Cannot scan classpath " + componentScanPackage))
+                .orElseThrow(() -> new IllegalStateException("No classpath scanner found for " + componentScanPackage
+                        + " use fast-classpath-scanner dependency or generate preprocessed files"))
                 .scan(componentScanPackage);
     }
 

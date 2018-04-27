@@ -33,7 +33,6 @@ public class RecursiveDependencyDescriptorCollector {
     public SortedSet<DependencyDescriptor> collectDependenciesUsingFullClasspathScan(String packageName) {
         ComponentScanPackage componentScanPackage = ComponentScanPackage.builder()
                 .withPackageName(packageName)
-                .withOnlyCurrentJar(false)
                 .build();
         return collectDependenciesInternal(componentScanPackage);
     }
@@ -43,15 +42,6 @@ public class RecursiveDependencyDescriptorCollector {
         packages.stream()
                 .forEach(pkg -> result.addAll(collectDependenciesUsingFullClasspathScan(pkg)));
         return result;
-    }
-
-    public SortedSet<DependencyDescriptor> collectDependenciesUsingJarClasspathScan(String packageName, Class<?> jarRootClass) {
-        ComponentScanPackage componentScanPackage = ComponentScanPackage.builder()
-                .withPackageName(packageName)
-                .withRootClass(jarRootClass)
-                .withOnlyCurrentJar(true)
-                .build();
-        return collectDependenciesInternal(componentScanPackage);
     }
 
     private SortedSet<DependencyDescriptor> collectDependenciesInternal(ComponentScanPackage componentScanPackage) {
