@@ -1,0 +1,4 @@
+com.helospark.test.DummyClass
+com.helospark.test.FakeClass
+com.helospark.it.SomeItTest
+com.notrelated.Clazz

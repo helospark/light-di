@@ -16,7 +16,7 @@ public class InvalidConfigurationIT {
         // GIVEN
 
         // WHEN
-        lightDi.initContextByClass(ComponentWithMultipleAutowiredAnnotatedConstructor.class);
+        LightDi.initContextByClass(ComponentWithMultipleAutowiredAnnotatedConstructor.class);
 
         // THEN throws
     }
@@ -26,7 +26,7 @@ public class InvalidConfigurationIT {
         // GIVEN
 
         // WHEN
-        lightDi.initContextByClass(ComponentWithMultipleNonAnnotatedConstructor.class);
+        LightDi.initContextByClass(ComponentWithMultipleNonAnnotatedConstructor.class);
 
         // THEN throws
     }
@@ -36,7 +36,7 @@ public class InvalidConfigurationIT {
         // GIVEN
 
         // WHEN
-        lightDi.initContextByClass(BothLazyAndEagerInitialized.class);
+        LightDi.initContextByClass(BothLazyAndEagerInitialized.class);
 
         // THEN throws
     }

@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     private Elements elementUtils;
     private Filer filer;
 
-    private HashSet<String> foundClasses;
+    private Set<String> foundClasses;
     private Writer writer;
 
     @Override
@@ -45,7 +46,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         this.filer = environment.getFiler();
 
         // Need cache, because of multiple passes annotation processor might do
-        foundClasses = new HashSet<>();
+        foundClasses = Collections.synchronizedSet(new HashSet<>());
         writer = null;
     }
 

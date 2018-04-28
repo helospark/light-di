@@ -27,7 +27,7 @@ public class ContextWithCircleTest {
 
         // WHEN
         try {
-            lightDi.initContextUsingFullClasspathScan(ClassA.class.getPackage().getName(), configuration);
+            LightDi.initContextByPackage(ClassA.class.getPackage().getName(), configuration);
         } catch (Exception e) {
             thrownException = e;
         }
@@ -47,7 +47,7 @@ public class ContextWithCircleTest {
 
         // WHEN
         try {
-            lightDi.initContextUsingFullClasspathScan(ClassA.class.getPackage().getName(), configuration);
+            LightDi.initContextByPackage(ClassA.class.getPackage().getName(), configuration);
         } catch (Exception e) {
             thrownException = e;
         }
@@ -63,7 +63,7 @@ public class ContextWithCircleTest {
 
         // WHEN
         try {
-            lightDi.initContextUsingFullClasspathScan(ClassA.class.getPackage().getName());
+            LightDi.initContextByPackage(ClassA.class.getPackage().getName());
         } catch (Exception e) {
             thrownException = e;
         }

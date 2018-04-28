@@ -19,7 +19,7 @@ public class MetaAnnotationIT {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextByClass(MetaAnnotationConfiguration.class);
+        context = LightDi.initContextByClass(MetaAnnotationConfiguration.class);
     }
 
     @Test

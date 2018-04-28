@@ -19,7 +19,7 @@ public class MissingRequiredDependencyContextLoadFailIT {
 
         // WHEN
         LightDi lightDi = new LightDi();
-        lightDi.initContextByClass(BeanWithNonExistentRequiredFieldDependency.class);
+        LightDi.initContextByClass(BeanWithNonExistentRequiredFieldDependency.class);
 
         // THEN throws
     }
@@ -30,7 +30,7 @@ public class MissingRequiredDependencyContextLoadFailIT {
 
         // WHEN
         LightDi lightDi = new LightDi();
-        lightDi.initContextByClass(BeanWithNonExistentRequiredSetterDependency.class);
+        LightDi.initContextByClass(BeanWithNonExistentRequiredSetterDependency.class);
 
         // THEN throws
     }
@@ -41,7 +41,7 @@ public class MissingRequiredDependencyContextLoadFailIT {
 
         // WHEN
         LightDi lightDi = new LightDi();
-        lightDi.initContextByClass(BeanWithNonExistentRequiredConstructorDependency.class);
+        LightDi.initContextByClass(BeanWithNonExistentRequiredConstructorDependency.class);
 
         // THEN throws
     }
@@ -50,7 +50,7 @@ public class MissingRequiredDependencyContextLoadFailIT {
     public void testBeanInitializationShouldFailWithMissingValueAnnotation() {
         // GIVEN
         LightDi lightDi = new LightDi();
-        LightDiContext context = lightDi.initContextByClass(BeanWithNonExistentValueInField.class);
+        LightDiContext context = LightDi.initContextByClass(BeanWithNonExistentValueInField.class);
 
         // WHEN
         context.getBean(BeanWithNonExistentValueInField.class);

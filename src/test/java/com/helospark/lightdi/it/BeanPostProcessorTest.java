@@ -18,7 +18,7 @@ public class BeanPostProcessorTest {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextUsingFullClasspathScan(TestBeanPostProcessor.class.getPackage().getName());
+        context = LightDi.initContextByPackage(TestBeanPostProcessor.class.getPackage().getName());
     }
 
     @After

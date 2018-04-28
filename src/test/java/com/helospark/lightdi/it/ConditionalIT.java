@@ -26,7 +26,7 @@ public class ConditionalIT {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextUsing(TestConfiguration.class.getPackage().getName(), this.getClass());
+        context = LightDi.initContextByPackage(TestConfiguration.class.getPackage().getName());
     }
 
     @Test(expected = IllegalArgumentException.class)

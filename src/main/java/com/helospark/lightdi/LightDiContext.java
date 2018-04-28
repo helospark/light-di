@@ -179,7 +179,11 @@ public class LightDiContext implements AutoCloseable {
 
     private Object createNewInstance(DependencyDescriptorQuery query) {
         DependencyDescriptor foundDependency = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
-        return createDependency(foundDependency);
+        if (foundDependency == null) {
+            return null;
+        } else {
+            return createDependency(foundDependency);
+        }
     }
 
     private Object createDependency(DependencyDescriptor descriptorToUse) {
@@ -276,18 +280,7 @@ public class LightDiContext implements AutoCloseable {
         this.autowireSupportUtil.autowireFieldsTo(instance);
     }
 
-    /**
-     * Loads context from package
-     * @param packageName
-     * 
-     * @deprecated use loadDependenciesFromPackage
-     */
-    @Deprecated
-    public void loadDependenciesFromPackageUsingFullClasspathScan(String packageName) {
-        loadDependencies(Collections.singletonList(packageName), Collections.emptyList());
-    }
-
-    public void loadDependenciesFromPackage(String packageName, Class<?> referenceClass) {
+    public void loadDependencyFromPackage(String packageName) {
         loadDependencies(Collections.singletonList(packageName), Collections.emptyList());
     }
 

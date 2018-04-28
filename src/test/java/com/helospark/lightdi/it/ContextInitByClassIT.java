@@ -18,7 +18,7 @@ public class ContextInitByClassIT {
     @Before
     public void setUp() {
         LightDi lightDi = new LightDi();
-        context = lightDi.initContextByClass(ClassInitConfigurationClass.class);
+        context = LightDi.initContextByClass(ClassInitConfigurationClass.class);
     }
 
     @After

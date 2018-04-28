@@ -14,10 +14,10 @@ public class PropertyOverrideIT {
     @Test
     public void testValueShouldBeTheOverridden() {
         // GIVEN
-        LightDiContext lightDi = LightDi.initContextUsing("com.helospark.lightdi.it.propertyoverride", this.getClass());
+        LightDiContext lightDiContext = LightDi.initContextByPackage("com.helospark.lightdi.it.propertyoverride");
 
         // WHEN
-        BeanWithProperty bean = lightDi.getBean(BeanWithProperty.class);
+        BeanWithProperty bean = lightDiContext.getBean(BeanWithProperty.class);
 
         // THEN
         assertThat(bean.getValue(), is("overridden"));

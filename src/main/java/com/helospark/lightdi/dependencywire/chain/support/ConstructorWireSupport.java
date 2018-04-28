@@ -50,7 +50,8 @@ public class ConstructorWireSupport {
     }
 
     private Optional<Constructor<?>> getConstructorToUse(Class<?> clazz) {
-        List<Constructor<?>> constructors = Arrays.asList(clazz.getDeclaredConstructors());
+        // We cannot use nonpublic constructors, because Android generates package private constructors
+        List<Constructor<?>> constructors = Arrays.asList(clazz.getConstructors());
         if (constructors.size() == 1) {
             return Optional.of(constructors.get(0));
         } else if (constructors.size() > 1) {
@@ -60,7 +61,7 @@ public class ConstructorWireSupport {
             if (autowiredAnnotatedConstructors.size() == 1) {
                 return Optional.of(autowiredAnnotatedConstructors.get(0));
             } else {
-                throw new IllegalArgumentException("No unambiguous constructor found for " + clazz
+                throw new IllegalArgumentException("No unambiguous public constructor found for " + clazz
                         + ", either create one constructor only or annotatate only one constructor with @Autowired");
             }
         }

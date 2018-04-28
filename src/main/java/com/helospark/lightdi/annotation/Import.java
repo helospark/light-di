@@ -7,6 +7,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Import a stereotype annotated class to the context.
+ * @author helospark
+ */
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD })
 public @interface Import {

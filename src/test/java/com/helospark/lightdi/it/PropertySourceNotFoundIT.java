@@ -18,7 +18,7 @@ public class PropertySourceNotFoundIT {
         // GIVEN
 
         // WHEN
-        lightDi.initContextByClass(RequiredPropertySourceNotFoundConfiguration.class);
+        LightDi.initContextByClass(RequiredPropertySourceNotFoundConfiguration.class);
 
         // THEN throws
     }
@@ -28,7 +28,7 @@ public class PropertySourceNotFoundIT {
         // GIVEN
 
         // WHEN
-        LightDiContext context = lightDi.initContextByClass(NonRequiredPropertySourceNotFoundConfiguration.class);
+        LightDiContext context = LightDi.initContextByClass(NonRequiredPropertySourceNotFoundConfiguration.class);
 
         // THEN
         assertNotNull(context);

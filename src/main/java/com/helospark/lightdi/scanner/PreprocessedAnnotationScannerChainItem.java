@@ -22,12 +22,19 @@ import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
 
 public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerChainItem {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreprocessedAnnotationScannerChainItem.class);
+
+    private PreprocessedFileLocationProvider preprocessedFileLocationProvider;
+
     private Set<String> resourceFileContent;
     private Object resourceFileContentLock = new Object();
 
+    public PreprocessedAnnotationScannerChainItem(PreprocessedFileLocationProvider preprocessedFileLocationProvider) {
+        this.preprocessedFileLocationProvider = preprocessedFileLocationProvider;
+    }
+
     @Override
     public List<String> scan(ComponentScanPackage componentScanPackage) {
-        LOGGER.debug("Scanning " + componentScanPackage + " using preprocessed file with classpath: " + System.getProperty("java.class.path"));
+        LOGGER.debug("Scanning " + componentScanPackage + " using preprocessed file");
 
         return readFile().stream()
                 .filter(className -> doesPackageMatch(componentScanPackage, className))
@@ -47,13 +54,13 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
         if (resourceFileContent == null) {
             synchronized (resourceFileContentLock) {
                 if (resourceFileContent == null) {
-                    Set<String> fileList = getFileList();
+                    Set<String> fileList = preprocessedFileLocationProvider.getFileList();
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Reading files " + fileList);
                     }
                     Set<String> result = new HashSet<>();
                     fileList.stream()
-                            .map(file -> readFileName(file))
+                            .map(file -> readFileContent(file))
                             .forEach(list -> result.addAll(list));
                     resourceFileContent = result;
                 }
@@ -63,26 +70,7 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
         return resourceFileContent;
     }
 
-    private Set<String> getFileList() {
-        String localJar = "/resources/lightdi/preprocessed";
-        String classpathSeparator = File.pathSeparator;
-        String[] classpath = System.getProperty("java.class.path").split(classpathSeparator);
-        LOGGER.debug("Classpath is " + Arrays.toString(classpath));
-        Set<String> result = Arrays.stream(classpath)
-                .filter(path -> isFolder(path))
-                .map(path -> path + localJar)
-                .filter(path -> new File(path).exists())
-                .collect(Collectors.toSet());
-        result.add(localJar);
-        return result;
-    }
-
-    private boolean isFolder(String path) {
-        File file = new File(path);
-        return file.exists() && file.isDirectory();
-    }
-
-    private Set<String> readFileName(String fileName) {
+    private Set<String> readFileContent(String fileName) {
         InputStream inputStream = null;
         try {
             inputStream = getInputStream(fileName);
@@ -96,7 +84,7 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
                     .filter(element -> !element.isEmpty())
                     .collect(Collectors.toSet());
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Preprocessed file contains: " + allPackages);
+                LOGGER.debug("Preprocessed file " + fileName + " contains: " + allPackages);
             }
             return allPackages;
         } else {
