@@ -1,7 +1,10 @@
 package com.helospark.lightdi.annotation;
 
+import static java.lang.annotation.ElementType.TYPE;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Annotation that the given class is eligible for ComponentScan.
@@ -19,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author helospark
  */
 @Retention(RetentionPolicy.RUNTIME)
+@Target(TYPE)
 public @interface Service {
     public static final String NAME_ATTRIBUTE_NAME = "value";
 

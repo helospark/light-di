@@ -38,7 +38,6 @@ import com.helospark.lightdi.properties.Environment;
 import com.helospark.lightdi.properties.EnvironmentFactory;
 import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
 import com.helospark.lightdi.properties.PropertySourceHolder;
-import com.helospark.lightdi.properties.ValueResolver;
 import com.helospark.lightdi.properties.converter.BooleanPropertyConverter;
 import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
 import com.helospark.lightdi.properties.converter.StringPropertyConverter;
@@ -47,6 +46,10 @@ import com.helospark.lightdi.scanner.ClasspathScannerChainFactory;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 import com.helospark.lightdi.util.DependencyChooser;
 
+/**
+ * Contains all data required for the context, like beans and properties.
+ * @author helospark
+ */
 public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
     // Configuration
@@ -61,7 +64,6 @@ public class LightDiContext implements AutoCloseable {
     private WiringProcessingServiceFactory preprocessWireServiceFactory;
     private BeanFactoryFactory beanFactoryFactory;
     private BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory;
-    private ValueResolver valueResolver;
     private AutowirePostProcessor autowireSupportUtil;
     private ConditionalFilter conditionalFilter;
 
@@ -72,12 +74,19 @@ public class LightDiContext implements AutoCloseable {
     private List<BeanPostProcessor> beanPostProcessors;
     private Environment environment = null;
 
+    /**
+     * Creates new context with default configuration.
+     */
     public LightDiContext() {
         this(LightDiContextConfiguration.builder()
                 .withCheckForIntegrity(true)
                 .build());
     }
 
+    /**
+     * Creates new context with given configuration.
+     * @param lightDiContextConfiguration configuration
+     */
     public LightDiContext(LightDiContextConfiguration lightDiContextConfiguration) {
         this.lightDiContextConfiguration = lightDiContextConfiguration;
 
@@ -89,6 +98,7 @@ public class LightDiContext implements AutoCloseable {
         this.conditionalFilter = new ConditionalFilter();
 
         /** Moved from LightDi class **/
+        // TODO move to separate class
 
         beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
         beanDefinitionCollector = beanDefinitionProcessorChainFactory.createBeanDefinitionProcessorChain();
@@ -116,6 +126,13 @@ public class LightDiContext implements AutoCloseable {
         registerSingleton(new BooleanPropertyConverter());
     }
 
+    /**
+     * Get a bean from the context by type.
+     * @param clazz bean type to get
+     * @return found and instantiated bean, not null
+     * @throws IllegalArgumentException if the given bean cannot be found
+     * @param <T> type of bean
+     */
     public <T> T getBean(Class<T> clazz) {
         DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
                 .withClazz(clazz)
@@ -123,14 +140,32 @@ public class LightDiContext implements AutoCloseable {
         return (T) getOrCreateDependencyInternal(query);
     }
 
+    /**
+     * Get bean by the given Query descriptor.
+     * @param query to get bean based on
+     * @return found and instantiated bean. May be null if the query is not required
+     * @throws IllegalArgumentException if the given bean cannot be found
+     */
     public Object getBean(DependencyDescriptorQuery query) {
         return getOrCreateDependencyInternal(query);
     }
 
+    /**
+     * Get bean by the given descriptor.
+     * @param query to get bean based on
+     * @return found and instantiated bean. May be null if the query is not required
+     * @throws IllegalArgumentException if the given bean cannot be found
+     */
     public Object getBean(DependencyDescriptor query) {
         return getOrCreateDependencyInternal(convertToQuery(query));
     }
 
+    /**
+     * Get bean by bean name.
+     * @param qualifier bean name
+     * @return found and instantiated bean. Never null
+     * @throws IllegalArgumentException if the given bean cannot be found
+     */
     public Object getBean(String qualifier) {
         DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
                 .withQualifier(qualifier)
@@ -138,19 +173,27 @@ public class LightDiContext implements AutoCloseable {
         return getOrCreateDependencyInternal(query);
     }
 
-    public ValueResolver getValueResolver() {
-        return valueResolver;
-    }
-
+    /**
+     * Eagerly initialize all beans in the context.
+     */
     public void eagerInitAllBeans() {
         dependencyDescriptors.stream()
                 .forEach(dependencyDescriptor -> getBean(convertToQuery(dependencyDescriptor)));
     }
 
+    /**
+     * Register a bean manually. Bean name is automatically generated by the class of the bean.
+     * @param bean instance to register
+     */
     public void registerSingleton(Object bean) {
         this.registerSingleton(bean, createBeanNameForStereotypeAnnotatedClass(bean.getClass()));
     }
 
+    /**
+     * Register a bean manually.
+     * @param bean instance to register
+     * @param beanName name of the bean
+     */
     public void registerSingleton(Object bean, String beanName) {
         ManualDependencyDescriptor dependencyDescriptor = ManualDependencyDescriptor.builder()
                 .withClazz(bean.getClass())
@@ -162,6 +205,11 @@ public class LightDiContext implements AutoCloseable {
         registerSingleton(dependencyDescriptor, bean);
     }
 
+    /**
+     * Register a bean manually.
+     * @param dependencyDescriptor to describe the bean data
+     * @param bean instance to register
+     */
     public void registerSingleton(ManualDependencyDescriptor dependencyDescriptor, Object bean) {
         dependencyDescriptor.setScope(LightDiConstants.SCOPE_SINGLETON);
         this.dependencyDescriptors.add(dependencyDescriptor);
@@ -221,6 +269,12 @@ public class LightDiContext implements AutoCloseable {
         }
     }
 
+    /**
+     * Return list of all beans with the given class.
+     * @param clazz to get beans from
+     * @return list of beans
+     * @param <T> type of bean
+     */
     @SuppressWarnings("unchecked")
     public <T> List<T> getListOfBeans(Class<T> clazz) {
         List<Object> result = dependencyDescriptors.stream()
@@ -239,6 +293,10 @@ public class LightDiContext implements AutoCloseable {
                 .build();
     }
 
+    /**
+     * Close the context.
+     * <p>May throw exception if the PreDestroy methods throw.
+     */
     @Override
     public void close() {
         initializedSingletonBeans.entrySet()
@@ -264,30 +322,59 @@ public class LightDiContext implements AutoCloseable {
         }
     }
 
+    /**
+     * Returns all dependency descriptors.
+     * @return all dependency descriptors
+     */
     public SortedSet<DependencyDescriptor> getDependencyDescriptors() {
         return dependencyDescriptors;
     }
 
+    /**
+     * Get autowire support util. <p>Can be used to inject fields to an nonmanaged instance.
+     * @return autowire support util
+     */
     public AutowirePostProcessor getAutowireSupportUtil() {
         return autowireSupportUtil;
     }
 
-    public void setAutowireSupportUtil(AutowirePostProcessor autowireSupportUtil) {
-        this.autowireSupportUtil = autowireSupportUtil;
-    }
-
+    /**
+     * Autowire fields to the given instance, even if the given instance is not managed.
+     * @param instance to autowire fields to
+     */
     public void processAutowireTo(Object instance) {
         this.autowireSupportUtil.autowireFieldsTo(instance);
     }
 
+    /**
+     * Load all beans in the given package. It will find annotated beans by classpath scan.<p>
+     * This will add beans, refresh context.<br>
+     * Note that calling this method separately for two different packages, which depend on each other will fail on the first call with not found beans.
+     * In that case use loadDependencies method.
+     * It may be called any time, even after an already started context.
+     * @param packageName package name to scan
+     */
     public void loadDependencyFromPackage(String packageName) {
         loadDependencies(Collections.singletonList(packageName), Collections.emptyList());
     }
 
+    /**
+     * Load given annotated bean (ex. Component).<p>
+     * This will add beans, refresh context.<br>
+     * Note that calling this method separately for two different configuration, which depend on each other will fail on the first call with not found beans.
+     * In that case use loadDependencies method.<br>
+     * It may be called any time, even after an already started context.
+     * @param clazz annotated class
+     */
     public void loadDependenciesFromClass(Class<?> clazz) {
         loadDependencies(Collections.emptyList(), Collections.singletonList(clazz));
     }
 
+    /**
+     * Load dependencies from given packages and annotated class.
+     * @param packages to scan and load beans from
+     * @param classes annotated classes to load as beans
+     */
     public void loadDependencies(List<String> packages, List<Class<?>> classes) {
         try {
             SortedSet<DependencyDescriptor> loadedDescriptors = new TreeSet<>();
@@ -300,7 +387,7 @@ public class LightDiContext implements AutoCloseable {
         }
     }
 
-    public void processDescriptors(SortedSet<DependencyDescriptor> loadedDescriptors) {
+    private void processDescriptors(SortedSet<DependencyDescriptor> loadedDescriptors) {
         environment = environmentInitializer.initializeEnvironment(environment, loadedDescriptors);
         loadedDescriptors = conditionalFilter.filterDependencies(this, loadedDescriptors);
 
@@ -330,10 +417,18 @@ public class LightDiContext implements AutoCloseable {
                 .forEach(dependency -> getBean(dependency));
     }
 
+    /**
+     * Get the environment. It can be used to add properties.
+     * @return environment
+     */
     public Environment getEnvironment() {
         return environment;
     }
 
+    /**
+     * Add a custom property source.
+     * @param propertySourceHolder custom property source
+     */
     public void addPropertySource(PropertySourceHolder propertySourceHolder) {
         environment.addPropertySource(propertySourceHolder);
     }

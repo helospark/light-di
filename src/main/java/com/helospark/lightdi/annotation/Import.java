@@ -16,6 +16,9 @@ import java.lang.annotation.Target;
 public @interface Import {
     public static final String ATTRIBUTE_NAME = "value";
 
+    /**
+     * @return Class to import.
+     */
     Class<?>[] value();
 
 }
