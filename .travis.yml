@@ -1,3 +1,4 @@
 language: java
 sudo: false
-script: mvn clean install -DskipGpgSign
+install: "mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -DskipGpgSign"
+script: "mvn verify"
