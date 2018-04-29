@@ -10,8 +10,8 @@
 	<url>https://github.com/helospark/light-di</url>
 
 	<properties>
-	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<skipGpgSign>false</skipGpgSign>
 		<skipSourceGeneration>false</skipSourceGeneration>
 		<skipJavadocGeneration>false</skipJavadocGeneration>
@@ -144,8 +144,8 @@
 				</executions>
 				<configuration>
 					<skip>${skipJavadocGeneration}</skip>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                    <additionalJOption>-html5</additionalJOption>
+					<additionalparam>-Xdoclint:none</additionalparam>
+					<!-- <additionalJOption>-html5</additionalJOption> This should be enabled only if Java 9+ is used, warning is generated otherwise :( -->
 				</configuration>
 			</plugin>
 			<plugin>
