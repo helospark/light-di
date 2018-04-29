@@ -14,7 +14,7 @@ public class SetterInvoker {
             Object result) {
         dependencyToCreate.getSetterDescriptor()
                 .stream()
-                .forEach(setter -> methodInvoker.invokeMethod(lightDiContext, setter, result));
+                .forEach(setter -> methodInvoker.invokeMethod(lightDiContext, setter, result, dependencyToCreate));
 
     }
 }

@@ -15,6 +15,7 @@ import com.helospark.lightdi.dependencywire.chain.support.MethodDependencyCollec
 import com.helospark.lightdi.dependencywire.chain.support.SetterWireSupport;
 import com.helospark.lightdi.dependencywire.chain.support.chain.CollectionInjectDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.DependencyInjectDescriptorBuilderChainItem;
+import com.helospark.lightdi.dependencywire.chain.support.chain.SpecialValueDescriptorBuilderChainItem;
 import com.helospark.lightdi.dependencywire.chain.support.chain.ValueInjectDescriptorBuilderChainItem;
 
 public class WiringProcessingServiceFactory {
@@ -39,9 +40,12 @@ public class WiringProcessingServiceFactory {
                 findInDependencySupport);
         ValueInjectDescriptorBuilderChainItem valueInjectDescriptorBuilderChainItem = new ValueInjectDescriptorBuilderChainItem(
                 propertyDescriptorFactory);
+        SpecialValueDescriptorBuilderChainItem specialValueDescriptorBuilderChainItem = new SpecialValueDescriptorBuilderChainItem();
 
         DependencyDescriptorBuilder parameterDependencyDescriptorBuilder = new DependencyDescriptorBuilder(
-                Arrays.asList(valueInjectDescriptorBuilderChainItem, collectionInjectDescriptorBuilderChainItem,
+                Arrays.asList(valueInjectDescriptorBuilderChainItem,
+                        specialValueDescriptorBuilderChainItem,
+                        collectionInjectDescriptorBuilderChainItem,
                         dependencyInjectDescriptorBuilderChainItem));
         CompatibleParameterFactory compatibleParameterFactory = new CompatibleParameterFactory();
 

@@ -33,7 +33,7 @@ public class StereotypeBeanDefinitionCollectorChainItem implements BeanDefinitio
     }
 
     public List<DependencyDescriptor> collectDefinitionsOnNonStereotypeClass(Class<?> clazz) {
-        DependencyDescriptor dependencyDescriptor = StereotypeDependencyDescriptor.builder()
+        StereotypeDependencyDescriptor dependencyDescriptor = StereotypeDependencyDescriptor.builder()
                 .withClazz(clazz)
                 .withQualifier(createBeanNameForStereotypeAnnotatedClass(clazz))
                 .withScope(QualifierExtractor.extractScope(clazz))

@@ -2,11 +2,13 @@ package com.helospark.lightdi.dependencywire.chain.support.chain;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.SortedSet;
 
 import javax.annotation.Generated;
 
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
+import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
 public class InjectDescriptorBuilderRequest {
     private SortedSet<DependencyDescriptor> dependencyDescriptors;
@@ -14,6 +16,7 @@ public class InjectDescriptorBuilderRequest {
     private Class<?> type;
     private Type genericType;
     private boolean required;
+    private InjectionDescriptor injectionDescriptorToCreate;
 
     @Generated("SparkTools")
     private InjectDescriptorBuilderRequest(Builder builder) {
@@ -22,6 +25,11 @@ public class InjectDescriptorBuilderRequest {
         this.type = builder.type;
         this.genericType = builder.genericType;
         this.required = builder.required;
+        this.injectionDescriptorToCreate = builder.injectionDescriptorToCreate;
+    }
+
+    public InjectionDescriptor getInjectionDescriptorToCreate() {
+        return injectionDescriptorToCreate;
     }
 
     public SortedSet<DependencyDescriptor> getDependencyDescriptors() {
@@ -51,11 +59,12 @@ public class InjectDescriptorBuilderRequest {
 
     @Generated("SparkTools")
     public static final class Builder {
-        private SortedSet<DependencyDescriptor> dependencyDescriptors;
+        private SortedSet<DependencyDescriptor> dependencyDescriptors = Collections.emptySortedSet();
         private AnnotatedElement parameter;
         private Class<?> type;
         private Type genericType;
         private boolean required;
+        private InjectionDescriptor injectionDescriptorToCreate;
 
         private Builder() {
         }
@@ -82,6 +91,11 @@ public class InjectDescriptorBuilderRequest {
 
         public Builder withRequired(boolean required) {
             this.required = required;
+            return this;
+        }
+
+        public Builder withInjectionDescriptorToCreate(InjectionDescriptor injectionDescriptorToCreate) {
+            this.injectionDescriptorToCreate = injectionDescriptorToCreate;
             return this;
         }
 

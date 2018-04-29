@@ -42,11 +42,11 @@ public class ComponentDependencyWireChainItem implements DependencyWireChain {
 
         Class<?> clazz = dependency.getClazz();
         List<ConstructorDescriptor> constructorDependencies = constructorWireSupport
-                .getConstructors(dependencyDescriptors, clazz);
+                .getConstructors(dependencyDescriptors, clazz, dependencyDescriptor);
         List<MethodDescriptor> setterDependencies = setterWireSupport.getSetterDependencies(clazz,
-                dependencyDescriptors);
+                dependencyDescriptors, dependencyDescriptor);
         List<FieldDescriptor> fieldDescriptors = fieldWireSupport.getFieldDependencies(clazz,
-                dependencyDescriptors);
+                dependencyDescriptors, dependencyDescriptor);
 
         dependency.setConstructorDescriptor(constructorDependencies);
         dependency.setSetterDescriptor(setterDependencies);

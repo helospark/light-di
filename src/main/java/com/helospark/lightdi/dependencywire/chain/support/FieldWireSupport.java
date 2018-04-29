@@ -22,15 +22,15 @@ public class FieldWireSupport {
     }
 
     public List<FieldDescriptor> getFieldDependencies(Class<?> clazz,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> allDependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<FieldDescriptor> result = new ArrayList<>();
-        result.addAll(collectAutowiredFields(clazz, dependencyDescriptors));
-        result.addAll(collectValueFields(clazz, dependencyDescriptors));
+        result.addAll(collectAutowiredFields(clazz, allDependencyDescriptors, dependencyToCreate));
+        result.addAll(collectValueFields(clazz, allDependencyDescriptors, dependencyToCreate));
         return result;
     }
 
     private List<FieldDescriptor> collectAutowiredFields(Class<?> clazz,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<FieldDescriptor> result = new ArrayList<>();
         List<Field> fields = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> isAnnotated(field))
@@ -39,7 +39,8 @@ public class FieldWireSupport {
         for (Field field : fields) {
             InjectionDescriptor injectDescriptor = dependencyDescriptorBuilder.build(field, dependencyDescriptors,
                     AnnotationUtil.getSingleAnnotationOfType(field, Autowired.class).getAttributeAs(Autowired.REQUIRED_ATTRIBUTE_NAME,
-                            Boolean.class));
+                            Boolean.class),
+                    dependencyToCreate);
             result.add(FieldDescriptor.builder()
                     .withField(field)
                     .withInjectionDescriptor(injectDescriptor)
@@ -49,7 +50,7 @@ public class FieldWireSupport {
     }
 
     private List<FieldDescriptor> collectValueFields(Class<?> clazz,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<FieldDescriptor> result = new ArrayList<>();
         List<Field> fields = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> AnnotationUtil.hasAnnotation(field, Value.class))
@@ -57,7 +58,8 @@ public class FieldWireSupport {
 
         for (Field field : fields) {
             InjectionDescriptor injectDescriptor = dependencyDescriptorBuilder.build(field, dependencyDescriptors,
-                    AnnotationUtil.getSingleAnnotationOfType(field, Value.class).getAttributeAs(Autowired.REQUIRED_ATTRIBUTE_NAME, Boolean.class));
+                    AnnotationUtil.getSingleAnnotationOfType(field, Value.class).getAttributeAs(Autowired.REQUIRED_ATTRIBUTE_NAME, Boolean.class),
+                    dependencyToCreate);
             result.add(FieldDescriptor.builder()
                     .withField(field)
                     .withInjectionDescriptor(injectDescriptor)

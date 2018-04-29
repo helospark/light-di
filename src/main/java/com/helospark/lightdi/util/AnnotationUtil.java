@@ -154,8 +154,8 @@ public class AnnotationUtil {
                 .withType(annotation)
                 .build();
 
-        //         meta annotations may contain themselves, see @Retention, avoid
-        //         recursing if it already contains it.
+        // meta annotations may contain themselves, see @Retention, avoid
+        // recursing if it already contains it.
         if (!doesContainItself(result, annotation)) {
             result.add(lightDiAnnotation);
             result.addAll(recursivelyMergeAllAnnotationsInternal(type, result, superDataCopy));
@@ -170,22 +170,17 @@ public class AnnotationUtil {
         if (inheritedAnnotationMethodsCache == null) {
             synchronized (cacheLock) {
                 if (inheritedAnnotationMethodsCache == null) {
-                    inheritedAnnotationMethodsCache = getInheritedMethodNames(Annotation.class, new HashSet<>());
+                    inheritedAnnotationMethodsCache = getMethodNamesIn(Annotation.class);
                 }
             }
         }
         return inheritedAnnotationMethodsCache.contains(methodToFind);
     }
 
-    private static Set<String> getInheritedMethodNames(Class<?> clazz, Set<String> result) {
-        Arrays.stream(clazz.getMethods())
+    private static Set<String> getMethodNamesIn(Class<?> clazz) {
+        return Arrays.stream(clazz.getMethods())
                 .map(method -> method.getName())
-                .forEach(a -> result.add(a));
-        Class<?> superclass = clazz.getSuperclass();
-        if (superclass != null) {
-            result.addAll(getInheritedMethodNames(superclass, result));
-        }
-        return result;
+                .collect(Collectors.toSet());
     }
 
     private static Object getAnnotationValue(Annotation annotation, Method method) {

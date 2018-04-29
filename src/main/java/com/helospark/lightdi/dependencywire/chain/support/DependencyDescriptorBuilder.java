@@ -17,24 +17,28 @@ public class DependencyDescriptorBuilder {
         this.chain = chain;
     }
 
-    public InjectionDescriptor build(CustomParameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
+    public InjectionDescriptor build(CustomParameter parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required,
+            InjectionDescriptor descriptorToCreate) {
         InjectDescriptorBuilderRequest request = InjectDescriptorBuilderRequest.builder()
                 .withDependencyDescriptors(dependencyDescriptors)
                 .withRequired(required)
                 .withType(parameter.getParameterType())
                 .withGenericType(parameter.getGenericType())
                 .withParameter(parameter.getAnnotatedParameterTypes())
+                .withInjectionDescriptorToCreate(descriptorToCreate)
                 .build();
         return findWithChain(request);
     }
 
-    public InjectionDescriptor build(Field parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required) {
+    public InjectionDescriptor build(Field parameter, SortedSet<DependencyDescriptor> dependencyDescriptors, boolean required,
+            InjectionDescriptor descriptorToCreate) {
         InjectDescriptorBuilderRequest request = InjectDescriptorBuilderRequest.builder()
                 .withDependencyDescriptors(dependencyDescriptors)
                 .withRequired(required)
                 .withType(parameter.getType())
                 .withGenericType(parameter.getGenericType())
                 .withParameter(parameter)
+                .withInjectionDescriptorToCreate(descriptorToCreate)
                 .build();
         return findWithChain(request);
     }

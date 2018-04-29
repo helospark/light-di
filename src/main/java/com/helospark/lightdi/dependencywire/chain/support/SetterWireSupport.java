@@ -28,15 +28,15 @@ public class SetterWireSupport {
     }
 
     public List<MethodDescriptor> getSetterDependencies(Class<?> clazz,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<MethodDescriptor> result = new ArrayList<>();
-        result.addAll(collectInjectMethods(clazz, dependencyDescriptors));
+        result.addAll(collectInjectMethods(clazz, dependencyDescriptors, dependencyToCreate));
         result.addAll(collectValueMethods(clazz, dependencyDescriptors));
         return result;
     }
 
     private List<MethodDescriptor> collectInjectMethods(Class<?> clazz,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<MethodDescriptor> result = new ArrayList<>();
         List<Method> setters = Arrays.stream(clazz.getMethods())
                 .filter(method -> isAutowiredSetter(method))
@@ -44,7 +44,7 @@ public class SetterWireSupport {
 
         for (Method method : setters) {
             List<InjectionDescriptor> injections = methodDependencyCollector.getSetterDependencies(method,
-                    dependencyDescriptors);
+                    dependencyDescriptors, dependencyToCreate);
             result.add(MethodDescriptor.builder()
                     .withMethod(method)
                     .withInjectionDescriptor(injections)

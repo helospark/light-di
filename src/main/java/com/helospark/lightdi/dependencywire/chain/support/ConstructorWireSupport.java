@@ -27,7 +27,7 @@ public class ConstructorWireSupport {
     }
 
     public List<ConstructorDescriptor> getConstructors(SortedSet<DependencyDescriptor> dependencyDescriptors,
-            Class<?> clazz) {
+            Class<?> clazz, DependencyDescriptor dependencyToCreate) {
         List<ConstructorDescriptor> constructorDescriptors = new ArrayList<>();
         Optional<Constructor<?>> constructorToUseOptional = getConstructorToUse(clazz);
         if (constructorToUseOptional.isPresent()) {
@@ -36,7 +36,7 @@ public class ConstructorWireSupport {
             for (int i = 0; i < parameters.length; ++i) {
                 CustomParameter parameter = compatibleParameterFactory.createParameter(constructorToUse, i);
                 InjectionDescriptor injectDescriptor = parameterDependencyDescriptorBuilder.build(parameter,
-                        dependencyDescriptors, CONSTRUCTOR_PARAMETER_REQUIRED);
+                        dependencyDescriptors, CONSTRUCTOR_PARAMETER_REQUIRED, dependencyToCreate);
 
                 constructorDescriptors.add(ConstructorDescriptor.builder()
                         .withIndex(i)

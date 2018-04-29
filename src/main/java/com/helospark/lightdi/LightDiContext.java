@@ -398,6 +398,7 @@ public class LightDiContext implements AutoCloseable {
         autowireSupportUtil = new AutowirePostProcessor(
                 beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
                 preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
+                beanFactoryFactory.getBeanPostConstructInitializer(),
                 this);
 
         if (lightDiContextConfiguration.isCheckForIntegrity()) {

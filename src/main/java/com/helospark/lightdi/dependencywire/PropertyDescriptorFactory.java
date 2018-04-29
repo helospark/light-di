@@ -5,9 +5,7 @@ import static com.helospark.lightdi.annotation.Value.VALUE_ATTRIBUTE_NAME;
 import static com.helospark.lightdi.util.AnnotationUtil.getSingleAnnotationOfType;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.Optional;
 
 import com.helospark.lightdi.annotation.Value;
@@ -24,14 +22,6 @@ public class PropertyDescriptorFactory {
         boolean required = valueAnnotation.getAttributeAs(REQUIRED_ATTRIBUTE_NAME, Boolean.class);
         GenericClass genericClass = new GenericClass(type, firstGenericType);
         return new PropertyDescritor(genericClass, value, required);
-    }
-
-    public InjectionDescriptor buildPropertyDescriptor(Parameter parameter) {
-        return buildPropertyDescriptor(parameter, parameter.getType(), ReflectionUtil.extractFirstGenericType(parameter));
-    }
-
-    public InjectionDescriptor buildPropertyDescriptor(Field field) {
-        return buildPropertyDescriptor(field, field.getType(), ReflectionUtil.extractFirstGenericType(field));
     }
 
     public InjectionDescriptor buildPropertyDescriptor(Method method) {

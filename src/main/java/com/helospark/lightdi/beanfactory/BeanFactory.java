@@ -7,28 +7,26 @@ import java.util.List;
 import java.util.SortedSet;
 
 import com.helospark.lightdi.LightDiContext;
-import com.helospark.lightdi.aware.ContextAware;
 import com.helospark.lightdi.beanfactory.chain.BeanFactoryChainItem;
+import com.helospark.lightdi.beanfactory.chain.BeanPostConstructInitializer;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.BeanCreationException;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
-import com.helospark.lightdi.reflection.PostConstructInvoker;
 
 public class BeanFactory {
     private List<BeanFactoryChainItem> chain;
-    private PostConstructInvoker postConstructInvoker;
+    private BeanPostConstructInitializer beanPostConstructInitializer;
 
-    public BeanFactory(List<BeanFactoryChainItem> chain, PostConstructInvoker postConstructInvoker) {
+    public BeanFactory(List<BeanFactoryChainItem> chain, BeanPostConstructInitializer beanPostConstructInitializer) {
         this.chain = chain;
-        this.postConstructInvoker = postConstructInvoker;
+        this.beanPostConstructInitializer = beanPostConstructInitializer;
     }
 
     public Object createBean(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate) {
         try {
             Object createdBean = findHandler(dependencyToCreate)
                     .createBean(lightDiContext, dependencyToCreate);
-
-            postProcessCreatedBean(lightDiContext, dependencyToCreate, createdBean);
+            beanPostConstructInitializer.postProcessCreatedBean(lightDiContext, dependencyToCreate, createdBean);
 
             return createdBean;
         } catch (Exception e) {
@@ -70,13 +68,6 @@ public class BeanFactory {
     private List<DependencyDescriptor> findDependenciesFor(DependencyDescriptor dependencyToCreate) {
         return findHandler(dependencyToCreate)
                 .extractDependencies(dependencyToCreate);
-    }
-
-    private void postProcessCreatedBean(LightDiContext context, DependencyDescriptor dependencyToCreate, Object createdBean) {
-        if (createdBean instanceof ContextAware) {
-            ((ContextAware) createdBean).setContext(context);
-        }
-        postConstructInvoker.invokePostConstructMethods(dependencyToCreate, createdBean);
     }
 
 }

@@ -27,6 +27,7 @@ import com.helospark.lightdi.annotation.Component;
 import com.helospark.lightdi.annotation.PropertySource;
 import com.helospark.lightdi.annotation.RepeatableAnnotationContainer;
 import com.helospark.lightdi.annotation.Service;
+import com.helospark.lightdi.exception.IllegalConfigurationException;
 
 public class AnnotationUtilTest {
 
@@ -160,6 +161,28 @@ public class AnnotationUtilTest {
         assertThat(values, is(expected));
     }
 
+    @Test(expected = IllegalConfigurationException.class)
+    public void testNoMetaAnnotationField() {
+        // GIVEN
+
+        // WHEN
+        AnnotationUtil.getAnnotationsOfType(NonExistentMetaAnnotationAttribute.class,
+                MetaAnnotationAttributeDoesNotExist.class);
+
+        // THEN throws
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNoSingleAnnotation() {
+        // GIVEN
+
+        // WHEN
+        AnnotationUtil.getSingleAnnotationOfType(AnnotationContainerTest.class,
+                RepeatableAnnotation.class);
+
+        // THEN throws
+    }
+
     @LocalAliasForTestAnnotation(name = "testName")
     static class LocalAliasForTestWithNameGiven {
 
@@ -188,12 +211,26 @@ public class AnnotationUtilTest {
 
     }
 
+    @MetaAnnotationAttributeDoesNotExist
+    static class NonExistentMetaAnnotationAttribute {
+
+    }
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     @Documented
     @PropertySource(value = "DOES_NOT_MATTER")
     public @interface UnitTestTestPropertySource {
         @AliasFor(value = "value", annotation = PropertySource.class)
+        String[] location() default "";
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    @Documented
+    @PropertySource(value = "DOES_NOT_MATTER")
+    public @interface MetaAnnotationAttributeDoesNotExist {
+        @AliasFor(value = "doesNotExists", annotation = PropertySource.class)
         String[] location() default "";
     }
 

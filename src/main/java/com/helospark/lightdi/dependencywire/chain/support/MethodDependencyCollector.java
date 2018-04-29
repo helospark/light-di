@@ -24,20 +24,20 @@ public class MethodDependencyCollector {
     }
 
     public List<InjectionDescriptor> getSetterDependencies(Method method,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<InjectionDescriptor> result = new ArrayList<>();
         for (int i = 0; i < method.getParameterTypes().length; ++i) {
             CustomParameter methodParameter = compatibleParameterFactory.createParameter(method, i);
-            result.add(collectDependencyFor(method, methodParameter, dependencyDescriptors));
+            result.add(collectDependencyFor(method, methodParameter, dependencyDescriptors, dependencyToCreate));
         }
         return result;
     }
 
     private InjectionDescriptor collectDependencyFor(Method method, CustomParameter parameter,
-            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+            SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         boolean isRequired = extractRequired(method);
         return parameterDependencyDescriptorBuilder.build(parameter,
-                dependencyDescriptors, isRequired);
+                dependencyDescriptors, isRequired, dependencyToCreate);
     }
 
     private boolean extractRequired(Method method) {

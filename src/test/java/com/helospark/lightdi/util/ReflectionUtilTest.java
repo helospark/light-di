@@ -3,6 +3,7 @@ package com.helospark.lightdi.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,19 @@ public class ReflectionUtilTest {
         assertFalse(foundGenericParameter.isPresent());
     }
 
+    @Test
+    public void testExtractGenericTypeFieldShouldReturnExpected() throws NoSuchMethodException, SecurityException {
+        // GIVEN
+        Field field = GenericTypeField.class.getFields()[0];
+
+        // WHEN
+        Optional<Class<?>> foundGenericParameter = ReflectionUtil.extractFirstGenericType(field);
+
+        // THEN
+        assertTrue(foundGenericParameter.isPresent());
+        assertTrue(foundGenericParameter.get().equals(String.class));
+    }
+
     public void reflectTest(List<String> param) {
 
     }
@@ -59,5 +73,9 @@ public class ReflectionUtilTest {
 
     public void reflectTest3(String asd) {
 
+    }
+
+    static class GenericTypeField {
+        public List<String> field;
     }
 }

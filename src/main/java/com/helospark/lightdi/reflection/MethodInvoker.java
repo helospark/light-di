@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
@@ -17,11 +18,11 @@ public class MethodInvoker {
     }
 
     public Object invokeMethod(LightDiContext lightDiContext, MethodDescriptor methodDescriptor,
-            Object result) {
+            Object result, DependencyDescriptor dependencyToCreate) {
         try {
             List<InjectionDescriptor> injectionDescriptor = methodDescriptor.getInjectionDescriptor();
             Object[] arguments = injectionDescriptor.stream()
-                    .map(dependency -> resolveDependency(lightDiContext, dependency))
+                    .map(dependency -> resolveDependency(lightDiContext, dependency, dependencyToCreate))
                     .collect(Collectors.toList())
                     .toArray();
             Method method = methodDescriptor.getMethod();
@@ -32,7 +33,7 @@ public class MethodInvoker {
         }
     }
 
-    private Object resolveDependency(LightDiContext context, InjectionDescriptor descriptor) {
+    private Object resolveDependency(LightDiContext context, InjectionDescriptor descriptor, DependencyDescriptor dependencyToCreate) {
         return dependencyObjectResolverHandler.resolve(context, descriptor);
     }
 

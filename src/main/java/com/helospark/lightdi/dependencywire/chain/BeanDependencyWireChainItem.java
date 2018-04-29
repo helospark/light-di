@@ -25,7 +25,8 @@ public class BeanDependencyWireChainItem implements DependencyWireChain {
             Method beanMethod = beanDescriptor.getMethod();
             List<InjectionDescriptor> injectionDescriptions = methodDependencyCollector.getSetterDependencies(
                     beanMethod,
-                    dependencyDescriptors);
+                    dependencyDescriptors,
+                    dependency);
 
             beanDescriptor.setMethodDescriptor(MethodDescriptor.builder()
                     .withMethod(beanMethod)
