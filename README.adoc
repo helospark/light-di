@@ -1,3 +1,6 @@
+image:https://travis-ci.org/helospark/light-di.svg?branch=master["Build Status", link="https://travis-ci.org/helospark/light-di"]
+image:https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square["PRs Welcome", link="http://makeapullrequest.com"]
+
 = LightDI
 
 *Fast, lightweight, Spring like, annotation driven dependency injection framework.*
