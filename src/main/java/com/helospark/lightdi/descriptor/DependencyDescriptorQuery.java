@@ -6,6 +6,10 @@ import java.util.Optional;
 
 import javax.annotation.Generated;
 
+/**
+ * Required parameters to find a dependency.
+ * @author helospark
+ */
 public class DependencyDescriptorQuery {
     private Optional<Class<?>> clazz;
     private Optional<String> qualifier;

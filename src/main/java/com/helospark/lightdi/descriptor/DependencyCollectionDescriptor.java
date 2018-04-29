@@ -5,6 +5,13 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
+/**
+ * Represents a list of dependencies to be injected.
+ * <p>
+ * Used when injecting an Collection by interface.
+ *
+ * @author helospark
+ */
 public class DependencyCollectionDescriptor implements InjectionDescriptor {
     private Class<? extends Collection<?>> collectionType;
     private List<DependencyDescriptor> dependencies;

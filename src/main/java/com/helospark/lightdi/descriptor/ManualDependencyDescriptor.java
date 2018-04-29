@@ -8,6 +8,10 @@ import javax.annotation.Generated;
 
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 
+/**
+ * Represents a dependency that was manually registered using registerSingleton method on the context.
+ * @author helospark
+ */
 public class ManualDependencyDescriptor extends DependencyDescriptor {
 
     @Generated("SparkTools")

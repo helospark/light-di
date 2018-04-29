@@ -3,6 +3,10 @@ package com.helospark.lightdi.descriptor.property;
 import com.helospark.lightdi.descriptor.GenericClass;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 
+/**
+ * Descriptor represents parameters require for a property injection.
+ * @author helospark
+ */
 public class PropertyDescritor implements InjectionDescriptor {
     private GenericClass clazz;
     private String value;

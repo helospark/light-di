@@ -10,6 +10,10 @@ import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
 
+/**
+ * Represent a dependency created by a {@literal @}Bean method.
+ * @author helospark
+ */
 public class BeanDependencyDescriptor extends DependencyDescriptor {
     private DependencyDescriptor configurationDescriptor;
     private Method method;

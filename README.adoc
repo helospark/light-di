@@ -17,6 +17,7 @@ Similar to Spring annotation-support.
 * Classpath scanning for beans
 * Android support
 * Stereotype annotations to create a bean `@Component`, `@Service`
+* Component scan at compile time
 * `@Configuration` can be applied to classes, annotated class can contain multiple `@Bean` annotated methods, these methods will be automatically called, and their return value will be injected to the context
 * `@Autowired` can be applied to constructor, fields, setters to automatically set dependency (or even collection of dependencies)
 * `@Value` can be applied to constructors, fields, setters to get value from property file
@@ -27,8 +28,7 @@ Similar to Spring annotation-support.
 * By default all beans are lazily initialized
 * `@Primary` can be used to declare a bean as primary in case of bean collision (useful for mocking out dependencies)
 * `@ComponentScan` and `@Import` support to load more beans in other packages
-* Conditional bean support, based on existance of other beans, classes, properties
-* `@ComponentScan` only for current jar file, therefore increasing performance, and decreasing bugs from accidentally picking up classes
+* Conditional bean support, based on existence of other beans, classes, properties
 * JUnit test support (`@Autowire` to test, and automatically create Mockito mocks (`@MockBean`, `@SpyBean`) and inject into the test to test)
 * Fast startup time, small memory footprint (see performance section (soon))
 

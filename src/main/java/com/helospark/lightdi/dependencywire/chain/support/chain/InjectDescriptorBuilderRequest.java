@@ -2,8 +2,8 @@ package com.helospark.lightdi.dependencywire.chain.support.chain;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.annotation.Generated;
 
@@ -59,7 +59,7 @@ public class InjectDescriptorBuilderRequest {
 
     @Generated("SparkTools")
     public static final class Builder {
-        private SortedSet<DependencyDescriptor> dependencyDescriptors = Collections.emptySortedSet();
+        private SortedSet<DependencyDescriptor> dependencyDescriptors = new TreeSet<>();
         private AnnotatedElement parameter;
         private Class<?> type;
         private Type genericType;

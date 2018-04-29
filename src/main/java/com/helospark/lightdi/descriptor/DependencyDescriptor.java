@@ -7,6 +7,11 @@ import java.util.List;
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.constants.LightDiConstants;
 
+/**
+ * Descriptor represents all parameters known about an class instance dependency.
+ * @author helospark
+ *
+ */
 public abstract class DependencyDescriptor implements InjectionDescriptor, Comparable<DependencyDescriptor> {
     protected Class<?> clazz;
     protected String qualifier;

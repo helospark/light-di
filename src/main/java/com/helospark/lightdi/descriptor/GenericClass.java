@@ -3,6 +3,10 @@ package com.helospark.lightdi.descriptor;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Class representing a generic type including the type parameter.
+ * @author helospark
+ */
 public class GenericClass {
     private Class<?> type;
     private Optional<Class<?>> firstGenericType; // TODO: maybe a list in arbitrary depth, usually first is enough
