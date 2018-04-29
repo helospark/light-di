@@ -1,4 +1,5 @@
 image:https://travis-ci.org/helospark/light-di.svg?branch=master["Build Status", link="https://travis-ci.org/helospark/light-di"]
+image:https://codecov.io/gh/helospark/light-di/branch/master/graph/badge.svg["Coverage", link="https://codecov.io/gh/helospark/light-di"]
 image:https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square["PRs Welcome", link="http://makeapullrequest.com"]
 
 = LightDI
