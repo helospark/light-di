@@ -1,12 +1,14 @@
 image:https://travis-ci.org/helospark/light-di.svg?branch=master["Build Status", link="https://travis-ci.org/helospark/light-di"]
-image:https://codecov.io/gh/helospark/light-di/branch/master/graph/badge.svg["Coverage", link="https://codecov.io/gh/helospark/light-di"]
-image:https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square["PRs Welcome", link="http://makeapullrequest.com"]
+image:https://img.shields.io/codecov/c/github/helospark/light-di.svg["Coverage", link="https://codecov.io/gh/helospark/light-di"]
+image:https://img.shields.io/github/license/helospark/light-di.svg["MIT licence", link="https://github.com/helospark/light-di/blob/master/LICENSE"]
+image:https://img.shields.io/badge/PRs-welcome-brightgreen.svg["PRs Welcome", link="http://makeapullrequest.com"]
+
 
 = LightDI
 
 *Fast, lightweight, Spring like, annotation driven dependency injection framework.*
 
-Designed specifically for small applications, that has to have small memory footprint, small jar size and fast startup time, for example plugins, (embedded) standalone application, integration tests, jobs etc.
+Designed specifically for small applications, that has to have small memory footprint, small jar size and fast startup time, for example plugins, (embedded) standalone application, integration tests, jobs, Android applications, etc.
 
 == Features
 
@@ -79,7 +81,7 @@ LightDI is usable for Android, but please note the following:
 
 The library is built using Java 8, so you need to add the following option to your Gradle file:
 
-[source,json]
+[source]
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -94,7 +96,7 @@ While this is a standard Java feature, IDEs may not turn it on by default to get
 
 and add the LightDi jar as a annotationProcessor explicitly in your `build.gradle` file, like:
 
-[source,json]
+[source]
     dependencies {
        ...
        implementation 'com.helospark:lightdi:{version you would like to use}'
