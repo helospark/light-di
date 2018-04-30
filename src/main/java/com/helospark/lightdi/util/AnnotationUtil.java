@@ -22,7 +22,6 @@ import com.helospark.lightdi.cache.SimpleNonThreadSafeCache;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
 
 public class AnnotationUtil {
-
     private static Object cacheLock = new Object();
     private static Set<String> inheritedAnnotationMethodsCache = null;
     private static Map<AnnotatedElement, Set<LightDiAnnotation>> cache = Collections
@@ -56,7 +55,7 @@ public class AnnotationUtil {
 
     /**
      * Gets all annotation on the given element, including annotations on annotations.
-     * It also contains meta annotations (if present) such as Documented or Retention, but deduplicated, if mulitple annotations have it.
+     * It also contains meta annotations (if present), default metaannotations (Target, Documented, Retention are filetered), but deduplicated, if mulitple annotations have it.
      * @param parameter to extract annotations from
      * @return all annotations
      */
@@ -77,14 +76,21 @@ public class AnnotationUtil {
             Map<Class<?>, List<AliasData>> superData) {
 
         for (Annotation annotation : parameter.getAnnotations()) {
-            if (annotation.annotationType().isAnnotationPresent(RepeatableAnnotationContainer.class)) {
-                extractRepeatableAnnotations(annotation)
-                        .forEach(newAnnotation -> processAnnotation(result, newAnnotation, superData));
-            } else {
-                processAnnotation(result, annotation, superData);
+            if (!isForbiddenAnnotation(annotation)) {
+                if (annotation.annotationType().isAnnotationPresent(RepeatableAnnotationContainer.class)) {
+                    extractRepeatableAnnotations(annotation)
+                            .forEach(newAnnotation -> processAnnotation(result, newAnnotation, superData));
+                } else {
+                    processAnnotation(result, annotation, superData);
+                }
             }
         }
         return result;
+    }
+
+    private static boolean isForbiddenAnnotation(Annotation annotation) {
+        // for performance reasons common meta annotations are forbidden
+        return annotation.annotationType().getName().startsWith("java.lang.annotation");
     }
 
     private static Stream<Annotation> extractRepeatableAnnotations(Annotation annotation) {

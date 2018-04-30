@@ -3,6 +3,7 @@ package com.helospark.lightdi.util;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Generated;
@@ -41,6 +42,25 @@ public class LightDiAnnotation {
         } else {
             throw new IllegalArgumentException("Attribute " + key + " cannot be found on " + type);
         }
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof LightDiAnnotation)) {
+            return false;
+        }
+        LightDiAnnotation castOther = (LightDiAnnotation) other;
+        return Objects.equals(type, castOther.type) && Objects.equals(attributes, castOther.attributes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, attributes);
+    }
+
+    @Override
+    public String toString() {
+        return "LightDiAnnotation [type=" + type + ", attributes=" + attributes + "]";
     }
 
     @Generated("SparkTools")

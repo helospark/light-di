@@ -12,8 +12,8 @@ Designed specifically for small applications, that has to have small memory foot
 
 == Features
 
-Similar to Spring annotation-support.
 
+* Similar to Spring annotation-support.
 * Classpath scanning for beans
 * Android support
 * Stereotype annotations to create a bean `@Component`, `@Service`

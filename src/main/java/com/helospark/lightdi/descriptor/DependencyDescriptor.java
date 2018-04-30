@@ -3,6 +3,7 @@ package com.helospark.lightdi.descriptor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.constants.LightDiConstants;
@@ -97,13 +98,28 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {
-        boolean classMatch = toFind.getClazz()
-                .map(clazz -> clazz.isAssignableFrom(this.getClazz()))
-                .orElse(true);
-        boolean qualifierMatch = toFind.getQualifier()
-                .map(toFindQualifier -> toFindQualifier.equals(this.getQualifier()))
-                .orElse(true);
-        return classMatch && qualifierMatch;
+        return qualifierMatch(toFind) && classMatch(toFind);
+    }
+
+    private Boolean classMatch(DependencyDescriptorQuery toFind) {
+        Optional<Class<?>> classToCheck = toFind.getClazz();
+        if (classToCheck.isPresent()) {
+            Class<?> notNullClass = classToCheck.get();
+            // separated to avoid native call in most cases with simple reference check
+            return notNullClass.equals(this.clazz) || notNullClass.isAssignableFrom(this.clazz);
+        } else {
+            return true;
+        }
+    }
+
+    private Boolean qualifierMatch(DependencyDescriptorQuery toFind) {
+        // .map is omitted for performance reason
+        Optional<String> qualifier = toFind.getQualifier();
+        if (qualifier.isPresent()) {
+            return qualifier.get().equals(this.qualifier);
+        } else {
+            return true;
+        }
     }
 
     @Override
