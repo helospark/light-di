@@ -5,6 +5,9 @@ import static java.util.Arrays.asList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helospark.lightdi.LightDiContextConfiguration;
 import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.beanfactory.chain.BeanPostConstructInitializer;
@@ -80,20 +83,23 @@ import com.helospark.lightdi.util.CollectionFactory;
  * @author helospark
  */
 public class DefaultInternalDi implements InternalDi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInternalDi.class);
     public List<Object> diContainer = new ArrayList<>();
 
     @Override
     public void initialize(LightDiContextConfiguration lightDiContextConfiguration) {
-	addDependency(lightDiContextConfiguration);
-	addDependency(new StreamFactory(lightDiContextConfiguration));
-	prepareEnvironment();
-	prepareBeanDefinitionCollector();
-	prepareBeanFactory();
-	prepareWiringProcessor();
-	prepareDependencyCollector();
+        LOGGER.debug("Internal DI init started");
+        addDependency(lightDiContextConfiguration);
+        addDependency(new StreamFactory(lightDiContextConfiguration));
+        prepareEnvironment();
+        prepareBeanDefinitionCollector();
+        prepareBeanFactory();
+        prepareWiringProcessor();
+        prepareDependencyCollector();
 
-	addDependency(new ConditionalFilter());
-	addDependency(new DefinitionIntegrityChecker(lightDiContextConfiguration, getDependency(BeanFactory.class)));
+        addDependency(new ConditionalFilter());
+        addDependency(new DefinitionIntegrityChecker(lightDiContextConfiguration, getDependency(BeanFactory.class)));
+        LOGGER.debug("Internal DI init ended");
     }
 
     // @formatter:off
@@ -219,36 +225,36 @@ public class DefaultInternalDi implements InternalDi {
 
     @Override
     public void addDependency(Object dependency) {
-	diContainer.add(dependency);
+        diContainer.add(dependency);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getDependency(Class<T> clazz) {
-	for (int i = diContainer.size() - 1; i >= 0; --i) {
-	    Object value = diContainer.get(i);
-	    if (clazz.isAssignableFrom(value.getClass())) {
-		return (T) value;
-	    }
-	}
-	throw new RuntimeException("Unable to initialize " + clazz.getName() + " not found");
+        for (int i = diContainer.size() - 1; i >= 0; --i) {
+            Object value = diContainer.get(i);
+            if (clazz.isAssignableFrom(value.getClass())) {
+                return (T) value;
+            }
+        }
+        throw new RuntimeException("Unable to initialize " + clazz.getName() + " not found");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDependencyList(Class<T> classToFind) {
-	List<Object> result = new ArrayList<>();
-	for (Object o : diContainer) {
-	    if (classToFind.isAssignableFrom(o.getClass())) {
-		result.add(o);
-	    }
-	}
-	return (List<T>) result;
+        List<Object> result = new ArrayList<>();
+        for (Object o : diContainer) {
+            if (classToFind.isAssignableFrom(o.getClass())) {
+                result.add(o);
+            }
+        }
+        return (List<T>) result;
     }
 
     @Override
     public <T> List<T> getDependencyList(T... objects) {
-	return asList(objects);
+        return asList(objects);
     }
 
 }

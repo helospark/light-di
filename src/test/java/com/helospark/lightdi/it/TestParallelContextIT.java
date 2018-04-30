@@ -16,18 +16,18 @@ public class TestParallelContextIT {
 
     @Test
     public void testRunningContextInParallelShouldStartWithoutIssue() {
-	// GIVEN
-	LightDiContextConfiguration config = LightDiContextConfiguration.builder()
-		.withCheckForIntegrity(true)
-		.withThreadNumber(2)
-		.build();
+        // GIVEN
+        LightDiContextConfiguration config = LightDiContextConfiguration.builder()
+                .withCheckForIntegrity(true)
+                .withThreadNumber(2)
+                .build();
 
-	// WHEN
-	LightDiContext context = LightDi.initContextByPackage(ConstructorDependency.class.getPackage().getName(),
-		config);
+        // WHEN
+        LightDiContext context = LightDi.initContextByPackage(ConstructorDependency.class.getPackage().getName(),
+                config);
 
-	// THEN
-	assertThat(context.getBean(ConstructorDependency.class), is(not(nullValue())));
+        // THEN
+        assertThat(context.getBean(ConstructorDependency.class), is(not(nullValue())));
     }
 
 }

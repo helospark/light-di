@@ -11,18 +11,18 @@ public class StreamFactory {
     private boolean isParallel = false;
 
     public StreamFactory(LightDiContextConfiguration contextConfiguration) {
-	if (contextConfiguration.getThreadNumber() > 1) {
-	    forkJoinPool = new ForkJoinPool(contextConfiguration.getThreadNumber());
-	    isParallel = true;
-	}
+        if (contextConfiguration.getThreadNumber() > 1) {
+            forkJoinPool = new ForkJoinPool(contextConfiguration.getThreadNumber());
+            isParallel = true;
+        }
     }
 
     public <T> Stream<T> stream(Collection<T> collection) {
-	Stream<T> result = collection.stream();
-	if (isParallel) {
-	    return new ParallelStream<>(forkJoinPool, result.parallel());
-	} else {
-	    return result;
-	}
+        Stream<T> result = collection.stream();
+        if (isParallel) {
+            return new ParallelStream<>(forkJoinPool, result.parallel());
+        } else {
+            return result;
+        }
     }
 }
