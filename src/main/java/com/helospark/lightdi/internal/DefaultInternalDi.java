@@ -62,6 +62,7 @@ import com.helospark.lightdi.reflection.aware.InterfaceAwareInjector;
 import com.helospark.lightdi.reflection.aware.chain.BeanNameAwareInjector;
 import com.helospark.lightdi.reflection.aware.chain.ContextAwareInjector;
 import com.helospark.lightdi.reflection.aware.chain.EnvironmentAwareInjector;
+import com.helospark.lightdi.reflection.aware.chain.ImportingClassAwareInjector;
 import com.helospark.lightdi.reflection.chain.DependencyCollectionResolverChainItem;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
 import com.helospark.lightdi.reflection.chain.DependentObjectResolverChainItem;
@@ -159,6 +160,7 @@ public class DefaultInternalDi implements InternalDi {
         addDependency(new EnvironmentAwareInjector());
         addDependency(new BeanNameAwareInjector());
         addDependency(new ContextAwareInjector());
+        addDependency(new ImportingClassAwareInjector());
         addDependency(new InterfaceAwareInjector(getDependencyList(AwareDependencyInjectorChainItem.class)));
         
         addDependency(new BeanPostConstructInitializer(getDependency(PostConstructInvoker.class), getDependency(InterfaceAwareInjector.class)));

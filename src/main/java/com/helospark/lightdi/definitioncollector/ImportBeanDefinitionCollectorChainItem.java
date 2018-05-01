@@ -5,6 +5,7 @@ import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,24 +29,29 @@ public class ImportBeanDefinitionCollectorChainItem implements BeanDefinitionCol
         if (isSupported(clazz)) {
             return AnnotationUtil.getAnnotationsOfType(clazz, Import.class)
                     .stream()
-                    .flatMap(importAnnotation -> processImport(importAnnotation))
+                    .flatMap(importAnnotation -> processImport(importAnnotation, clazz))
                     .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
     }
 
-    private Stream<DependencyDescriptor> processImport(LightDiAnnotation annotation) {
+    private Stream<DependencyDescriptor> processImport(LightDiAnnotation annotation, Class<?> importingClass) {
         Class<?>[] importedConfiguration = annotation.getAttributeAs(Import.ATTRIBUTE_NAME, Class[].class);
         return Arrays.stream(importedConfiguration)
-                .flatMap(a -> processSingleClass(a));
+                .flatMap(a -> processSingleClass(a, importingClass));
     }
 
-    private Stream<DependencyDescriptor> processSingleClass(Class<?> importedConfiguration) {
+    private Stream<DependencyDescriptor> processSingleClass(Class<?> importedConfiguration, Class<?> importingClass) {
         if (!hasAnnotation(importedConfiguration, Configuration.class)) {
             throw new IllegalConfigurationException("Importing a class that is not a configuration");
         }
-        return configurationClassBeanDefinitionCollectorChainItem.collectDefinitions(importedConfiguration).stream();
+        return configurationClassBeanDefinitionCollectorChainItem.collectDefinitions(importedConfiguration)
+                .stream()
+                .map(element -> {
+                    element.setImportingClass(Optional.of(importingClass));
+                    return element;
+                });
     }
 
     public boolean isSupported(Class<?> clazz) {

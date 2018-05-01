@@ -1,5 +1,7 @@
 package com.helospark.lightdi.descriptor;
 
+import static java.util.Optional.empty;
+
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +21,6 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
     protected String scope;
     protected boolean isLazy = true;
     protected boolean isPrimary = false;
-    protected boolean initalizationFinished = false;
     protected int order = LightDiConstants.DEFAULT_ORDER;
 
     protected List<Method> postConstructMethods = Collections.emptyList();
@@ -27,12 +28,23 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
 
     protected List<DependencyCondition> conditions = Collections.emptyList();
 
+    protected boolean initalizationFinished = false;
+    protected Optional<Class<?>> importingClass = empty();
+
     public void setInitalizationFinished(boolean initalizationFinished) {
         this.initalizationFinished = initalizationFinished;
     }
 
     public boolean isInitalizationFinished() {
         return initalizationFinished;
+    }
+
+    public Optional<Class<?>> getImportingClass() {
+        return importingClass;
+    }
+
+    public void setImportingClass(Optional<Class<?>> importingClass) {
+        this.importingClass = importingClass;
     }
 
     public Class<?> getClazz() {

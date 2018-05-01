@@ -38,6 +38,7 @@ import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
 import com.helospark.lightdi.properties.PropertySourceHolder;
 import com.helospark.lightdi.properties.converter.BooleanPropertyConverter;
 import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
+import com.helospark.lightdi.properties.converter.LongPropertyConverter;
 import com.helospark.lightdi.properties.converter.StringPropertyConverter;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 import com.helospark.lightdi.util.AutowirePostProcessorFactory;
@@ -107,6 +108,7 @@ public class LightDiContext implements AutoCloseable {
         registerSingleton(environment);
         registerSingleton(this);
         registerSingleton(new IntegerPropertyConverter());
+        registerSingleton(new LongPropertyConverter());
         registerSingleton(new StringPropertyConverter());
         registerSingleton(new BooleanPropertyConverter());
     }
