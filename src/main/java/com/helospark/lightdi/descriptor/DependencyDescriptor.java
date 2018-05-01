@@ -19,12 +19,21 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
     protected String scope;
     protected boolean isLazy = true;
     protected boolean isPrimary = false;
+    protected boolean initalizationFinished = false;
     protected int order = LightDiConstants.DEFAULT_ORDER;
 
     protected List<Method> postConstructMethods = Collections.emptyList();
     protected List<Method> preDestroyMethods = Collections.emptyList();
 
     protected List<DependencyCondition> conditions = Collections.emptyList();
+
+    public void setInitalizationFinished(boolean initalizationFinished) {
+        this.initalizationFinished = initalizationFinished;
+    }
+
+    public boolean isInitalizationFinished() {
+        return initalizationFinished;
+    }
 
     public Class<?> getClazz() {
         return clazz;
@@ -92,9 +101,8 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
 
     @Override
     public String toString() {
-        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary="
-                + isPrimary + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods
-                + ", conditions=" + conditions + "]";
+        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary=" + isPrimary + ", initalizationFinished="
+                + initalizationFinished + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + ", conditions=" + conditions + "]";
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {

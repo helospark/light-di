@@ -4,25 +4,29 @@ import static com.helospark.lightdi.annotation.ComponentScan.BASE_PACKAGE_ATTRIB
 import static com.helospark.lightdi.annotation.ComponentScan.VALUE_ATTRIBUTE_NAME;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.helospark.lightdi.annotation.ComponentScan;
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.util.AnnotationUtil;
 import com.helospark.lightdi.util.LightDiAnnotation;
 
 public class ComponentScanCollector {
+    private StreamFactory streamFactory;
 
-    public List<ComponentScanPackage> collectComponentScan(SortedSet<DependencyDescriptor> dependencyDescriptors) {
-        return dependencyDescriptors.stream()
+    public ComponentScanCollector(StreamFactory streamFactory) {
+        this.streamFactory = streamFactory;
+    }
+
+    public Set<ComponentScanPackage> collectComponentScan(SortedSet<DependencyDescriptor> dependencyDescriptors) {
+        return streamFactory.stream(dependencyDescriptors)
                 .flatMap(descriptor -> addClasses(descriptor))
-                .distinct()
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     private Stream<ComponentScanPackage> addClasses(DependencyDescriptor descriptor) {

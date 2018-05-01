@@ -4,7 +4,6 @@ import static com.helospark.lightdi.util.AnnotationUtil.hasAnnotation;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
@@ -16,6 +15,7 @@ import com.helospark.lightdi.dependencywire.PropertyDescriptorFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
+import com.helospark.lightdi.util.ReflectionUtil;
 
 public class SetterWireSupport {
     private PropertyDescriptorFactory propertyDescriptorFactory;
@@ -38,7 +38,7 @@ public class SetterWireSupport {
     private List<MethodDescriptor> collectInjectMethods(Class<?> clazz,
             SortedSet<DependencyDescriptor> dependencyDescriptors, DependencyDescriptor dependencyToCreate) {
         List<MethodDescriptor> result = new ArrayList<>();
-        List<Method> setters = Arrays.stream(clazz.getMethods())
+        List<Method> setters = ReflectionUtil.getNonObjectMethods(clazz)
                 .filter(method -> isAutowiredSetter(method))
                 .collect(Collectors.toList());
 
@@ -56,7 +56,7 @@ public class SetterWireSupport {
     private List<MethodDescriptor> collectValueMethods(Class<?> clazz,
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
         List<MethodDescriptor> result = new ArrayList<>();
-        List<Method> setters = Arrays.stream(clazz.getMethods())
+        List<Method> setters = ReflectionUtil.getNonObjectMethods(clazz)
                 .filter(method -> isValueSetter(method))
                 .collect(Collectors.toList());
 

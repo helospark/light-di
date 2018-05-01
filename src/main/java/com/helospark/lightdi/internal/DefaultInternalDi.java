@@ -73,6 +73,7 @@ import com.helospark.lightdi.scanner.ClasspathScannerChain;
 import com.helospark.lightdi.scanner.FastClasspathScannerChainItem;
 import com.helospark.lightdi.scanner.PreprocessedAnnotationScannerChainItem;
 import com.helospark.lightdi.scanner.PreprocessedFileLocationProvider;
+import com.helospark.lightdi.util.AutowirePostProcessorFactory;
 import com.helospark.lightdi.util.CollectionFactory;
 
 /**
@@ -83,8 +84,10 @@ import com.helospark.lightdi.util.CollectionFactory;
  * @author helospark
  */
 public class DefaultInternalDi implements InternalDi {
+    private static final int APPROXIMATE_NUMBER_OF_DEPENDENCIES = 100;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInternalDi.class);
-    public List<Object> diContainer = new ArrayList<>();
+    private List<Object> diContainer = new ArrayList<>(APPROXIMATE_NUMBER_OF_DEPENDENCIES);
 
     @Override
     public void initialize(LightDiContextConfiguration lightDiContextConfiguration) {
@@ -99,20 +102,21 @@ public class DefaultInternalDi implements InternalDi {
 
         addDependency(new ConditionalFilter());
         addDependency(new DefinitionIntegrityChecker(lightDiContextConfiguration, getDependency(BeanFactory.class)));
+
         LOGGER.debug("Internal DI init ended");
     }
 
     // @formatter:off
 
     private void prepareEnvironment() {
-	addDependency(new PropertyValueResolver());
-	addDependency(new PropertyStringResolver(getDependency(PropertyValueResolver.class)));
-	addDependency(new AssignablePredicate());
-	addDependency(new CollectionFactory());
-	addDependency(new ValueResolver(getDependency(PropertyStringResolver.class),
-		getDependency(AssignablePredicate.class),
-		getDependency(CollectionFactory.class)));
-	addDependency(new EnvironmentFactory(getDependency(ValueResolver.class)));
+        addDependency(new PropertyValueResolver());
+        addDependency(new PropertyStringResolver(getDependency(PropertyValueResolver.class)));
+        addDependency(new AssignablePredicate());
+        addDependency(new CollectionFactory());
+        addDependency(new ValueResolver(getDependency(PropertyStringResolver.class),
+            getDependency(AssignablePredicate.class),
+            getDependency(CollectionFactory.class)));
+        addDependency(new EnvironmentFactory(getDependency(ValueResolver.class)));
     }
 
     private void prepareBeanDefinitionCollector() {
@@ -164,7 +168,7 @@ public class DefaultInternalDi implements InternalDi {
                        getDependency(ConfigurationBeanFacotoryChainItem.class),
                        getDependency(ManualBeanFactoryChainItem.class)),
                 getDependency(BeanPostConstructInitializer.class),
-        	getDependency(StreamFactory.class)));
+                getDependency(StreamFactory.class)));
     }
 
     private void prepareWiringProcessor() {
@@ -197,27 +201,29 @@ public class DefaultInternalDi implements InternalDi {
         addDependency(new CommonDependencyWireChain());
 
         addDependency(new WiringProcessingService(getDependencyList(DependencyWireChain.class), getDependency(StreamFactory.class)));
+    
+        addDependency(new AutowirePostProcessorFactory(getDependency(StereotypeBeanDefinitionCollectorChainItem.class), getDependency(WiringProcessingService.class), getDependency(AutowirePostProcessSupport.class), getDependency(BeanPostConstructInitializer.class)));
     }
     
     private void prepareDependencyCollector() {
-	addDependency(new PropertiesFileLoader());
-	addDependency(new EnvironmentInitializerFactory(getDependency(PropertiesFileLoader.class)));
-	addDependency(new ComponentScanCollector());
-	
-	prepareClasspathScanner();
-
-	addDependency(new RecursiveDependencyDescriptorCollector(getDependency(ClasspathScannerChain.class),
-		getDependency(BeanDefinitionCollector.class), getDependency(ComponentScanCollector.class)));	
+        addDependency(new PropertiesFileLoader());
+        addDependency(new EnvironmentInitializerFactory(getDependency(PropertiesFileLoader.class)));
+        addDependency(new ComponentScanCollector(getDependency(StreamFactory.class)));
+        
+        prepareClasspathScanner();
+        
+        addDependency(new RecursiveDependencyDescriptorCollector(getDependency(ClasspathScannerChain.class),
+           getDependency(BeanDefinitionCollector.class), getDependency(ComponentScanCollector.class)));	
     }
     
     private void prepareClasspathScanner() {
-	addDependency(new ClasspathProvider());
+        addDependency(new ClasspathProvider());
         addDependency(new PreprocessedFileLocationProvider(getDependency(ClasspathProvider.class)));
         addDependency(new PreprocessedAnnotationScannerChainItem(getDependency(PreprocessedFileLocationProvider.class)));
         addDependency(new FastClasspathScannerChainItem());
 
         addDependency(new ClasspathScannerChain(
-        	getDependencyList(getDependency(PreprocessedAnnotationScannerChainItem.class),
+            getDependencyList(getDependency(PreprocessedAnnotationScannerChainItem.class),
                               getDependency(FastClasspathScannerChainItem.class))));	
     }
 

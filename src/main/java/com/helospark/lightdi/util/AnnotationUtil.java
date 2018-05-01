@@ -22,16 +22,23 @@ import com.helospark.lightdi.cache.SimpleNonThreadSafeCache;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
 
 public class AnnotationUtil {
-    private static Object cacheLock = new Object();
     private static Set<String> inheritedAnnotationMethodsCache = null;
     private static Map<AnnotatedElement, Set<LightDiAnnotation>> cache = Collections
             .synchronizedMap(new SimpleNonThreadSafeCache<AnnotatedElement, Set<LightDiAnnotation>>(100));
 
+    static {
+        inheritedAnnotationMethodsCache = getMethodNamesIn(Annotation.class);
+    }
+
     public static Set<LightDiAnnotation> getAnnotationsOfType(AnnotatedElement parameter, Class<? extends Annotation> annotationClass) {
+        //        System.out.println("Resolving " + annotationClass + " on " + parameter);
+
         Set<LightDiAnnotation> annotations = getAllMergedAnnotations(parameter);
-        return annotations.stream()
+        Set<LightDiAnnotation> result = annotations.stream()
                 .filter(annotation -> annotation.getType().annotationType().equals(annotationClass))
                 .collect(Collectors.toSet());
+        //        System.out.println("Time: " + (System.nanoTime() - startTime));
+        return result;
     }
 
     public static LightDiAnnotation getSingleAnnotationOfType(AnnotatedElement parameter, Class<? extends Annotation> annotationToFind) {
@@ -75,7 +82,11 @@ public class AnnotationUtil {
     private static Set<LightDiAnnotation> recursivelyMergeAllAnnotationsInternal(AnnotatedElement parameter, Set<LightDiAnnotation> result,
             Map<Class<?>, List<AliasData>> superData) {
 
-        for (Annotation annotation : parameter.getAnnotations()) {
+        //        long startTime = System.nanoTime();
+        Annotation[] annotations = parameter.getAnnotations();
+        //        System.out.println(parameter + " getAnnotations took " + (System.nanoTime() - startTime));
+
+        for (Annotation annotation : annotations) {
             if (!isForbiddenAnnotation(annotation)) {
                 if (annotation.annotationType().isAnnotationPresent(RepeatableAnnotationContainer.class)) {
                     extractRepeatableAnnotations(annotation)
@@ -90,7 +101,9 @@ public class AnnotationUtil {
 
     private static boolean isForbiddenAnnotation(Annotation annotation) {
         // for performance reasons common meta annotations are forbidden
-        return annotation.annotationType().getName().startsWith("java.lang.annotation");
+        String packageName = annotation.annotationType().getName();
+        return packageName.startsWith("java.lang.annotation") ||
+                packageName.startsWith("jdk.internal");
     }
 
     private static Stream<Annotation> extractRepeatableAnnotations(Annotation annotation) {
@@ -173,13 +186,6 @@ public class AnnotationUtil {
     }
 
     private static boolean inheritedFromObject(String methodToFind) {
-        if (inheritedAnnotationMethodsCache == null) {
-            synchronized (cacheLock) {
-                if (inheritedAnnotationMethodsCache == null) {
-                    inheritedAnnotationMethodsCache = getMethodNamesIn(Annotation.class);
-                }
-            }
-        }
         return inheritedAnnotationMethodsCache.contains(methodToFind);
     }
 
@@ -241,7 +247,7 @@ public class AnnotationUtil {
     }
 
     public static List<Method> getMethodsWithAnnotation(Class<?> clazz, Class<? extends Annotation>... annotations) {
-        return Arrays.stream(clazz.getMethods())
+        return ReflectionUtil.getNonObjectMethods(clazz)
                 .filter(method -> doesElementContainAnyAnnotationOf(method, annotations))
                 .collect(Collectors.toList());
     }

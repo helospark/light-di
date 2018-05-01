@@ -16,24 +16,26 @@ public class WiringProcessingService {
     private StreamFactory streamFactory;
 
     public WiringProcessingService(List<DependencyWireChain> wireChain, StreamFactory streamFactory) {
-	this.wireChain = wireChain;
-	this.streamFactory = streamFactory;
+        this.wireChain = wireChain;
+        this.streamFactory = streamFactory;
     }
 
     public void wireTogetherDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors) {
-	streamFactory.stream(dependencyDescriptors)
-		.forEach(dependency -> initializeAllWiring(dependency, dependencyDescriptors));
+        streamFactory.stream(dependencyDescriptors)
+                .filter(dependency -> !dependency.isInitalizationFinished())
+                .forEach(dependency -> initializeAllWiring(dependency, dependencyDescriptors));
 
-	if (LOGGER.isDebugEnabled()) {
-	    LOGGER.debug("Dependency descriptors are loaded: " + dependencyDescriptors);
-	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Dependency descriptors are loaded: " + dependencyDescriptors);
+        }
 
     }
 
     public void initializeAllWiring(DependencyDescriptor dependency,
-	    SortedSet<DependencyDescriptor> dependencyDescriptors) {
-	wireChain.stream()
-		.forEach(chainItem -> chainItem.collectDependencies(dependencyDescriptors, dependency));
+            SortedSet<DependencyDescriptor> dependencyDescriptors) {
+        wireChain.stream()
+                .forEach(chainItem -> chainItem.collectDependencies(dependencyDescriptors, dependency));
+        dependency.setInitalizationFinished(true);
     }
 
 }
