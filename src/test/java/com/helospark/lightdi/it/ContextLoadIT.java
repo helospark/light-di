@@ -157,6 +157,7 @@ public class ContextLoadIT {
 
         // THEN
         assertThat(component.getIntValue(), is(1));
+        assertThat(component.getLongValue(), is(1L));
         assertThat(component.isBoolValue(), is(true));
     }
 

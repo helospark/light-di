@@ -7,11 +7,17 @@ import com.helospark.lightdi.annotation.Value;
 public class ComponentWithPrimitiveValue {
     @Value("${INT_VALUE}")
     private int intValue;
+    @Value("${INT_VALUE}")
+    private long longValue;
     @Value("${BOOLEAN_VALUE}")
     private boolean boolValue;
 
     public int getIntValue() {
         return intValue;
+    }
+
+    public long getLongValue() {
+        return longValue;
     }
 
     public boolean isBoolValue() {

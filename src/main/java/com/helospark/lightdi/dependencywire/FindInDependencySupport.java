@@ -13,10 +13,15 @@ import com.helospark.lightdi.descriptor.NullInjectDescriptor;
 import com.helospark.lightdi.util.DependencyChooser;
 
 public class FindInDependencySupport {
+    private DependencyChooser dependencyChooser;
+
+    public FindInDependencySupport(DependencyChooser dependencyChooser) {
+        this.dependencyChooser = dependencyChooser;
+    }
 
     public InjectionDescriptor find(SortedSet<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptorQuery query) {
-        DependencyDescriptor findDependencyFromQuery = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
+        DependencyDescriptor findDependencyFromQuery = dependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
         if (findDependencyFromQuery == null) {
             return new NullInjectDescriptor();
         } else {

@@ -11,6 +11,20 @@ import java.util.Arrays;
 public class CustomAnnotatedElement implements AnnotatedElement {
     private Annotation[] annotations;
 
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof CustomAnnotatedElement)) {
+            return false;
+        }
+        CustomAnnotatedElement castOther = (CustomAnnotatedElement) other;
+        return Arrays.equals(annotations, castOther.annotations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(annotations);
+    }
+
     public CustomAnnotatedElement(Annotation[] annotations) {
         this.annotations = annotations;
     }
@@ -31,6 +45,11 @@ public class CustomAnnotatedElement implements AnnotatedElement {
     @Override
     public Annotation[] getDeclaredAnnotations() {
         return annotations;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomAnnotatedElement [annotations=" + Arrays.toString(annotations) + "]";
     }
 
 }

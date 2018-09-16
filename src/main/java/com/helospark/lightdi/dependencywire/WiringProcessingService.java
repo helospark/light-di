@@ -6,19 +6,23 @@ import java.util.SortedSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.dependencywire.chain.DependencyWireChain;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
 public class WiringProcessingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(WiringProcessingService.class);
     private List<DependencyWireChain> wireChain;
+    private StreamFactory streamFactory;
 
-    public WiringProcessingService(List<DependencyWireChain> wireChain) {
+    public WiringProcessingService(List<DependencyWireChain> wireChain, StreamFactory streamFactory) {
         this.wireChain = wireChain;
+        this.streamFactory = streamFactory;
     }
 
     public void wireTogetherDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors) {
-        dependencyDescriptors.stream()
+        streamFactory.stream(dependencyDescriptors)
+                .filter(dependency -> !dependency.isInitalizationFinished())
                 .forEach(dependency -> initializeAllWiring(dependency, dependencyDescriptors));
 
         if (LOGGER.isDebugEnabled()) {
@@ -31,6 +35,7 @@ public class WiringProcessingService {
             SortedSet<DependencyDescriptor> dependencyDescriptors) {
         wireChain.stream()
                 .forEach(chainItem -> chainItem.collectDependencies(dependencyDescriptors, dependency));
+        dependency.setInitalizationFinished(true);
     }
 
 }

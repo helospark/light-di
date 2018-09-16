@@ -9,6 +9,7 @@ import java.util.SortedSet;
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.beanfactory.chain.BeanFactoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.BeanPostConstructInitializer;
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.BeanCreationException;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
@@ -16,10 +17,13 @@ import com.helospark.lightdi.exception.IllegalConfigurationException;
 public class BeanFactory {
     private List<BeanFactoryChainItem> chain;
     private BeanPostConstructInitializer beanPostConstructInitializer;
+    private StreamFactory streamFactory;
 
-    public BeanFactory(List<BeanFactoryChainItem> chain, BeanPostConstructInitializer beanPostConstructInitializer) {
+    public BeanFactory(List<BeanFactoryChainItem> chain, BeanPostConstructInitializer beanPostConstructInitializer,
+            StreamFactory streamFactory) {
         this.chain = chain;
         this.beanPostConstructInitializer = beanPostConstructInitializer;
+        this.streamFactory = streamFactory;
     }
 
     public Object createBean(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate) {
@@ -44,17 +48,18 @@ public class BeanFactory {
     }
 
     public void assertValidConfiguration(SortedSet<DependencyDescriptor> earlierInRoute) {
-        for (DependencyDescriptor descriptor : earlierInRoute) {
-            assertValidConfiguration(descriptor, new ArrayList<>());
-        }
+        streamFactory.stream(earlierInRoute)
+                .forEach(descriptor -> assertValidConfiguration(descriptor, new ArrayList<>()));
     }
 
-    public void assertValidConfiguration(DependencyDescriptor dependencyToCreate, List<DependencyDescriptor> earlierInRoute) {
+    public void assertValidConfiguration(DependencyDescriptor dependencyToCreate,
+            List<DependencyDescriptor> earlierInRoute) {
         List<DependencyDescriptor> dependencies = findDependenciesFor(dependencyToCreate);
 
         for (DependencyDescriptor dependency : dependencies) {
             if (earlierInRoute.contains(dependency)) {
-                throw new IllegalConfigurationException("Circle in bean definitions: " + convertToBeanNameListString(earlierInRoute));
+                throw new IllegalConfigurationException(
+                        "Circle in bean definitions: " + convertToBeanNameListString(earlierInRoute));
             }
         }
 

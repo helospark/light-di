@@ -3,6 +3,7 @@ package com.helospark.lightdi.dependencywire;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.scanner.ClasspathScannerChain;
 
 public class RecursiveDependencyDescriptorCollector {
+    private static final TreeSet<DependencyDescriptor> EMPTY_TREESET = new TreeSet<>();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RecursiveDependencyDescriptorCollector.class);
 
     private ClasspathScannerChain classpathScannerChain;
@@ -74,14 +77,14 @@ public class RecursiveDependencyDescriptorCollector {
             List<String> classes = classpathScannerChain.scan(packageName);
             return collectClasses(alreadyScannerPackages, classes);
         } else {
-            return new TreeSet<>();
+            return EMPTY_TREESET;
         }
     }
 
     private SortedSet<DependencyDescriptor> collectClasses(List<ComponentScanPackage> alreadyScannerPackages, List<String> classes) {
         SortedSet<DependencyDescriptor> dependencyDescriptors = beanDefinitionCollector.collectDependencyDescriptors(classes);
 
-        List<ComponentScanPackage> findOtherPackages = componentScanCollector.collectComponentScan(dependencyDescriptors);
+        Set<ComponentScanPackage> findOtherPackages = componentScanCollector.collectComponentScan(dependencyDescriptors);
 
         findOtherPackages.stream()
                 .filter(scannedPackageName -> !alreadyScannerPackages.contains(scannedPackageName))

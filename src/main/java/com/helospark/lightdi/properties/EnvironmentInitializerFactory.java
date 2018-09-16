@@ -25,8 +25,8 @@ public class EnvironmentInitializerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentInitializerFactory.class);
     private PropertiesFileLoader propertiesFileLoader;
 
-    public EnvironmentInitializerFactory() {
-        this.propertiesFileLoader = new PropertiesFileLoader();
+    public EnvironmentInitializerFactory(PropertiesFileLoader propertiesFileLoader) {
+        this.propertiesFileLoader = propertiesFileLoader;
     }
 
     public Environment initializeEnvironment(Environment environment,
@@ -61,7 +61,8 @@ public class EnvironmentInitializerFactory {
                 .map(value -> environment.resolve(value))
                 .map(value -> loadProperties(value, annotation)).filter(value -> value.isPresent())
                 .map(value -> value.get())
-                .map(loadedProperty -> new PropertySourceHolder(annotation.getAttributeAs(ORDER_ATTRIBUTE_NAME, Integer.class), loadedProperty));
+                .map(loadedProperty -> new PropertySourceHolder(
+                        annotation.getAttributeAs(ORDER_ATTRIBUTE_NAME, Integer.class), loadedProperty));
     }
 
     private Optional<Map<String, String>> loadProperties(String value, LightDiAnnotation annotation) {

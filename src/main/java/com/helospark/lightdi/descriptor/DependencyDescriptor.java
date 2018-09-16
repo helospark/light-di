@@ -1,5 +1,7 @@
 package com.helospark.lightdi.descriptor;
 
+import static java.util.Optional.empty;
+
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +27,25 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
     protected List<Method> preDestroyMethods = Collections.emptyList();
 
     protected List<DependencyCondition> conditions = Collections.emptyList();
+
+    protected boolean initalizationFinished = false;
+    protected Optional<Class<?>> importingClass = empty();
+
+    public void setInitalizationFinished(boolean initalizationFinished) {
+        this.initalizationFinished = initalizationFinished;
+    }
+
+    public boolean isInitalizationFinished() {
+        return initalizationFinished;
+    }
+
+    public Optional<Class<?>> getImportingClass() {
+        return importingClass;
+    }
+
+    public void setImportingClass(Optional<Class<?>> importingClass) {
+        this.importingClass = importingClass;
+    }
 
     public Class<?> getClazz() {
         return clazz;
@@ -92,9 +113,8 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
 
     @Override
     public String toString() {
-        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary="
-                + isPrimary + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods
-                + ", conditions=" + conditions + "]";
+        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary=" + isPrimary + ", initalizationFinished="
+                + initalizationFinished + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + ", conditions=" + conditions + "]";
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {

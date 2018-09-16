@@ -5,13 +5,14 @@ import static com.helospark.lightdi.util.DependencyChooser.findPrimary;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -20,19 +21,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
-import com.helospark.lightdi.beanfactory.BeanFactoryFactory;
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.conditional.ConditionalFilter;
 import com.helospark.lightdi.constants.LightDiConstants;
-import com.helospark.lightdi.definitioncollector.BeanDefinitionCollector;
-import com.helospark.lightdi.definitioncollector.BeanDefinitionProcessorChainFactory;
-import com.helospark.lightdi.dependencywire.ComponentScanCollector;
+import com.helospark.lightdi.dependencywire.DefinitionIntegrityChecker;
 import com.helospark.lightdi.dependencywire.RecursiveDependencyDescriptorCollector;
 import com.helospark.lightdi.dependencywire.WiringProcessingService;
-import com.helospark.lightdi.dependencywire.WiringProcessingServiceFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.descriptor.ManualDependencyDescriptor;
 import com.helospark.lightdi.exception.ContextInitializationFailedException;
+import com.helospark.lightdi.internal.DefaultInternalDi;
+import com.helospark.lightdi.internal.InternalDi;
+import com.helospark.lightdi.internal.InternalDiInitializer;
+import com.helospark.lightdi.internal.LightDiPlugin;
 import com.helospark.lightdi.postprocessor.BeanPostProcessor;
 import com.helospark.lightdi.properties.Environment;
 import com.helospark.lightdi.properties.EnvironmentFactory;
@@ -40,38 +42,36 @@ import com.helospark.lightdi.properties.EnvironmentInitializerFactory;
 import com.helospark.lightdi.properties.PropertySourceHolder;
 import com.helospark.lightdi.properties.converter.BooleanPropertyConverter;
 import com.helospark.lightdi.properties.converter.IntegerPropertyConverter;
+import com.helospark.lightdi.properties.converter.LongPropertyConverter;
 import com.helospark.lightdi.properties.converter.StringPropertyConverter;
-import com.helospark.lightdi.scanner.ClasspathScannerChain;
-import com.helospark.lightdi.scanner.ClasspathScannerChainFactory;
 import com.helospark.lightdi.util.AutowirePostProcessor;
+import com.helospark.lightdi.util.AutowirePostProcessorFactory;
 import com.helospark.lightdi.util.DependencyChooser;
 
 /**
  * Contains all data required for the context, like beans and properties.
+ * 
  * @author helospark
  */
 public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
-    // Configuration
-    private LightDiContextConfiguration lightDiContextConfiguration;
 
     // Helpers
+    private InternalDi internalDi;
     private BeanFactory beanFactory;
     private WiringProcessingService wiringProcessingService;
-    private BeanDefinitionCollector beanDefinitionCollector;
     private EnvironmentInitializerFactory environmentInitializer;
     private RecursiveDependencyDescriptorCollector recursiveDependencyDescriptorCollector;
-    private WiringProcessingServiceFactory preprocessWireServiceFactory;
-    private BeanFactoryFactory beanFactoryFactory;
-    private BeanDefinitionProcessorChainFactory beanDefinitionProcessorChainFactory;
     private AutowirePostProcessor autowireSupportUtil;
     private ConditionalFilter conditionalFilter;
+    private DefinitionIntegrityChecker definitionIntegrityChecker;
+    private AutowirePostProcessorFactory autowirePostProcessorFactory;
+    private DependencyChooser dependencyChooser;
 
     // State
     private SortedSet<DependencyDescriptor> dependencyDescriptors;
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
-    private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
-    private List<BeanPostProcessor> beanPostProcessors;
+    private Set<BeanPostProcessor> beanPostProcessors;
     private Environment environment = null;
 
     /**
@@ -80,68 +80,73 @@ public class LightDiContext implements AutoCloseable {
     public LightDiContext() {
         this(LightDiContextConfiguration.builder()
                 .withCheckForIntegrity(true)
+                .withThreadNumber(1)
                 .build());
     }
 
     /**
      * Creates new context with given configuration.
+     * 
      * @param lightDiContextConfiguration configuration
      */
     public LightDiContext(LightDiContextConfiguration lightDiContextConfiguration) {
-        this.lightDiContextConfiguration = lightDiContextConfiguration;
-
         this.initializedSingletonBeans = new HashMap<>();
-        this.initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = new TreeSet<>();
-        this.beanPostProcessors = new ArrayList<>();
-        this.environment = new EnvironmentFactory().createEnvironment(this);
-        this.conditionalFilter = new ConditionalFilter();
+        this.beanPostProcessors = new LinkedHashSet<>(); // TODO: We may need to order bean post processors better
 
-        /** Moved from LightDi class **/
-        // TODO move to separate class
+        initializeInternalDi(lightDiContextConfiguration);
 
-        beanDefinitionProcessorChainFactory = new BeanDefinitionProcessorChainFactory();
-        beanDefinitionCollector = beanDefinitionProcessorChainFactory.createBeanDefinitionProcessorChain();
-
-        beanFactoryFactory = new BeanFactoryFactory();
-        beanFactory = beanFactoryFactory.createBeanFactory();
-
-        preprocessWireServiceFactory = new WiringProcessingServiceFactory();
-        wiringProcessingService = preprocessWireServiceFactory.createFieldWireSupport();
-
-        environmentInitializer = new EnvironmentInitializerFactory();
-
-        ComponentScanCollector componentScanCollector = new ComponentScanCollector();
-
-        ClasspathScannerChain classpathScannerChain = new ClasspathScannerChainFactory().create();
-
-        recursiveDependencyDescriptorCollector = new RecursiveDependencyDescriptorCollector(classpathScannerChain, beanDefinitionCollector,
-                componentScanCollector);
+        this.conditionalFilter = internalDi.getDependency(ConditionalFilter.class);
+        this.environment = internalDi.getDependency(EnvironmentFactory.class).createEnvironment(this);
+        this.beanFactory = internalDi.getDependency(BeanFactory.class);
+        this.wiringProcessingService = internalDi.getDependency(WiringProcessingService.class);
+        this.environmentInitializer = internalDi.getDependency(EnvironmentInitializerFactory.class);
+        this.recursiveDependencyDescriptorCollector = internalDi
+                .getDependency(RecursiveDependencyDescriptorCollector.class);
+        this.definitionIntegrityChecker = internalDi.getDependency(DefinitionIntegrityChecker.class);
+        this.autowirePostProcessorFactory = internalDi.getDependency(AutowirePostProcessorFactory.class);
+        this.dependencyChooser = internalDi.getDependency(DependencyChooser.class);
 
         /** Register default beans */
         registerSingleton(environment);
         registerSingleton(this);
         registerSingleton(new IntegerPropertyConverter());
+        registerSingleton(new LongPropertyConverter());
         registerSingleton(new StringPropertyConverter());
         registerSingleton(new BooleanPropertyConverter());
     }
 
+    private void initializeInternalDi(LightDiContextConfiguration lightDiContextConfiguration) {
+        internalDi = new DefaultInternalDi();
+        for (LightDiPlugin plugin : lightDiContextConfiguration.getPlugins()) {
+            internalDi = plugin.customizeInteralDi(internalDi);
+        }
+
+        lightDiContextConfiguration.getPlugins()
+                .forEach(plugin -> plugin.preconfigureInternalDi(internalDi));
+
+        new InternalDiInitializer(internalDi).initialize(lightDiContextConfiguration);
+
+        lightDiContextConfiguration.getPlugins()
+                .forEach(plugin -> plugin.postconfigureInternalDi(internalDi));
+    }
+
     /**
      * Get a bean from the context by type.
+     * 
      * @param clazz bean type to get
      * @return found and instantiated bean, not null
      * @throws IllegalArgumentException if the given bean cannot be found
      * @param <T> type of bean
      */
     public <T> T getBean(Class<T> clazz) {
-        DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
-                .withClazz(clazz)
-                .build();
+        DependencyDescriptorQuery query = DependencyDescriptorQuery.builder().withClazz(clazz).build();
         return (T) getOrCreateDependencyInternal(query);
     }
 
     /**
      * Get bean by the given Query descriptor.
+     * 
      * @param query to get bean based on
      * @return found and instantiated bean. May be null if the query is not required
      * @throws IllegalArgumentException if the given bean cannot be found
@@ -152,6 +157,7 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Get bean by the given descriptor.
+     * 
      * @param query to get bean based on
      * @return found and instantiated bean. May be null if the query is not required
      * @throws IllegalArgumentException if the given bean cannot be found
@@ -162,14 +168,13 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Get bean by bean name.
+     * 
      * @param qualifier bean name
      * @return found and instantiated bean. Never null
      * @throws IllegalArgumentException if the given bean cannot be found
      */
     public Object getBean(String qualifier) {
-        DependencyDescriptorQuery query = DependencyDescriptorQuery.builder()
-                .withQualifier(qualifier)
-                .build();
+        DependencyDescriptorQuery query = DependencyDescriptorQuery.builder().withQualifier(qualifier).build();
         return getOrCreateDependencyInternal(query);
     }
 
@@ -177,12 +182,13 @@ public class LightDiContext implements AutoCloseable {
      * Eagerly initialize all beans in the context.
      */
     public void eagerInitAllBeans() {
-        dependencyDescriptors.stream()
-                .forEach(dependencyDescriptor -> getBean(convertToQuery(dependencyDescriptor)));
+        dependencyDescriptors.stream().forEach(dependencyDescriptor -> getBean(convertToQuery(dependencyDescriptor)));
     }
 
     /**
-     * Register a bean manually. Bean name is automatically generated by the class of the bean.
+     * Register a bean manually. Bean name is automatically generated by the class
+     * of the bean.
+     * 
      * @param bean instance to register
      */
     public void registerSingleton(Object bean) {
@@ -191,24 +197,22 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Register a bean manually.
-     * @param bean instance to register
+     * 
+     * @param bean     instance to register
      * @param beanName name of the bean
      */
     public void registerSingleton(Object bean, String beanName) {
         ManualDependencyDescriptor dependencyDescriptor = ManualDependencyDescriptor.builder()
-                .withClazz(bean.getClass())
-                .withIsLazy(false)
-                .withQualifier(beanName)
-                .withScope(LightDiConstants.SCOPE_SINGLETON)
-                .withIsPrimary(false)
-                .build();
+                .withClazz(bean.getClass()).withIsLazy(false).withQualifier(beanName)
+                .withScope(LightDiConstants.SCOPE_SINGLETON).withIsPrimary(false).build();
         registerSingleton(dependencyDescriptor, bean);
     }
 
     /**
      * Register a bean manually.
+     * 
      * @param dependencyDescriptor to describe the bean data
-     * @param bean instance to register
+     * @param bean                 instance to register
      */
     public void registerSingleton(ManualDependencyDescriptor dependencyDescriptor, Object bean) {
         dependencyDescriptor.setScope(LightDiConstants.SCOPE_SINGLETON);
@@ -226,7 +230,7 @@ public class LightDiContext implements AutoCloseable {
     }
 
     private Object createNewInstance(DependencyDescriptorQuery query) {
-        DependencyDescriptor foundDependency = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
+        DependencyDescriptor foundDependency = dependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
         if (foundDependency == null) {
             return null;
         } else {
@@ -239,8 +243,6 @@ public class LightDiContext implements AutoCloseable {
         createdBean = postProcessInstance(createdBean, descriptorToUse);
         if (descriptorToUse.getScope().equals(LightDiConstants.SCOPE_SINGLETON)) {
             initializedSingletonBeans.put(descriptorToUse, createdBean);
-        } else {
-            initializedPrototypeBeans.put(descriptorToUse, createdBean);
         }
         return createdBean;
     }
@@ -258,8 +260,8 @@ public class LightDiContext implements AutoCloseable {
     }
 
     private Optional<DependencyDescriptor> findInitializedSingletonDescriptor(DependencyDescriptorQuery toFind) {
-        SortedSet<DependencyDescriptor> foundDependencies = DependencyChooser.findDependencyDescriptor(initializedSingletonBeans.keySet(),
-                toFind);
+        SortedSet<DependencyDescriptor> foundDependencies = dependencyChooser
+                .findDependencyDescriptor(initializedSingletonBeans.keySet(), toFind);
         if (foundDependencies.isEmpty()) {
             return Optional.empty();
         } else if (foundDependencies.size() == 1) {
@@ -271,6 +273,7 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Return list of all beans with the given class.
+     * 
      * @param clazz to get beans from
      * @return list of beans
      * @param <T> type of bean
@@ -279,38 +282,29 @@ public class LightDiContext implements AutoCloseable {
     public <T> List<T> getListOfBeans(Class<T> clazz) {
         List<Object> result = dependencyDescriptors.stream()
                 .filter(descriptor -> clazz.isAssignableFrom(descriptor.getClazz()))
-                .map(descriptor -> convertToQuery(descriptor))
-                .map(descriptor -> this.getBean(descriptor))
+                .map(descriptor -> convertToQuery(descriptor)).map(descriptor -> this.getBean(descriptor))
                 .collect(Collectors.toList());
         return (List<T>) result;
 
     }
 
     private DependencyDescriptorQuery convertToQuery(DependencyDescriptor descriptor) {
-        return DependencyDescriptorQuery.builder()
-                .withClazz(descriptor.getClazz())
-                .withQualifier(descriptor.getQualifier())
-                .build();
+        return DependencyDescriptorQuery.builder().withClazz(descriptor.getClazz())
+                .withQualifier(descriptor.getQualifier()).build();
     }
 
     /**
      * Close the context.
-     * <p>May throw exception if the PreDestroy methods throw.
+     * <p>
+     * May throw exception if the PreDestroy methods throw.
      */
     @Override
     public void close() {
-        initializedSingletonBeans.entrySet()
-                .stream()
-                .forEach(entry -> closeDependency(entry));
-        initializedPrototypeBeans.entrySet()
-                .stream()
-                .forEach(entry -> closeDependency(entry));
+        initializedSingletonBeans.entrySet().stream().forEach(entry -> closeDependency(entry));
     }
 
     private void closeDependency(Entry<DependencyDescriptor, Object> entry) {
-        entry.getKey()
-                .getPreDestroyMethods()
-                .stream()
+        entry.getKey().getPreDestroyMethods().stream()
                 .forEach(preDestoryMethod -> invokeMethod(preDestoryMethod, entry.getValue()));
     }
 
@@ -324,6 +318,7 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Returns all dependency descriptors.
+     * 
      * @return all dependency descriptors
      */
     public SortedSet<DependencyDescriptor> getDependencyDescriptors() {
@@ -331,7 +326,10 @@ public class LightDiContext implements AutoCloseable {
     }
 
     /**
-     * Get autowire support util. <p>Can be used to inject fields to an nonmanaged instance.
+     * Get autowire support util.
+     * <p>
+     * Can be used to inject fields to an nonmanaged instance.
+     * 
      * @return autowire support util
      */
     public AutowirePostProcessor getAutowireSupportUtil() {
@@ -339,7 +337,9 @@ public class LightDiContext implements AutoCloseable {
     }
 
     /**
-     * Autowire fields to the given instance, even if the given instance is not managed.
+     * Autowire fields to the given instance, even if the given instance is not
+     * managed.
+     * 
      * @param instance to autowire fields to
      */
     public void processAutowireTo(Object instance) {
@@ -347,11 +347,15 @@ public class LightDiContext implements AutoCloseable {
     }
 
     /**
-     * Load all beans in the given package. It will find annotated beans by classpath scan.<p>
+     * Load all beans in the given package. It will find annotated beans by
+     * classpath scan.
+     * <p>
      * This will add beans, refresh context.<br>
-     * Note that calling this method separately for two different packages, which depend on each other will fail on the first call with not found beans.
-     * In that case use loadDependencies method.
-     * It may be called any time, even after an already started context.
+     * Note that calling this method separately for two different packages, which
+     * depend on each other will fail on the first call with not found beans. In
+     * that case use loadDependencies method. It may be called any time, even after
+     * an already started context.
+     * 
      * @param packageName package name to scan
      */
     public void loadDependencyFromPackage(String packageName) {
@@ -359,11 +363,14 @@ public class LightDiContext implements AutoCloseable {
     }
 
     /**
-     * Load given annotated bean (ex. Component).<p>
+     * Load given annotated bean (ex. Component).
+     * <p>
      * This will add beans, refresh context.<br>
-     * Note that calling this method separately for two different configuration, which depend on each other will fail on the first call with not found beans.
+     * Note that calling this method separately for two different configuration,
+     * which depend on each other will fail on the first call with not found beans.
      * In that case use loadDependencies method.<br>
      * It may be called any time, even after an already started context.
+     * 
      * @param clazz annotated class
      */
     public void loadDependenciesFromClass(Class<?> clazz) {
@@ -372,15 +379,17 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Load dependencies from given packages and annotated class.
+     * 
      * @param packages to scan and load beans from
-     * @param classes annotated classes to load as beans
+     * @param classes  annotated classes to load as beans
      */
     public void loadDependencies(List<String> packages, List<Class<?>> classes) {
         try {
             SortedSet<DependencyDescriptor> loadedDescriptors = new TreeSet<>();
-            loadedDescriptors.addAll(recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(classes));
-            loadedDescriptors.addAll(recursiveDependencyDescriptorCollector
-                    .collectDependenciesUsingFullClasspathScan(packages));
+            loadedDescriptors
+                    .addAll(recursiveDependencyDescriptorCollector.collectDependenciesStartingFromClass(classes));
+            loadedDescriptors
+                    .addAll(recursiveDependencyDescriptorCollector.collectDependenciesUsingFullClasspathScan(packages));
             processDescriptors(loadedDescriptors);
         } catch (Exception e) {
             throw new ContextInitializationFailedException("Context initialization failed", e);
@@ -395,31 +404,25 @@ public class LightDiContext implements AutoCloseable {
 
         wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
 
-        autowireSupportUtil = new AutowirePostProcessor(
-                beanDefinitionProcessorChainFactory.getStereotypeBeanDefinitionCollectorChainItem(),
-                preprocessWireServiceFactory.createFieldWireSupport(), beanFactoryFactory.getAutowirePostProcessSupport(),
-                beanFactoryFactory.getBeanPostConstructInitializer(),
-                this);
-
-        if (lightDiContextConfiguration.isCheckForIntegrity()) {
-            beanFactory.assertValidConfiguration(dependencyDescriptors);
-        }
+        definitionIntegrityChecker.checkIntegrityIfNeeded(loadedDescriptors);
 
         initializeEagerDependencies(dependencyDescriptors);
 
-        LOGGER.info("Context initialized");
-
         this.beanPostProcessors.addAll(this.getListOfBeans(BeanPostProcessor.class));
+        this.autowireSupportUtil = autowirePostProcessorFactory.create(this);
+
+        LOGGER.debug("Context initialized");
+        internalDi.getDependency(StreamFactory.class).close();
     }
 
     private void initializeEagerDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors) {
-        dependencyDescriptors.stream()
-                .filter(dependency -> !dependency.isLazy())
+        dependencyDescriptors.stream().filter(dependency -> !dependency.isLazy())
                 .forEach(dependency -> getBean(dependency));
     }
 
     /**
      * Get the environment. It can be used to add properties.
+     * 
      * @return environment
      */
     public Environment getEnvironment() {
@@ -428,6 +431,7 @@ public class LightDiContext implements AutoCloseable {
 
     /**
      * Add a custom property source.
+     * 
      * @param propertySourceHolder custom property source
      */
     public void addPropertySource(PropertySourceHolder propertySourceHolder) {

@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,18 +17,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.annotationpreprocessor.AnnotationProcessor;
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
 
 public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerChainItem {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreprocessedAnnotationScannerChainItem.class);
 
     private PreprocessedFileLocationProvider preprocessedFileLocationProvider;
+    private StreamFactory streamFactory;
 
     private Set<String> resourceFileContent;
     private Object resourceFileContentLock = new Object();
 
-    public PreprocessedAnnotationScannerChainItem(PreprocessedFileLocationProvider preprocessedFileLocationProvider) {
+    public PreprocessedAnnotationScannerChainItem(PreprocessedFileLocationProvider preprocessedFileLocationProvider, StreamFactory streamFactory) {
         this.preprocessedFileLocationProvider = preprocessedFileLocationProvider;
+        this.streamFactory = streamFactory;
     }
 
     @Override
@@ -58,11 +60,9 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Reading files " + fileList);
                     }
-                    Set<String> result = new HashSet<>();
-                    fileList.stream()
-                            .map(file -> readFileContent(file))
-                            .forEach(list -> result.addAll(list));
-                    resourceFileContent = result;
+                    resourceFileContent = streamFactory.stream(fileList)
+                            .flatMap(file -> readFileContent(file).stream())
+                            .collect(Collectors.toSet());
                 }
 
             }

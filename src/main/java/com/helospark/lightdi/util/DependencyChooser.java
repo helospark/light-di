@@ -6,25 +6,30 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 
 public class DependencyChooser {
+    private StreamFactory streamFactory;
 
-    public static DependencyDescriptor findDependencyFromQuery(Collection<DependencyDescriptor> dependencies, DependencyDescriptorQuery toFind) {
+    public DependencyChooser(StreamFactory streamFactory) {
+        this.streamFactory = streamFactory;
+    }
+
+    public DependencyDescriptor findDependencyFromQuery(Collection<DependencyDescriptor> dependencies, DependencyDescriptorQuery toFind) {
         SortedSet<DependencyDescriptor> found = findDependencyDescriptor(dependencies, toFind);
         return findDependencyToGenerate(found, toFind);
     }
 
-    public static SortedSet<DependencyDescriptor> findDependencyDescriptor(Collection<DependencyDescriptor> dependencies,
+    public SortedSet<DependencyDescriptor> findDependencyDescriptor(Collection<DependencyDescriptor> dependencies,
             DependencyDescriptorQuery toFind) {
-        return dependencies
-                .stream()
+        return streamFactory.stream(dependencies)
                 .filter(dependencyEntry -> dependencyEntry.doesMatch(toFind))
                 .collect(Collectors.toCollection(() -> new TreeSet<>()));
     }
 
-    public static DependencyDescriptor findDependencyToGenerate(SortedSet<DependencyDescriptor> dependencyToCreate,
+    public DependencyDescriptor findDependencyToGenerate(SortedSet<DependencyDescriptor> dependencyToCreate,
             DependencyDescriptorQuery toFind) {
         if (dependencyToCreate.size() == 1) {
             return dependencyToCreate.first();
