@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import com.helospark.lightdi.LightDiContextConfiguration;
 
 public class StreamFactory {
-    private ForkJoinPool forkJoinPool = null;
+    private static ForkJoinPool forkJoinPool = null;
     private boolean isParallel = false;
 
     public StreamFactory(LightDiContextConfiguration contextConfiguration) {
@@ -23,6 +23,13 @@ public class StreamFactory {
             return new ParallelStream<>(forkJoinPool, result.parallel());
         } else {
             return result;
+        }
+    }
+
+    public void close() {
+        if (forkJoinPool != null) {
+            forkJoinPool.shutdown();
+            forkJoinPool = null;
         }
     }
 }

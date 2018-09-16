@@ -5,7 +5,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,31 +12,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.helospark.lightdi.annotation.AliasFor;
 import com.helospark.lightdi.annotation.RepeatableAnnotationContainer;
-import com.helospark.lightdi.cache.SimpleNonThreadSafeCache;
 import com.helospark.lightdi.exception.IllegalConfigurationException;
 
 public class AnnotationUtil {
     private static Set<String> inheritedAnnotationMethodsCache = null;
-    private static Map<AnnotatedElement, Set<LightDiAnnotation>> cache = Collections
-            .synchronizedMap(new SimpleNonThreadSafeCache<AnnotatedElement, Set<LightDiAnnotation>>(100));
+    private static Map<AnnotatedElement, Set<LightDiAnnotation>> cache = new ConcurrentHashMap<>();
 
     static {
         inheritedAnnotationMethodsCache = getMethodNamesIn(Annotation.class);
     }
 
     public static Set<LightDiAnnotation> getAnnotationsOfType(AnnotatedElement parameter, Class<? extends Annotation> annotationClass) {
-        //        System.out.println("Resolving " + annotationClass + " on " + parameter);
-
         Set<LightDiAnnotation> annotations = getAllMergedAnnotations(parameter);
         Set<LightDiAnnotation> result = annotations.stream()
                 .filter(annotation -> annotation.getType().annotationType().equals(annotationClass))
                 .collect(Collectors.toSet());
-        //        System.out.println("Time: " + (System.nanoTime() - startTime));
         return result;
     }
 
@@ -72,6 +67,7 @@ public class AnnotationUtil {
         if (cacheResult != null) {
             return cacheResult;
         } else {
+            System.out.println("Processing " + parameter);
             Set<LightDiAnnotation> result = new HashSet<>();
             Set<LightDiAnnotation> methodResult = recursivelyMergeAllAnnotationsInternal(parameter, result, new HashMap<>());
             cache.putIfAbsent(parameter, methodResult);

@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.conditional.ConditionalFilter;
 import com.helospark.lightdi.constants.LightDiConstants;
 import com.helospark.lightdi.dependencywire.DefinitionIntegrityChecker;
@@ -31,6 +32,9 @@ import com.helospark.lightdi.descriptor.DependencyDescriptorQuery;
 import com.helospark.lightdi.descriptor.ManualDependencyDescriptor;
 import com.helospark.lightdi.exception.ContextInitializationFailedException;
 import com.helospark.lightdi.internal.DefaultInternalDi;
+import com.helospark.lightdi.internal.InternalDi;
+import com.helospark.lightdi.internal.InternalDiInitializer;
+import com.helospark.lightdi.internal.LightDiPlugin;
 import com.helospark.lightdi.postprocessor.BeanPostProcessor;
 import com.helospark.lightdi.properties.Environment;
 import com.helospark.lightdi.properties.EnvironmentFactory;
@@ -53,7 +57,7 @@ public class LightDiContext implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LightDi.class);
 
     // Helpers
-    private DefaultInternalDi internalDi;
+    private InternalDi internalDi;
     private BeanFactory beanFactory;
     private WiringProcessingService wiringProcessingService;
     private EnvironmentInitializerFactory environmentInitializer;
@@ -62,11 +66,11 @@ public class LightDiContext implements AutoCloseable {
     private ConditionalFilter conditionalFilter;
     private DefinitionIntegrityChecker definitionIntegrityChecker;
     private AutowirePostProcessorFactory autowirePostProcessorFactory;
+    private DependencyChooser dependencyChooser;
 
     // State
     private SortedSet<DependencyDescriptor> dependencyDescriptors;
     private Map<DependencyDescriptor, Object> initializedSingletonBeans;
-    private Map<DependencyDescriptor, Object> initializedPrototypeBeans;
     private Set<BeanPostProcessor> beanPostProcessors;
     private Environment environment = null;
 
@@ -87,12 +91,10 @@ public class LightDiContext implements AutoCloseable {
      */
     public LightDiContext(LightDiContextConfiguration lightDiContextConfiguration) {
         this.initializedSingletonBeans = new HashMap<>();
-        this.initializedPrototypeBeans = new HashMap<>();
         this.dependencyDescriptors = new TreeSet<>();
         this.beanPostProcessors = new LinkedHashSet<>(); // TODO: We may need to order bean post processors better
 
-        internalDi = new DefaultInternalDi();
-        internalDi.initialize(lightDiContextConfiguration);
+        initializeInternalDi(lightDiContextConfiguration);
 
         this.conditionalFilter = internalDi.getDependency(ConditionalFilter.class);
         this.environment = internalDi.getDependency(EnvironmentFactory.class).createEnvironment(this);
@@ -103,6 +105,7 @@ public class LightDiContext implements AutoCloseable {
                 .getDependency(RecursiveDependencyDescriptorCollector.class);
         this.definitionIntegrityChecker = internalDi.getDependency(DefinitionIntegrityChecker.class);
         this.autowirePostProcessorFactory = internalDi.getDependency(AutowirePostProcessorFactory.class);
+        this.dependencyChooser = internalDi.getDependency(DependencyChooser.class);
 
         /** Register default beans */
         registerSingleton(environment);
@@ -111,6 +114,21 @@ public class LightDiContext implements AutoCloseable {
         registerSingleton(new LongPropertyConverter());
         registerSingleton(new StringPropertyConverter());
         registerSingleton(new BooleanPropertyConverter());
+    }
+
+    private void initializeInternalDi(LightDiContextConfiguration lightDiContextConfiguration) {
+        internalDi = new DefaultInternalDi();
+        for (LightDiPlugin plugin : lightDiContextConfiguration.getPlugins()) {
+            internalDi = plugin.customizeInteralDi(internalDi);
+        }
+
+        lightDiContextConfiguration.getPlugins()
+                .forEach(plugin -> plugin.preconfigureInternalDi(internalDi));
+
+        new InternalDiInitializer(internalDi).initialize(lightDiContextConfiguration);
+
+        lightDiContextConfiguration.getPlugins()
+                .forEach(plugin -> plugin.postconfigureInternalDi(internalDi));
     }
 
     /**
@@ -212,7 +230,7 @@ public class LightDiContext implements AutoCloseable {
     }
 
     private Object createNewInstance(DependencyDescriptorQuery query) {
-        DependencyDescriptor foundDependency = DependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
+        DependencyDescriptor foundDependency = dependencyChooser.findDependencyFromQuery(dependencyDescriptors, query);
         if (foundDependency == null) {
             return null;
         } else {
@@ -225,8 +243,6 @@ public class LightDiContext implements AutoCloseable {
         createdBean = postProcessInstance(createdBean, descriptorToUse);
         if (descriptorToUse.getScope().equals(LightDiConstants.SCOPE_SINGLETON)) {
             initializedSingletonBeans.put(descriptorToUse, createdBean);
-        } else {
-            initializedPrototypeBeans.put(descriptorToUse, createdBean);
         }
         return createdBean;
     }
@@ -244,7 +260,7 @@ public class LightDiContext implements AutoCloseable {
     }
 
     private Optional<DependencyDescriptor> findInitializedSingletonDescriptor(DependencyDescriptorQuery toFind) {
-        SortedSet<DependencyDescriptor> foundDependencies = DependencyChooser
+        SortedSet<DependencyDescriptor> foundDependencies = dependencyChooser
                 .findDependencyDescriptor(initializedSingletonBeans.keySet(), toFind);
         if (foundDependencies.isEmpty()) {
             return Optional.empty();
@@ -285,7 +301,6 @@ public class LightDiContext implements AutoCloseable {
     @Override
     public void close() {
         initializedSingletonBeans.entrySet().stream().forEach(entry -> closeDependency(entry));
-        initializedPrototypeBeans.entrySet().stream().forEach(entry -> closeDependency(entry));
     }
 
     private void closeDependency(Entry<DependencyDescriptor, Object> entry) {
@@ -397,6 +412,7 @@ public class LightDiContext implements AutoCloseable {
         this.autowireSupportUtil = autowirePostProcessorFactory.create(this);
 
         LOGGER.debug("Context initialized");
+        internalDi.getDependency(StreamFactory.class).close();
     }
 
     private void initializeEagerDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors) {

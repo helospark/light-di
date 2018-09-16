@@ -10,15 +10,19 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helospark.lightdi.common.StreamFactory;
+
 public class PreprocessedFileLocationProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreprocessedFileLocationProvider.class);
 
     private static final String PREPROCESSED_FILE_RELATIVE_LOCATION = "/resources/lightdi/" + RESOURCE_FILE_NAME;
 
     private ClasspathProvider classpathProvider;
+    private StreamFactory streamFactory;
 
-    public PreprocessedFileLocationProvider(ClasspathProvider classpathProvider) {
+    public PreprocessedFileLocationProvider(ClasspathProvider classpathProvider, StreamFactory streamFactory) {
         this.classpathProvider = classpathProvider;
+        this.streamFactory = streamFactory;
     }
 
     public Set<String> getFileList() {
@@ -26,8 +30,7 @@ public class PreprocessedFileLocationProvider {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Classpath is " + classpath);
         }
-        Set<String> result = classpath
-                .stream()
+        Set<String> result = streamFactory.stream(classpath)
                 .filter(path -> isFolder(path))
                 .map(path -> path + PREPROCESSED_FILE_RELATIVE_LOCATION)
                 .collect(Collectors.toSet());

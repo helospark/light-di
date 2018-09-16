@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
 
 public class PreprocessedAnnotationScannerChainItemTest {
@@ -33,13 +36,16 @@ public class PreprocessedAnnotationScannerChainItemTest {
 
     @Mock
     private PreprocessedFileLocationProvider preprocessedFileLocationProvider;
+    @Mock
+    private StreamFactory streamFactory;
 
     private PreprocessedAnnotationScannerChainItem underTest;
 
     @Before
     public void setUp() {
         initMocks(this);
-        underTest = new PreprocessedAnnotationScannerChainItem(preprocessedFileLocationProvider);
+        underTest = new PreprocessedAnnotationScannerChainItem(preprocessedFileLocationProvider, streamFactory);
+        given(streamFactory.stream(any(Collection.class))).willAnswer(ads -> ((Collection<?>) ads.getArguments()[0]).stream());
     }
 
     @Test

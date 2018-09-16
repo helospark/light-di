@@ -3,7 +3,6 @@ package com.helospark.lightdi.dependencywire.chain.support.domain;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Similar to Java 8 AnnotatedType, but compatible with Java 7.
@@ -18,12 +17,12 @@ public class CustomAnnotatedElement implements AnnotatedElement {
             return false;
         }
         CustomAnnotatedElement castOther = (CustomAnnotatedElement) other;
-        return Objects.equals(annotations, castOther.annotations);
+        return Arrays.equals(annotations, castOther.annotations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(annotations);
+        return Arrays.hashCode(annotations);
     }
 
     public CustomAnnotatedElement(Annotation[] annotations) {
