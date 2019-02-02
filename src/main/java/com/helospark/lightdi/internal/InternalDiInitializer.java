@@ -100,7 +100,7 @@ public class InternalDiInitializer {
         prepareBeanDefinitionCollector();
         prepareBeanFactory();
         prepareWiringProcessor();
-        prepareDependencyCollector();
+        prepareDependencyCollector(lightDiContextConfiguration);
 
         addDependency(new ConditionalFilter());
         addDependency(new DefinitionIntegrityChecker(lightDiContextConfiguration, getDependency(BeanFactory.class)));
@@ -116,8 +116,8 @@ public class InternalDiInitializer {
         addDependency(new AssignablePredicate());
         addDependency(new CollectionFactory());
         addDependency(new ValueResolver(getDependency(PropertyStringResolver.class),
-            getDependency(AssignablePredicate.class),
-            getDependency(CollectionFactory.class)));
+                getDependency(AssignablePredicate.class),
+                getDependency(CollectionFactory.class)));
         addDependency(new EnvironmentFactory(getDependency(ValueResolver.class)));
     }
 
@@ -128,7 +128,7 @@ public class InternalDiInitializer {
         addDependency(new ImportBeanDefinitionCollectorChainItem(getDependency(ConfigurationClassBeanDefinitionCollectorChainItem.class)));
         addDependency(new BeanDefinitionCollector(getDependencyList(BeanDefinitionCollectorChainItem.class), getDependency(StreamFactory.class)));
     }
-    
+
     private void prepareBeanFactory() {
         addDependency(new DependentObjectResolverChainItem());
         addDependency(new PropertyObjectResolverChainItem());
@@ -150,7 +150,8 @@ public class InternalDiInitializer {
 
         addDependency(new InjectDescriptorsToDependencies());
 
-        addDependency(new StereotypeAnnotatedBeanFactoryChainItem(getDependency(ConstructorInvoker.class), getDependency(AutowirePostProcessSupport.class), getDependency(InjectDescriptorsToDependencies.class)));
+        addDependency(new StereotypeAnnotatedBeanFactoryChainItem(getDependency(ConstructorInvoker.class), getDependency(AutowirePostProcessSupport.class),
+                getDependency(InjectDescriptorsToDependencies.class)));
         addDependency(new ManualBeanFactoryChainItem());
         addDependency(new ConfigurationBeanFacotoryChainItem(getDependency(MethodInvoker.class), getDependency(InjectDescriptorsToDependencies.class)));
 
@@ -159,7 +160,7 @@ public class InternalDiInitializer {
         addDependency(new ContextAwareInjector());
         addDependency(new ImportingClassAwareInjector());
         addDependency(new InterfaceAwareInjector(getDependencyList(AwareDependencyInjectorChainItem.class)));
-        
+
         addDependency(new BeanPostConstructInitializer(getDependency(PostConstructInvoker.class), getDependency(InterfaceAwareInjector.class)));
 
         addDependency(new BeanFactory(
@@ -182,7 +183,7 @@ public class InternalDiInitializer {
                         getDependency(SpecialValueDescriptorBuilderChainItem.class),
                         getDependency(CollectionInjectDescriptorBuilderChainItem.class),
                         getDependency(DependencyInjectDescriptorBuilderChainItem.class))));
-        
+
         addDependency(new CompatibleParameterFactory());
 
         addDependency(new ConstructorWireSupport(getDependency(DependencyDescriptorBuilder.class), getDependency(CompatibleParameterFactory.class)));
@@ -198,30 +199,31 @@ public class InternalDiInitializer {
         addDependency(new CommonDependencyWireChain());
 
         addDependency(new WiringProcessingService(getDependencyList(DependencyWireChain.class), getDependency(StreamFactory.class)));
-    
-        addDependency(new AutowirePostProcessorFactory(getDependency(StereotypeBeanDefinitionCollectorChainItem.class), getDependency(WiringProcessingService.class), getDependency(AutowirePostProcessSupport.class), getDependency(BeanPostConstructInitializer.class)));
+
+        addDependency(new AutowirePostProcessorFactory(getDependency(StereotypeBeanDefinitionCollectorChainItem.class), getDependency(WiringProcessingService.class),
+                getDependency(AutowirePostProcessSupport.class), getDependency(BeanPostConstructInitializer.class)));
     }
-    
-    private void prepareDependencyCollector() {
+
+    private void prepareDependencyCollector(LightDiContextConfiguration lightDiContextConfiguration) {
         addDependency(new PropertiesFileLoader());
         addDependency(new EnvironmentInitializerFactory(getDependency(PropertiesFileLoader.class)));
         addDependency(new ComponentScanCollector(getDependency(StreamFactory.class)));
-        
-        prepareClasspathScanner();
-        
+
+        prepareClasspathScanner(lightDiContextConfiguration);
+
         addDependency(new RecursiveDependencyDescriptorCollector(getDependency(ClasspathScannerChain.class),
-           getDependency(BeanDefinitionCollector.class), getDependency(ComponentScanCollector.class))); 
+                getDependency(BeanDefinitionCollector.class), getDependency(ComponentScanCollector.class)));
     }
-    
-    private void prepareClasspathScanner() {
+
+    private void prepareClasspathScanner(LightDiContextConfiguration lightDiContextConfiguration) {
         addDependency(new ClasspathProvider());
         addDependency(new PreprocessedFileLocationProvider(getDependency(ClasspathProvider.class), getDependency(StreamFactory.class)));
-        addDependency(new PreprocessedAnnotationScannerChainItem(getDependency(PreprocessedFileLocationProvider.class), getDependency(StreamFactory.class)));
+        addDependency(new PreprocessedAnnotationScannerChainItem(getDependency(PreprocessedFileLocationProvider.class), getDependency(StreamFactory.class), lightDiContextConfiguration));
         addDependency(new FastClasspathScannerChainItem());
 
         addDependency(new ClasspathScannerChain(
-            getDependencyList(getDependency(PreprocessedAnnotationScannerChainItem.class),
-                              getDependency(FastClasspathScannerChainItem.class))));    
+                getDependencyList(getDependency(PreprocessedAnnotationScannerChainItem.class),
+                        getDependency(FastClasspathScannerChainItem.class))));
     }
 
     // @formatter:on

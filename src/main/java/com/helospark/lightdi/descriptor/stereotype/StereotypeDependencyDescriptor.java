@@ -1,6 +1,7 @@
 package com.helospark.lightdi.descriptor.stereotype;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -110,12 +111,12 @@ public class StereotypeDependencyDescriptor extends DependencyDescriptor {
         private boolean isLazy;
         private boolean isPrimary;
         private int order;
-        private List<Method> postConstructMethods;
-        private List<Method> preDestroyMethods;
-        private List<DependencyCondition> conditions;
-        private List<ConstructorDescriptor> constructorDescriptor;
-        private List<MethodDescriptor> setterDescriptor;
-        private List<FieldDescriptor> fieldDescriptor;
+        private List<Method> postConstructMethods = Collections.emptyList();
+        private List<Method> preDestroyMethods = Collections.emptyList();
+        private List<DependencyCondition> conditions = Collections.emptyList();
+        private List<ConstructorDescriptor> constructorDescriptor = Collections.emptyList();
+        private List<MethodDescriptor> setterDescriptor = Collections.emptyList();
+        private List<FieldDescriptor> fieldDescriptor = Collections.emptyList();
 
         private Builder() {
         }

@@ -27,8 +27,12 @@ public class ComponentDependencyWireChainItem implements DependencyWireChain {
     @Override
     public void collectDependencies(SortedSet<DependencyDescriptor> dependencyDescriptors,
             DependencyDescriptor dependencyDescriptor) {
-        if (canHandle(dependencyDescriptor)) {
-            handleInternal(dependencyDescriptors, dependencyDescriptor);
+        try {
+            if (canHandle(dependencyDescriptor)) {
+                handleInternal(dependencyDescriptors, dependencyDescriptor);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to create " + dependencyDescriptor, e);
         }
     }
 

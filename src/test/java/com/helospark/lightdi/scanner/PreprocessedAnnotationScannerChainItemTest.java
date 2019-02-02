@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import com.helospark.lightdi.LightDiContextConfiguration;
 import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
 
@@ -39,12 +40,19 @@ public class PreprocessedAnnotationScannerChainItemTest {
     @Mock
     private StreamFactory streamFactory;
 
+    private LightDiContextConfiguration lightDiContextConfiguration;
+
     private PreprocessedAnnotationScannerChainItem underTest;
 
     @Before
     public void setUp() {
         initMocks(this);
-        underTest = new PreprocessedAnnotationScannerChainItem(preprocessedFileLocationProvider, streamFactory);
+
+        lightDiContextConfiguration = LightDiContextConfiguration.builder()
+                .withUseClasspathFile(true)
+                .build();
+
+        underTest = new PreprocessedAnnotationScannerChainItem(preprocessedFileLocationProvider, streamFactory, lightDiContextConfiguration);
         given(streamFactory.stream(any(Collection.class))).willAnswer(ads -> ((Collection<?>) ads.getArguments()[0]).stream());
     }
 
@@ -57,6 +65,26 @@ public class PreprocessedAnnotationScannerChainItemTest {
 
         // THEN
         assertThat(result, is(not(nullValue())));
+    }
+
+    @Test
+    public void testDoesSupportWhenItIsDisabledInConfiguration() {
+        // GIVEN
+        lightDiContextConfiguration = LightDiContextConfiguration.builder()
+                .withUseClasspathFile(false)
+                .build();
+        ComponentScanPackage componentScanPackage = ComponentScanPackage.builder()
+                .withPackageName("com.helospark.test")
+                .build();
+        given(preprocessedFileLocationProvider.getFileList())
+                .willReturn(Collections.singleton(FAKE_PREPROCESSED_FILE));
+        underTest = new PreprocessedAnnotationScannerChainItem(preprocessedFileLocationProvider, streamFactory, lightDiContextConfiguration);
+
+        // WHEN
+        boolean result = underTest.doesSupport(componentScanPackage);
+
+        // THEN
+        assertThat(result, is(false));
     }
 
     @Test

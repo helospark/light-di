@@ -67,7 +67,6 @@ public class AnnotationUtil {
         if (cacheResult != null) {
             return cacheResult;
         } else {
-            System.out.println("Processing " + parameter);
             Set<LightDiAnnotation> result = new HashSet<>();
             Set<LightDiAnnotation> methodResult = recursivelyMergeAllAnnotationsInternal(parameter, result, new HashMap<>());
             cache.putIfAbsent(parameter, methodResult);
@@ -78,9 +77,7 @@ public class AnnotationUtil {
     private static Set<LightDiAnnotation> recursivelyMergeAllAnnotationsInternal(AnnotatedElement parameter, Set<LightDiAnnotation> result,
             Map<Class<?>, List<AliasData>> superData) {
 
-        //        long startTime = System.nanoTime();
         Annotation[] annotations = parameter.getAnnotations();
-        //        System.out.println(parameter + " getAnnotations took " + (System.nanoTime() - startTime));
 
         for (Annotation annotation : annotations) {
             if (!isForbiddenAnnotation(annotation)) {

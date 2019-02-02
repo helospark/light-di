@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helospark.lightdi.LightDiContextConfiguration;
 import com.helospark.lightdi.annotationpreprocessor.AnnotationProcessor;
 import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.dependencywire.domain.ComponentScanPackage;
@@ -25,13 +26,15 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
 
     private PreprocessedFileLocationProvider preprocessedFileLocationProvider;
     private StreamFactory streamFactory;
+    private LightDiContextConfiguration contextConfiguration;
 
     private Set<String> resourceFileContent;
     private Object resourceFileContentLock = new Object();
 
-    public PreprocessedAnnotationScannerChainItem(PreprocessedFileLocationProvider preprocessedFileLocationProvider, StreamFactory streamFactory) {
+    public PreprocessedAnnotationScannerChainItem(PreprocessedFileLocationProvider preprocessedFileLocationProvider, StreamFactory streamFactory, LightDiContextConfiguration contextConfiguration) {
         this.preprocessedFileLocationProvider = preprocessedFileLocationProvider;
         this.streamFactory = streamFactory;
+        this.contextConfiguration = contextConfiguration;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class PreprocessedAnnotationScannerChainItem implements ClasspathScannerC
 
     @Override
     public boolean doesSupport(ComponentScanPackage componentScanPackage) {
-        return !readFile().isEmpty();
+        return contextConfiguration.isUseComponentScanFile() && !readFile().isEmpty();
     }
 
     private boolean doesPackageMatch(ComponentScanPackage componentScanPackage, String className) {

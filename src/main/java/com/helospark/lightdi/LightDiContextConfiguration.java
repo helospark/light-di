@@ -15,6 +15,7 @@ import com.helospark.lightdi.internal.LightDiPlugin;
 public class LightDiContextConfiguration {
     private boolean checkForIntegrity;
     private int threadNumber;
+    private boolean useComponentScanFile;
     private List<LightDiPlugin> plugins;
 
     @Generated("SparkTools")
@@ -22,6 +23,7 @@ public class LightDiContextConfiguration {
         this.checkForIntegrity = builder.checkForIntegrity;
         this.threadNumber = builder.threadNumber;
         this.plugins = builder.plugins;
+        this.useComponentScanFile = builder.useComponentScanFile;
     }
 
     public boolean isCheckForIntegrity() {
@@ -36,6 +38,10 @@ public class LightDiContextConfiguration {
         return plugins;
     }
 
+    public boolean isUseComponentScanFile() {
+        return useComponentScanFile;
+    }
+
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
@@ -46,6 +52,7 @@ public class LightDiContextConfiguration {
         private boolean checkForIntegrity;
         private int threadNumber;
         private List<LightDiPlugin> plugins = Collections.emptyList();
+        private boolean useComponentScanFile = false;
 
         private Builder() {
         }
@@ -75,10 +82,20 @@ public class LightDiContextConfiguration {
         /**
          * Plugins used to create the LightDi framework.
          * @param plugins list of plugins
-         * @return plugins
+         * @return builder
          */
         public Builder withAdditionalDependencies(List<LightDiPlugin> plugins) {
             this.plugins = plugins;
+            return this;
+        }
+
+        /**
+         * Use file for componentscan.
+         * @param useComponentScanFile use file for componentscan
+         * @return builder
+         */
+        public Builder withUseClasspathFile(boolean useComponentScanFile) {
+            this.useComponentScanFile = useComponentScanFile;
             return this;
         }
 
