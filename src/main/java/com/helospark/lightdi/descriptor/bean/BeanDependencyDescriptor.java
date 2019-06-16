@@ -3,12 +3,15 @@ package com.helospark.lightdi.descriptor.bean;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
 /**
  * Represent a dependency created by a {@literal @}Bean method.
@@ -30,6 +33,9 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         this.postConstructMethods = builder.postConstructMethods;
         this.preDestroyMethods = builder.preDestroyMethods;
         this.conditions = builder.conditions;
+        this.initalizationFinished = builder.initalizationFinished;
+        this.importingClass = builder.importingClass;
+        this.mergedAnnotations = builder.mergedAnnotations;
         this.configurationDescriptor = builder.configurationDescriptor;
         this.method = builder.method;
         this.methodDescriptor = builder.methodDescriptor;
@@ -81,6 +87,9 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
         private List<Method> postConstructMethods = Collections.emptyList();
         private List<Method> preDestroyMethods = Collections.emptyList();
         private List<DependencyCondition> conditions = Collections.emptyList();
+        private boolean initalizationFinished;
+        private Optional<Class<?>> importingClass = Optional.empty();
+        private Set<LightDiAnnotation> mergedAnnotations = Collections.emptySet();
         private DependencyDescriptor configurationDescriptor;
         private Method method;
         private MethodDescriptor methodDescriptor;
@@ -130,6 +139,21 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withConditions(List<DependencyCondition> conditions) {
             this.conditions = conditions;
+            return this;
+        }
+
+        public Builder withInitalizationFinished(boolean initalizationFinished) {
+            this.initalizationFinished = initalizationFinished;
+            return this;
+        }
+
+        public Builder withImportingClass(Optional<Class<?>> importingClass) {
+            this.importingClass = importingClass;
+            return this;
+        }
+
+        public Builder withMergedAnnotations(Set<LightDiAnnotation> mergedAnnotations) {
+            this.mergedAnnotations = mergedAnnotations;
             return this;
         }
 

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helospark.lightdi.beanfactory.BeanFactory;
 import com.helospark.lightdi.common.StreamFactory;
+import com.helospark.lightdi.conditional.AnnotationBasedConditionalProcessorFactory;
 import com.helospark.lightdi.conditional.ConditionalFilter;
 import com.helospark.lightdi.constants.LightDiConstants;
 import com.helospark.lightdi.dependencywire.DefinitionIntegrityChecker;
@@ -398,6 +399,13 @@ public class LightDiContext implements AutoCloseable {
 
     private void processDescriptors(SortedSet<DependencyDescriptor> loadedDescriptors) {
         environment = environmentInitializer.initializeEnvironment(environment, loadedDescriptors);
+
+        // Conditional providers have to be preinitialized, so they may be instantiated
+        loadedDescriptors.stream()
+                .filter(desc -> AnnotationBasedConditionalProcessorFactory.class.isAssignableFrom(desc.getClazz()))
+                .forEach(desc -> dependencyDescriptors.add(desc));
+        wiringProcessingService.wireTogetherDependencies(dependencyDescriptors);
+
         loadedDescriptors = conditionalFilter.filterDependencies(this, loadedDescriptors);
 
         dependencyDescriptors.addAll(loadedDescriptors);

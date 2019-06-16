@@ -6,9 +6,11 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.constants.LightDiConstants;
+import com.helospark.lightdi.util.LightDiAnnotation;
 
 /**
  * Descriptor represents all parameters known about an class instance dependency.
@@ -30,6 +32,8 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
 
     protected boolean initalizationFinished = false;
     protected Optional<Class<?>> importingClass = empty();
+
+    protected Set<LightDiAnnotation> mergedAnnotations = Collections.emptySet();
 
     public void setInitalizationFinished(boolean initalizationFinished) {
         this.initalizationFinished = initalizationFinished;
@@ -111,10 +115,15 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
         return order;
     }
 
+    public Set<LightDiAnnotation> getMergedAnnotations() {
+        return mergedAnnotations;
+    }
+
     @Override
     public String toString() {
-        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary=" + isPrimary + ", initalizationFinished="
-                + initalizationFinished + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + ", conditions=" + conditions + "]";
+        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary=" + isPrimary + ", order=" + order
+                + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + ", conditions=" + conditions + ", initalizationFinished=" + initalizationFinished
+                + ", importingClass=" + importingClass + ", mergedAnnotations=" + mergedAnnotations + "]";
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {
