@@ -11,10 +11,17 @@ public class ComponentWithCollectionValue {
     private String[] stringArray;
     @Value("${INT_ARRAY}")
     private Integer[] intArray;
-    //    @Value("${SPACE_SEPARATED_INT_ARRAY}")
-    private int[] spaceSeparatedIntArray;
     @Value("${INT_ARRAY}")
     private List<Integer> intArrayAsCollection;
+    @Value(value = "${NOT_EXISTENT_STRING_ARRAY}", required = false)
+    private String[] notExistentArray;
+
+    private String[] nonExistentArrayFromConstructor;
+    private String[] nonExistentArrayFromSetter;
+
+    public ComponentWithCollectionValue(@Value(value = "${NON_EXISTENT_ARRAY_TO_CONSTUCTOR}", required = false) String[] nonExistentArrayFromConstructor) {
+        this.nonExistentArrayFromConstructor = nonExistentArrayFromConstructor;
+    }
 
     public String[] getStringArray() {
         return stringArray;
@@ -24,12 +31,29 @@ public class ComponentWithCollectionValue {
         return intArray;
     }
 
-    public int[] getSpaceSeparatedIntArray() {
-        return spaceSeparatedIntArray;
-    }
-
     public List<Integer> getIntArrayAsCollection() {
         return intArrayAsCollection;
+    }
+
+    public String[] getNotExistentArray() {
+        return notExistentArray;
+    }
+
+    public String[] getNonExistentArrayFromConstructor() {
+        return nonExistentArrayFromConstructor;
+    }
+
+    public void setNonExistentArrayFromConstructor(String[] nonExistentArrayFromConstructor) {
+        this.nonExistentArrayFromConstructor = nonExistentArrayFromConstructor;
+    }
+
+    public String[] getNonExistentArrayFromSetter() {
+        return nonExistentArrayFromSetter;
+    }
+
+    @Value(value = "${NON_EXISTENT_ARRAY_TO_SETTER}", required = false)
+    public void setNonExistentArrayFromSetter(String[] nonExistentArrayFromSetter) {
+        this.nonExistentArrayFromSetter = nonExistentArrayFromSetter;
     }
 
 }

@@ -119,6 +119,11 @@ LightDI was designed to be much more lightweight than Spring, it also has many o
 * In LightDI by default every Bean is lazy unless otherwise specified. Lazy means different things in Spring and LightDI. Spring will inject a proxy of a Lazy bean to other beans, and instantiates it when there is a call on the proxy, in LightDI it just means, until requested, it will not be instantiated (requested by getBean, or a dependency of an initialized bean)
 * _More will come soon_ 
 
+== Incompatibilities between versions
+
+ - 0.0.6
+ -- When `@Value`'s property `required=false` and they key not available it will no longer fills String with empty String. For fields value is unchanged, for method `null` is passed. 
+
 == Why another DI framework
 
 This framework shamelessly copied the the usage and idea from Spring framework, even down to annotation names. So why I have not just used Spring instead?

@@ -26,9 +26,11 @@ public class FieldSetInvoker {
         try {
             InjectionDescriptor injectionDescriptor = field.getInjectionDescriptor();
             Object objectToSet = dependencyObjectResolverHandler.resolve(lightDiContext, injectionDescriptor);
-            Field reflectField = field.getField();
-            reflectField.setAccessible(true);
-            reflectField.set(result, objectToSet);
+            if (objectToSet != null) {
+                Field reflectField = field.getField();
+                reflectField.setAccessible(true);
+                reflectField.set(result, objectToSet);
+            }
         } catch (Exception e) {
             throw new IllegalStateException("Unable to call setter " + field, e);
         }

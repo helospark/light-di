@@ -1,6 +1,7 @@
 package com.helospark.lightdi.it;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -169,10 +170,12 @@ public class ContextLoadIT {
         ComponentWithCollectionValue bean = context.getBean(ComponentWithCollectionValue.class);
 
         // THEN
-        assertThat(bean.getIntArray(), is(new Integer[] { 1, 2, 3 }));
+        assertThat(bean.getIntArray(), is(new Integer[]{1, 2, 3}));
         assertThat(bean.getIntArrayAsCollection(), is(Arrays.asList(1, 2, 3)));
-        //        assertThat(bean.getSpaceSeparatedIntArray(), is(new int[] { 1, 2, 3 }));
-        assertThat(bean.getStringArray(), is(new String[] { "a", "b", "c" }));
+        assertThat(bean.getStringArray(), is(new String[]{"a", "b", "c"}));
+        assertThat(bean.getNonExistentArrayFromSetter(), is(nullValue()));
+        assertThat(bean.getNonExistentArrayFromConstructor(), is(nullValue()));
+        assertThat(bean.getNotExistentArray(), is(nullValue()));
     }
 
     @Test
@@ -392,7 +395,7 @@ public class ContextLoadIT {
         RequiredFalseValueMissing bean = context.getBean(RequiredFalseValueMissing.class);
 
         // THEN
-        assertThat(bean.getValue(), is(""));
+        assertThat(bean.getValue(), is(nullValue()));
     }
 
     @Test
