@@ -8,11 +8,12 @@ import com.helospark.lightdi.LightDiContextConfiguration;
 
 public class StreamFactory {
     private static ForkJoinPool forkJoinPool = null;
+    private int threadNumber;
     private boolean isParallel = false;
 
     public StreamFactory(LightDiContextConfiguration contextConfiguration) {
         if (contextConfiguration.getThreadNumber() > 1) {
-            forkJoinPool = new ForkJoinPool(contextConfiguration.getThreadNumber());
+            threadNumber = contextConfiguration.getThreadNumber();
             isParallel = true;
         }
     }
@@ -20,9 +21,20 @@ public class StreamFactory {
     public <T> Stream<T> stream(Collection<T> collection) {
         Stream<T> result = collection.stream();
         if (isParallel) {
+            lazyInitForkJoinPool();
             return new ParallelStream<>(forkJoinPool, result.parallel());
         } else {
             return result;
+        }
+    }
+
+    private void lazyInitForkJoinPool() {
+        if (forkJoinPool == null) {
+            synchronized (this) {
+                if (forkJoinPool == null) {
+                    forkJoinPool = new ForkJoinPool(threadNumber);
+                }
+            }
         }
     }
 
