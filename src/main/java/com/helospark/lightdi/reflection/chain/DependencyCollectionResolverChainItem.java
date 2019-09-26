@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.descriptor.DependencyCollectionDescriptor;
+import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
 import com.helospark.lightdi.util.CollectionFactory;
 
@@ -20,10 +21,14 @@ public class DependencyCollectionResolverChainItem implements DependencyObjectRe
         Class<? extends Collection<?>> collectionType = collectionDescriptor.getCollectionType();
         Collection<Object> collection = (Collection<Object>) collectionFactoryUtil.createCollectionFor(collectionType);
 
-        collectionDescriptor.getDependencies()
-                .stream()
-                .map(descriptor -> context.getBean(descriptor))
-                .forEach(element -> collection.add(element));
+        for (DependencyDescriptor descriptor : collectionDescriptor.getDependencies()) {
+            Object bean = context.getBean(descriptor);
+            if (bean instanceof Collection) {
+                collection.addAll((Collection) bean);
+            } else {
+                collection.add(bean);
+            }
+        }
 
         return collection;
     }

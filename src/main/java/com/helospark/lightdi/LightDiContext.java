@@ -5,6 +5,8 @@ import static com.helospark.lightdi.util.DependencyChooser.findPrimary;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -15,7 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import com.helospark.lightdi.properties.converter.StringPropertyConverter;
 import com.helospark.lightdi.util.AutowirePostProcessor;
 import com.helospark.lightdi.util.AutowirePostProcessorFactory;
 import com.helospark.lightdi.util.DependencyChooser;
+import com.helospark.lightdi.util.ReflectionUtil;
 
 /**
  * Contains all data required for the context, like beans and properties.
@@ -281,10 +283,25 @@ public class LightDiContext implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public <T> List<T> getListOfBeans(Class<T> clazz) {
-        List<Object> result = dependencyDescriptors.stream()
-                .filter(descriptor -> clazz.isAssignableFrom(descriptor.getClazz()))
-                .map(descriptor -> convertToQuery(descriptor)).map(descriptor -> this.getBean(descriptor))
-                .collect(Collectors.toList());
+        List<Object> result = new ArrayList<>();
+
+        for (DependencyDescriptor descriptor : dependencyDescriptors) {
+            if (clazz.isAssignableFrom(descriptor.getClazz())) {
+                Object bean = this.getBean(convertToQuery(descriptor));
+                result.add(bean);
+            }
+            if (Collection.class.isAssignableFrom(descriptor.getClazz())) {
+                boolean isGenericParameterMatch = descriptor.getGenericType()
+                        .flatMap(a -> ReflectionUtil.extractGenericTypeFromType(a))
+                        .map(a -> clazz.isAssignableFrom(a))
+                        .orElse(false);
+                if (isGenericParameterMatch) {
+                    Object collectionBean = this.getBean(convertToQuery(descriptor));
+                    result.addAll(((Collection) collectionBean));
+                }
+            }
+        }
+
         return (List<T>) result;
 
     }

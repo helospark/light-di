@@ -71,7 +71,9 @@ public class ConfigurationClassBeanDefinitionCollectorChainItem implements BeanD
     private DependencyDescriptor createDescriptor(Method method,
             StereotypeDependencyDescriptor configurationDescriptor) {
         Class<?> returnType = method.getReturnType();
-        return BeanDependencyDescriptor.builder().withClazz(returnType)
+        return BeanDependencyDescriptor.builder()
+                .withClazz(returnType)
+                .withGenericType(method.getGenericReturnType())
                 .withScope(QualifierExtractor.extractScope(method)).withMethod(method)
                 .withQualifier(createQualifierForMethodAnnotatedWithBean(method))
                 .withIsLazy(IsLazyExtractor.isLazy(method)).withIsPrimary(IsPrimaryExtractor.isPrimary(method))

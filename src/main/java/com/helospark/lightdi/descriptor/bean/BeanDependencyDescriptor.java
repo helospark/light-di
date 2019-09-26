@@ -1,6 +1,7 @@
 package com.helospark.lightdi.descriptor.bean;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
     @Generated("SparkTools")
     private BeanDependencyDescriptor(Builder builder) {
         this.clazz = builder.clazz;
+        this.genericType = builder.genericType;
         this.qualifier = builder.qualifier;
         this.scope = builder.scope;
         this.isLazy = builder.isLazy;
@@ -79,6 +81,7 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
     @Generated("SparkTools")
     public static final class Builder {
         private Class<?> clazz;
+        private Type genericType;
         private String qualifier;
         private String scope;
         private boolean isLazy;
@@ -99,6 +102,11 @@ public class BeanDependencyDescriptor extends DependencyDescriptor {
 
         public Builder withClazz(Class<?> clazz) {
             this.clazz = clazz;
+            return this;
+        }
+
+        public Builder withGenericType(Type genericType) {
+            this.genericType = genericType;
             return this;
         }
 

@@ -3,6 +3,7 @@ package com.helospark.lightdi.descriptor;
 import static java.util.Optional.empty;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import com.helospark.lightdi.util.LightDiAnnotation;
  */
 public abstract class DependencyDescriptor implements InjectionDescriptor, Comparable<DependencyDescriptor> {
     protected Class<?> clazz;
+    protected Type genericType;
     protected String qualifier;
     protected String scope;
     protected boolean isLazy = true;
@@ -41,6 +43,10 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
 
     public boolean isInitalizationFinished() {
         return initalizationFinished;
+    }
+
+    public Optional<Type> getGenericType() {
+        return Optional.ofNullable(genericType);
     }
 
     public Optional<Class<?>> getImportingClass() {
