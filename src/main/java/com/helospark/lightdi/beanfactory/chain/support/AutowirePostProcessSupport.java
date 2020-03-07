@@ -1,7 +1,7 @@
 package com.helospark.lightdi.beanfactory.chain.support;
 
 import com.helospark.lightdi.LightDiContext;
-import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.reflection.FieldSetInvoker;
 import com.helospark.lightdi.reflection.SetterInvoker;
 
@@ -14,8 +14,8 @@ public class AutowirePostProcessSupport {
         this.fieldSetInvoker = fieldSetInvoker;
     }
 
-    public void injectAutowired(LightDiContext lightDiContext, StereotypeDependencyDescriptor stereotypeDependency, Object result) {
-        setterInvoker.invokeSetters(lightDiContext, stereotypeDependency, result);
-        fieldSetInvoker.setFieldValues(lightDiContext, stereotypeDependency, result);
+    public void injectAutowired(LightDiContext lightDiContext, DependencyDescriptor dependencyDescriptor, Object result) {
+        setterInvoker.invokeSetters(lightDiContext, dependencyDescriptor, result);
+        fieldSetInvoker.setFieldValues(lightDiContext, dependencyDescriptor, result);
     }
 }

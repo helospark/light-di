@@ -9,6 +9,7 @@ import java.util.SortedSet;
 import com.helospark.lightdi.LightDiContext;
 import com.helospark.lightdi.beanfactory.chain.BeanFactoryChainItem;
 import com.helospark.lightdi.beanfactory.chain.BeanPostConstructInitializer;
+import com.helospark.lightdi.beanfactory.chain.support.AutowirePostProcessSupport;
 import com.helospark.lightdi.common.StreamFactory;
 import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.exception.BeanCreationException;
@@ -18,18 +19,21 @@ public class BeanFactory {
     private List<BeanFactoryChainItem> chain;
     private BeanPostConstructInitializer beanPostConstructInitializer;
     private StreamFactory streamFactory;
+    private AutowirePostProcessSupport autowirePostProcessSupport;
 
     public BeanFactory(List<BeanFactoryChainItem> chain, BeanPostConstructInitializer beanPostConstructInitializer,
-            StreamFactory streamFactory) {
+            StreamFactory streamFactory, AutowirePostProcessSupport autowirePostProcessSupport) {
         this.chain = chain;
         this.beanPostConstructInitializer = beanPostConstructInitializer;
         this.streamFactory = streamFactory;
+        this.autowirePostProcessSupport = autowirePostProcessSupport;
     }
 
     public Object createBean(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate) {
         try {
             Object createdBean = findHandler(dependencyToCreate)
                     .createBean(lightDiContext, dependencyToCreate);
+            autowirePostProcessSupport.injectAutowired(lightDiContext, dependencyToCreate, createdBean);
             beanPostConstructInitializer.postProcessCreatedBean(lightDiContext, dependencyToCreate, createdBean);
 
             return createdBean;

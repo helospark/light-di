@@ -150,8 +150,7 @@ public class InternalDiInitializer {
 
         addDependency(new InjectDescriptorsToDependencies());
 
-        addDependency(new StereotypeAnnotatedBeanFactoryChainItem(getDependency(ConstructorInvoker.class), getDependency(AutowirePostProcessSupport.class),
-                getDependency(InjectDescriptorsToDependencies.class)));
+        addDependency(new StereotypeAnnotatedBeanFactoryChainItem(getDependency(ConstructorInvoker.class), getDependency(InjectDescriptorsToDependencies.class)));
         addDependency(new ManualBeanFactoryChainItem());
         addDependency(new ConfigurationBeanFacotoryChainItem(getDependency(MethodInvoker.class), getDependency(InjectDescriptorsToDependencies.class)));
 
@@ -166,7 +165,8 @@ public class InternalDiInitializer {
         addDependency(new BeanFactory(
                 getDependencyList(BeanFactoryChainItem.class),
                 getDependency(BeanPostConstructInitializer.class),
-                getDependency(StreamFactory.class)));
+                getDependency(StreamFactory.class),
+                getDependency(AutowirePostProcessSupport.class)));
     }
 
     private void prepareWiringProcessor() {
@@ -195,12 +195,12 @@ public class InternalDiInitializer {
         addDependency(new FieldWireSupport(getDependency(DependencyDescriptorBuilder.class)));
 
         addDependency(new BeanDependencyWireChainItem(getDependency(MethodDependencyCollector.class)));
-        addDependency(new ComponentDependencyWireChainItem(getDependency(ConstructorWireSupport.class), getDependency(SetterWireSupport.class), getDependency(FieldWireSupport.class)));
-        addDependency(new CommonDependencyWireChain());
+        addDependency(new ComponentDependencyWireChainItem(getDependency(ConstructorWireSupport.class)));
+        addDependency(new CommonDependencyWireChain(getDependency(SetterWireSupport.class), getDependency(FieldWireSupport.class)));
 
         addDependency(new WiringProcessingService(getDependencyList(DependencyWireChain.class), getDependency(StreamFactory.class)));
 
-        addDependency(new AutowirePostProcessorFactory(getDependency(StereotypeBeanDefinitionCollectorChainItem.class), getDependency(WiringProcessingService.class),
+        addDependency(new AutowirePostProcessorFactory(getDependency(WiringProcessingService.class),
                 getDependency(AutowirePostProcessSupport.class), getDependency(BeanPostConstructInitializer.class)));
     }
 

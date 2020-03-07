@@ -1,5 +1,7 @@
 package com.helospark.lightdi.it.autowirepostprocessor;
 
+import java.math.BigDecimal;
+
 import com.helospark.lightdi.annotation.Autowired;
 import com.helospark.lightdi.annotation.Value;
 import com.helospark.lightdi.aware.BeanNameAware;
@@ -11,6 +13,11 @@ public class NotABean implements BeanNameAware {
     private String property;
     private String beanName;
     private SetterDependency setterDependency;
+
+    // Test that AutowiredPostProcessor doesn't take into account the constructor's parameters when initializing wiring
+    public NotABean(BigDecimal asd) {
+
+    }
 
     @Override
     public void setBeanName(String beanName) {

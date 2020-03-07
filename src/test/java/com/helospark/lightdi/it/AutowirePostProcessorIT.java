@@ -5,6 +5,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.math.BigDecimal;
+
 import org.junit.Test;
 
 import com.helospark.lightdi.LightDi;
@@ -20,7 +22,7 @@ public class AutowirePostProcessorIT {
         // GIVEN
         LightDiContext context = LightDi.initContextByClass(AutowirePostProcessorTestConfiguration.class);
         AutowirePostProcessor autowireUtil = context.getAutowireSupportUtil();
-        NotABean notABean = new NotABean();
+        NotABean notABean = new NotABean(BigDecimal.ONE);
 
         // WHEN
         autowireUtil.autowireFieldsTo(notABean);
@@ -31,4 +33,5 @@ public class AutowirePostProcessorIT {
         assertThat(notABean.getSetterDependency(), is(not(nullValue())));
         assertThat(notABean.getProperty(), is("asd"));
     }
+
 }

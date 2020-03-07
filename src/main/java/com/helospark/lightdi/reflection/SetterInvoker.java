@@ -1,7 +1,7 @@
 package com.helospark.lightdi.reflection;
 
 import com.helospark.lightdi.LightDiContext;
-import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
+import com.helospark.lightdi.descriptor.DependencyDescriptor;
 
 public class SetterInvoker {
     private MethodInvoker methodInvoker;
@@ -10,7 +10,7 @@ public class SetterInvoker {
         this.methodInvoker = methodInvoker;
     }
 
-    public void invokeSetters(LightDiContext lightDiContext, StereotypeDependencyDescriptor dependencyToCreate,
+    public void invokeSetters(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate,
             Object result) {
         dependencyToCreate.getSetterDescriptor()
                 .stream()

@@ -11,6 +11,8 @@ import java.util.Set;
 
 import com.helospark.lightdi.conditional.condition.DependencyCondition;
 import com.helospark.lightdi.constants.LightDiConstants;
+import com.helospark.lightdi.descriptor.stereotype.field.FieldDescriptor;
+import com.helospark.lightdi.descriptor.stereotype.setter.MethodDescriptor;
 import com.helospark.lightdi.util.LightDiAnnotation;
 
 /**
@@ -29,6 +31,8 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
 
     protected List<Method> postConstructMethods = Collections.emptyList();
     protected List<Method> preDestroyMethods = Collections.emptyList();
+    protected List<MethodDescriptor> setterDescriptor;
+    protected List<FieldDescriptor> fieldDescriptor;
 
     protected List<DependencyCondition> conditions = Collections.emptyList();
 
@@ -121,15 +125,32 @@ public abstract class DependencyDescriptor implements InjectionDescriptor, Compa
         return order;
     }
 
+    public void setSetterDescriptor(List<MethodDescriptor> setterDescriptor) {
+        this.setterDescriptor = setterDescriptor;
+    }
+
+    public void setFieldDescriptor(List<FieldDescriptor> fieldDescriptor) {
+        this.fieldDescriptor = fieldDescriptor;
+    }
+
     public Set<LightDiAnnotation> getMergedAnnotations() {
         return mergedAnnotations;
     }
 
+    public List<MethodDescriptor> getSetterDescriptor() {
+        return setterDescriptor;
+    }
+
+    public List<FieldDescriptor> getFieldDescriptor() {
+        return fieldDescriptor;
+    }
+
     @Override
     public String toString() {
-        return "DependencyDescriptor [clazz=" + clazz + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary=" + isPrimary + ", order=" + order
-                + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + ", conditions=" + conditions + ", initalizationFinished=" + initalizationFinished
-                + ", importingClass=" + importingClass + ", mergedAnnotations=" + mergedAnnotations + "]";
+        return "DependencyDescriptor [clazz=" + clazz + ", genericType=" + genericType + ", qualifier=" + qualifier + ", scope=" + scope + ", isLazy=" + isLazy + ", isPrimary=" + isPrimary
+                + ", order=" + order + ", postConstructMethods=" + postConstructMethods + ", preDestroyMethods=" + preDestroyMethods + ", setterDescriptor=" + setterDescriptor + ", fieldDescriptor="
+                + fieldDescriptor + ", conditions=" + conditions + ", initalizationFinished=" + initalizationFinished + ", importingClass=" + importingClass + ", mergedAnnotations="
+                + mergedAnnotations + "]";
     }
 
     public boolean doesMatch(DependencyDescriptorQuery toFind) {

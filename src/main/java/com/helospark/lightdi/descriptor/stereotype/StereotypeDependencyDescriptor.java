@@ -21,8 +21,6 @@ import com.helospark.lightdi.util.LightDiAnnotation;
  */
 public class StereotypeDependencyDescriptor extends DependencyDescriptor {
     private List<ConstructorDescriptor> constructorDescriptor;
-    private List<MethodDescriptor> setterDescriptor;
-    private List<FieldDescriptor> fieldDescriptor;
 
     @Generated("SparkTools")
     private StereotypeDependencyDescriptor(Builder builder) {

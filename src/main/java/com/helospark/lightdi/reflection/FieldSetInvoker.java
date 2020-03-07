@@ -3,8 +3,8 @@ package com.helospark.lightdi.reflection;
 import java.lang.reflect.Field;
 
 import com.helospark.lightdi.LightDiContext;
+import com.helospark.lightdi.descriptor.DependencyDescriptor;
 import com.helospark.lightdi.descriptor.InjectionDescriptor;
-import com.helospark.lightdi.descriptor.stereotype.StereotypeDependencyDescriptor;
 import com.helospark.lightdi.descriptor.stereotype.field.FieldDescriptor;
 import com.helospark.lightdi.reflection.chain.DependencyObjectResolverHandler;
 
@@ -15,7 +15,7 @@ public class FieldSetInvoker {
         this.dependencyObjectResolverHandler = dependencyObjectResolverHandler;
     }
 
-    public void setFieldValues(LightDiContext lightDiContext, StereotypeDependencyDescriptor dependencyToCreate,
+    public void setFieldValues(LightDiContext lightDiContext, DependencyDescriptor dependencyToCreate,
             Object result) {
         dependencyToCreate.getFieldDescriptor()
                 .stream()
