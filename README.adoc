@@ -125,6 +125,8 @@ LightDI was designed to be much more lightweight than Spring, it also has many o
  -- When `@Value`'s property `required=false` and they key not available it will no longer fills String with empty String. For fields value is unchanged, for method `null` is passed. 
  - 0.0.8
  -- When injecting a Collection of beans, beans witch are also collections but contain matching bean types are flatmapped (merged) (see MergeBeanListIT for example)
+ - 0.0.9
+ -- Beans created via `@Bean` will have autowired dependencies injected
 
 == Why another DI framework
 
